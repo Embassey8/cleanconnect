@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import {
-  EMPTY_FILTERS, filterListings, filtersFromParams, filtersToParams, formatNaira, paginate,
+  EMPTY_FILTERS, filterListings, filtersFromParams, filtersToParams, formatNaira, paginate, parseQuery,
   type ListingRow, type MarketplaceFilters, type MarketplaceSort,
 } from "@cleanconnect/shared";
 import { startThread } from "@/app/p/actions";
@@ -27,8 +27,8 @@ const TABS: { key: string; label: string; f: Pick<MarketplaceFilters, "service" 
  */
 export function MarketplaceBrowser({ rows, initialQuery }: { rows: ListingRow[]; initialQuery: string }) {
   const [state, setState] = useState(() => {
-    const p = new URLSearchParams(initialQuery);
-    return { f: filtersFromParams((k) => p.get(k), (k) => p.getAll(k)), page: Math.max(1, Number(p.get("page")) || 1) };
+    const p = parseQuery(initialQuery);
+    return { f: filtersFromParams(p.get, p.getAll), page: Math.max(1, Number(p.get("page")) || 1) };
   });
   const { f, page } = state;
 

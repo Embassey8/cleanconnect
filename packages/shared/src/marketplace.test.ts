@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { EMPTY_FILTERS, filterListings, filtersFromParams, filtersToParams, paginate, type ListingRow } from "./marketplace";
+import { EMPTY_FILTERS, filterListings, filtersFromParams, filtersToParams, paginate, parseQuery, type ListingRow } from "./marketplace";
 
 const row = (o: Partial<ListingRow>): ListingRow => ({
   id: "x", slug: "x", display_name: "X", type: "business", service: "cleaning", plan: "standard",
@@ -53,9 +53,14 @@ describe("URL round trip", () => {
   it("keeps filters shareable and ignores junk", () => {
     const f = { ...EMPTY_FILTERS, service: "laundry" as const, laundry: "dry" as const, q: "yaba", max: 2000, types: ["individual" as const], sort: "price_asc" as const };
     const qs = filtersToParams(f, 2);
-    const p = new URLSearchParams(qs);
-    expect(filtersFromParams((k) => p.get(k), (k) => p.getAll(k))).toEqual(f);
-    const bad = new URLSearchParams("service=boat&min=-5&type=alien&sort=zzz");
-    expect(filtersFromParams((k) => bad.get(k), (k) => bad.getAll(k))).toEqual(EMPTY_FILTERS);
+    const p = parseQuery(qs);
+    expect(filtersFromParams(p.get, p.getAll)).toEqual(f);
+    const bad = parseQuery("?service=boat&min=-5&type=alien&sort=zzz");
+    expect(filtersFromParams(bad.get, bad.getAll)).toEqual(EMPTY_FILTERS);
+  });
+  it("encodes and decodes awkward search text", () => {
+    const f = { ...EMPTY_FILTERS, q: "deep & clean, Lekki" };
+    const p = parseQuery(filtersToParams(f, 1));
+    expect(filtersFromParams(p.get, p.getAll).q).toBe("deep & clean, Lekki");
   });
 });
