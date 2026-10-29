@@ -69,10 +69,7 @@ async function Platform() {
 export default function PayoutsPage() {
   return (
     <div className="max-w-3xl space-y-8">
-      <div>
-        <h1 className="text-2xl font-extrabold">Payouts &amp; disputes</h1>
-        <Suspense fallback={null}><Platform /></Suspense>
-      </div>
+      <Suspense fallback={null}><Platform /></Suspense>
       <section>
         <h2 className="mb-2 font-extrabold">Withdrawals to settle</h2>
         <Suspense fallback={<p className="text-muted">Loading…</p>}><Payouts /></Suspense>

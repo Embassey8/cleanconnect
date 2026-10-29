@@ -39,7 +39,6 @@ async function Applications() {
 export default function ApplicationsPage() {
   return (
     <>
-      <h1 className="mb-6 text-2xl font-extrabold">Job applications</h1>
       <Suspense fallback={<p className="text-muted">Loading…</p>}><Applications /></Suspense>
     </>
   );

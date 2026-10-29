@@ -38,3 +38,37 @@ export const clockTime = (iso: string): string =>
 
 /** Today's date in Lagos as YYYY-MM-DD, for `min` on date inputs. */
 export const lagosToday = (): string => lagosDay(new Date());
+
+/** "2h ago", "Yesterday", "Oct 20": compact relative time for tables. */
+export function timeAgo(iso: string): string {
+  const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60_000);
+  if (mins < 1) return "Just now";
+  if (mins < 60) return `${mins}m ago`;
+  if (mins < 60 * 24) return `${Math.floor(mins / 60)}h ago`;
+  if (mins < 60 * 48) return "Yesterday";
+  return new Date(iso).toLocaleDateString("en-NG", { timeZone: "Africa/Lagos", month: "short", day: "numeric" });
+}
+
+export interface MonthOption { key: string; label: string; long: string }
+
+/** The current month and the previous `n - 1`, newest first. `key` is YYYY-MM. */
+export function recentMonths(n: number): MonthOption[] {
+  const [y, m] = lagosDay(new Date()).split("-").map(Number);
+  return Array.from({ length: n }, (_, i) => {
+    const d = new Date(Date.UTC(y, m - 1 - i, 1));
+    return {
+      key: `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`,
+      label: d.toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" }),
+      long: d.toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: "UTC" }),
+    };
+  });
+}
+
+/** Whole days from now until `iso` (negative when past). */
+export const daysUntil = (iso: string): number => Math.ceil((new Date(iso).getTime() - Date.now()) / 86_400_000);
+
+/** A valid `?month=YYYY-MM` from the last 12 months, else the current month. */
+export function pickMonth(v: string | string[] | undefined): string {
+  const keys = recentMonths(12).map((m) => m.key);
+  return typeof v === "string" && keys.includes(v) ? v : keys[0];
+}
