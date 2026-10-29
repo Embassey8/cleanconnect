@@ -32,7 +32,7 @@ export function LaundryBooking({
       <input type="hidden" name="providerId" value={providerId} />
       <input type="hidden" name="slug" value={slug} />
       <input type="hidden" name="lines" value={JSON.stringify(lines)} />
-      <div>
+      <div className="min-w-0">
         <div role="tablist" className="mb-3 flex gap-2 overflow-x-auto">
           {services.map((s) => (
             <button key={s.id} type="button" role="tab" aria-selected={active === s.id} onClick={() => setSvc(s.id)}

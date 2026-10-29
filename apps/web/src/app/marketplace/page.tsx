@@ -155,10 +155,14 @@ async function Page({ searchParams }: { searchParams: PageProps<"/marketplace">[
       </div>
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
         <aside aria-label="Filters" className="self-start rounded-card border border-border bg-surface p-4">
-          <form method="get" className="space-y-5">
+          <input type="checkbox" id="filters-toggle" className="peer sr-only" />
+          <label htmlFor="filters-toggle" className="flex min-h-11 cursor-pointer items-center justify-between font-extrabold peer-focus-visible:outline lg:hidden">
+            Filters <span aria-hidden="true">▾</span>
+          </label>
+          <form method="get" className="hidden space-y-5 pt-4 peer-checked:block lg:block lg:pt-0">
             {one(sp, "service") && <input type="hidden" name="service" value={one(sp, "service")} />}
             {one(sp, "laundry") && <input type="hidden" name="laundry" value={one(sp, "laundry")} />}
-            <div className="flex items-center justify-between"><h2 className="font-extrabold">Filters</h2><Link href="/marketplace" className="min-h-11 py-2.5 text-sm font-semibold text-primary">Clear all</Link></div>
+            <div className="flex items-center justify-between"><h2 className="font-extrabold max-lg:sr-only">Filters</h2><Link href="/marketplace" className="min-h-11 py-2.5 text-sm font-semibold text-primary">Clear all</Link></div>
             <fieldset><legend className="mb-2 text-sm font-bold">Starting price (₦)</legend>
               <div className="grid grid-cols-2 gap-2">
                 <label className="text-xs text-muted">Min<input name="min" type="number" min={0} defaultValue={one(sp, "min")} placeholder="0" className={input} /></label>
