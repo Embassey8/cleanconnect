@@ -37,11 +37,11 @@ export async function WalletView() {
       </section>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <section className="rounded-card border border-border bg-surface p-4">
+        <section id="fund" className="scroll-mt-4 rounded-card border border-border bg-surface p-4">
           <h2 className="mb-3 font-extrabold">Add money</h2>
           <FundForm />
         </section>
-        <section className="rounded-card border border-border bg-surface p-4">
+        <section id="withdraw" className="scroll-mt-4 rounded-card border border-border bg-surface p-4">
           <h2 className="mb-3 font-extrabold">Withdraw to bank</h2>
           <WithdrawForm />
         </section>
