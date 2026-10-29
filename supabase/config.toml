@@ -1,2 +1,9 @@
 # Local Supabase config. Run `supabase start` to use; no remote project is linked.
 project_id = "cleanconnect"
+
+# Private bucket for in-app job photos. Only the server (service role) reads and writes it;
+# the web app hands out short-lived signed URLs.
+[storage.buckets.job-media]
+public = false
+file_size_limit = "4MiB"
+allowed_mime_types = ["image/jpeg"]

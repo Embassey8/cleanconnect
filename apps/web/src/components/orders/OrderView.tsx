@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -8,6 +9,8 @@ import { createClient } from "@/lib/supabase/server";
 import { formatWhen } from "@/lib/time";
 import { ActionButtons } from "./ActionButtons";
 import { PayCard } from "./PayCard";
+import { OrderMedia } from "@/components/media/OrderMedia";
+import { OrderReview } from "@/components/reviews/OrderReview";
 
 export async function OrderView({ id, viewer }: { id: string; viewer: "customer" | "provider" }) {
   const supabase = await createClient();
@@ -101,6 +104,9 @@ export async function OrderView({ id, viewer }: { id: string; viewer: "customer"
           ? <p className="text-sm text-text-2">Where: {addr.address}{addr.area ? `, ${addr.area}` : ""}</p>
           : viewer === "provider" && <p className="text-sm text-muted">The customer&apos;s address is shown after you accept.</p>}
       </section>
+
+      <Suspense fallback={null}><OrderMedia orderId={o.id} service={service} status={status} viewer={viewer} /></Suspense>
+      <Suspense fallback={null}><OrderReview orderId={o.id} status={status} viewer={viewer} /></Suspense>
 
       {viewer === "customer" && provider && (
         <Link href={`/p/${provider.slug}`} className="inline-block text-sm font-semibold text-primary">View {provider.display_name}</Link>

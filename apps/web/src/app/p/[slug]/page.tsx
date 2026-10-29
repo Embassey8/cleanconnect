@@ -6,11 +6,15 @@ import { CleaningBooking, type CleaningBookingData } from "@/components/booking/
 import { startThread } from "@/app/p/actions";
 import { PublicShell } from "@/components/shell/PublicShell";
 import { createClient } from "@/lib/supabase/server";
+import { getSessionUser } from "@/lib/auth/session";
+import { Gallery, ProfileStats, Reviews } from "@/components/reviews/ProfileTrust";
+import { SaveProviderButton } from "@/components/media/PhotoButtons";
 
 const BADGE: Record<string, string> = { cac: "CAC verified", nin: "NIN verified", bvn: "BVN verified" };
 
-async function Profile({ params }: { params: PageProps<"/p/[slug]">["params"] }) {
+async function Profile({ params, searchParams }: { params: PageProps<"/p/[slug]">["params"]; searchParams: PageProps<"/p/[slug]">["searchParams"] }) {
   const { slug } = await params;
+  const withPhotos = (await searchParams).photos === "1";
   const supabase = await createClient();
   // RLS only returns approved, marketplace-listed providers.
   const { data: p } = await supabase
@@ -22,6 +26,10 @@ async function Profile({ params }: { params: PageProps<"/p/[slug]">["params"] })
 
   const { data: badges } = await supabase.from("provider_badges").select("kind, verified").eq("provider_id", p.id);
   const verified = (badges ?? []).filter((b) => b.verified && BADGE[b.kind]);
+  const user = await getSessionUser();
+  const { data: savedRow } = user
+    ? await supabase.from("saved_providers").select("provider_id").eq("user_id", user.id).eq("provider_id", p.id).maybeSingle()
+    : { data: null };
 
   return (
     <>
@@ -35,20 +43,26 @@ async function Profile({ params }: { params: PageProps<"/p/[slug]">["params"] })
         <p className="mt-1 text-muted">
           {p.type === "business" ? "Business" : "Individual"} · {p.service === "laundry" ? "Laundry" : "House & commercial cleaning"}
         </p>
+        <Suspense fallback={null}><ProfileStats providerId={p.id} /></Suspense>
         <ul className="mt-3 flex flex-wrap gap-2">
           {verified.map((b) => (
             <li key={b.kind} className="rounded-full bg-primary-tint px-3 py-1 text-xs font-bold text-primary">✓ {BADGE[b.kind]}</li>
           ))}
         </ul>
         {p.areas.length > 0 && <p className="mt-3 text-sm text-text-2">Covers: {p.areas.join(", ")}</p>}
-        <form action={startThread.bind(null, p.id, p.slug)} className="mt-4">
-          <button className="min-h-11 rounded-input border border-border bg-surface px-5 text-sm font-bold hover:bg-primary-tint">Message</button>
-        </form>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <form action={startThread.bind(null, p.id, p.slug)}>
+            <button className="min-h-11 rounded-input border border-border bg-surface px-5 text-sm font-bold hover:bg-primary-tint">Message</button>
+          </form>
+          <SaveProviderButton providerId={p.id} slug={p.slug} saved={!!savedRow} />
+        </div>
       </header>
       <section className="mt-6">
         <h2 className="mb-3 text-xl font-extrabold">{p.service === "laundry" ? "Order laundry" : "Get a price"}</h2>
         {p.service === "laundry" ? <LaundryPrices providerId={p.id} slug={p.slug} /> : <CleaningPrices providerId={p.id} slug={p.slug} />}
       </section>
+      <Suspense fallback={null}><Gallery providerId={p.id} slug={p.slug} /></Suspense>
+      <Suspense fallback={null}><Reviews providerId={p.id} slug={p.slug} withPhotos={withPhotos} /></Suspense>
     </>
   );
 }
@@ -87,7 +101,7 @@ async function CleaningPrices({ providerId, slug }: { providerId: string; slug: 
 export default function ProviderProfilePage(props: PageProps<"/p/[slug]">) {
   return (
     <PublicShell>
-      <Suspense fallback={<p className="text-muted">Loading…</p>}><Profile params={props.params} /></Suspense>
+      <Suspense fallback={<p className="text-muted">Loading…</p>}><Profile params={props.params} searchParams={props.searchParams} /></Suspense>
     </PublicShell>
   );
 }
