@@ -72,3 +72,17 @@ export function pickMonth(v: string | string[] | undefined): string {
   const keys = recentMonths(12).map((m) => m.key);
   return typeof v === "string" && keys.includes(v) ? v : keys[0];
 }
+
+/** ISO bounds of today in Lagos (UTC+1, no daylight saving). */
+export function lagosDayRange(): { start: string; end: string } {
+  const d = lagosDay(new Date());
+  return { start: new Date(`${d}T00:00:00+01:00`).toISOString(), end: new Date(`${d}T23:59:59.999+01:00`).toISOString() };
+}
+
+/** ISO start of this week (Monday 00:00 Lagos). */
+export function lagosWeekStart(): string {
+  const d = new Date(`${lagosDay(new Date())}T12:00:00+01:00`);
+  const back = (d.getUTCDay() + 6) % 7; // Monday = 0
+  const mon = new Date(d.getTime() - back * 86_400_000);
+  return new Date(`${lagosDay(mon)}T00:00:00+01:00`).toISOString();
+}

@@ -937,3 +937,37 @@ do $$ declare q record; begin
   assert q.rating_avg = 5.00 and q.rating_count = 1, 'partner rating';
   assert q.jobs_completed = 1 and q.photo_jobs = 1, 'partner photo compliance';
 end $$;
+
+-- ---------- Partner availability ----------
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+select create_carwash_request('exterior', 'saloon', true, '9 Avail Road', 'Yaba', null, null) as wash_avail \gset
+select set_config('t.wash_avail', :'wash_avail', false);
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000e1'::uuid);
+do $$ begin
+  begin
+    perform set_availability(false);
+    assert (select accepting_jobs from providers where id = current_setting('t.partner_id')::uuid) = false, 'partner paused';
+  end;
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000ad'::uuid);
+do $$ begin
+  begin
+    perform assign_carwash(current_setting('t.wash_avail')::uuid, current_setting('t.partner_id')::uuid);
+    raise exception 'offered a job to a paused partner';
+  exception when others then if sqlerrm not like '%not accepting jobs%' then raise; end if; end;
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000e1'::uuid);
+select set_availability(true);
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000ad'::uuid);
+select assign_carwash(:'wash_avail', :'partner_id');
+do $$ begin
+  assert (select status from orders where id = current_setting('t.wash_avail')::uuid) = 'assigning', 'offer made once the partner is back';
+end $$;
+-- Only partners can use the switch
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+do $$ begin
+  begin
+    perform set_availability(false);
+    raise exception 'a customer changed partner availability';
+  exception when others then if sqlerrm not like 'only car wash partners%' then raise; end if; end;
+end $$;
