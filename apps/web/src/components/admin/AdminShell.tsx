@@ -4,6 +4,7 @@ import { Suspense, useId, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ADMIN_NAV, navFor } from "./nav";
+import { signOut } from "@/app/login/actions";
 
 export interface ShellInfo {
   name: string;
@@ -42,7 +43,8 @@ function Sidebar({ info, path, onNavigate }: { info: ShellInfo; path: string; on
       </nav>
       <div className="mt-auto flex items-center gap-2.5 border-t border-[#2e433c] p-3">
         <span className="flex size-9 items-center justify-center rounded-full bg-[#3a4e47] text-[13px] font-bold">{initials}</span>
-        <span className="flex min-w-0 flex-col"><span className="truncate text-sm font-semibold">{info.name || "Admin"}</span><span className="text-xs text-[#a9b7b2]">{ROLE_LABEL[info.role] ?? "Super admin"}</span></span>
+        <span className="flex min-w-0 flex-1 flex-col"><span className="truncate text-sm font-semibold">{info.name || "Admin"}</span><span className="text-xs text-[#a9b7b2]">{ROLE_LABEL[info.role] ?? "Super admin"}</span></span>
+        <form action={signOut}><button className="min-h-11 rounded-lg px-2.5 text-xs font-semibold text-[#d5deda] hover:bg-[#1b2c26]">Sign out</button></form>
       </div>
     </>
   );

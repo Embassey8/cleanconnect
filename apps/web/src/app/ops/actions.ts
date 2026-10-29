@@ -97,3 +97,11 @@ export async function settlePartners(): Promise<{ error?: string; count?: number
   refresh();
   return { count: data as number };
 }
+
+export async function setAvailability(available: boolean): Promise<{ error?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("set_availability", { p_available: available });
+  if (error) return { error: error.message };
+  refresh();
+  return {};
+}

@@ -187,7 +187,7 @@ export async function RequestsSection({ limit }: { limit?: number }) {
     supabase.from("orders")
       .select("id, status, total, scheduled_at, created_at, carwash_package, vehicle, is_mobile, providers(display_name), order_addresses(area)")
       .eq("service", "carwash").in("status", ["requested", "assigning", "assigned", "en_route", "arrived", "condition_checked", "washing", "awaiting_signoff"]).order("created_at"),
-    supabase.from("providers").select("id, display_name, areas, partner_scores(offers_total, offers_accepted, jobs_completed, on_time_jobs)").eq("service", "carwash").eq("status", "approved"),
+    supabase.from("providers").select("id, display_name, areas, partner_scores(offers_total, offers_accepted, jobs_completed, on_time_jobs)").eq("service", "carwash").eq("status", "approved").eq("accepting_jobs", true),
     supabase.from("partner_quality").select("provider_id, rating_avg, jobs_completed, photo_jobs"),
   ]);
   const qById = new Map((quality ?? []).map((q) => [q.provider_id, q]));

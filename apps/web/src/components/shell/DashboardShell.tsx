@@ -3,6 +3,7 @@
 import { Suspense, useId, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut } from "@/app/login/actions";
 
 export interface NavItem { href: string; label: string }
 
@@ -55,12 +56,14 @@ function Shell({ title, nav, dark = false, children }: ShellProps) {
           <nav id={id} aria-label={`${title} menu`} className={`absolute inset-x-0 top-full z-40 flex max-h-[70dvh] flex-col gap-1 overflow-y-auto border-b p-2 shadow-lg ${bar}`}>
             {nav.map(link)}
             <Link href="/" className="flex min-h-11 items-center rounded-input px-3 py-2.5 text-sm font-semibold opacity-70">← Back to site</Link>
+            <form action={signOut}><button className="flex min-h-11 w-full items-center rounded-input px-3 py-2.5 text-left text-sm font-semibold opacity-70">Sign out</button></form>
           </nav>
         )}
       </header>
       <aside className={`hidden md:block md:w-60 md:shrink-0 ${dark ? "bg-ink text-white" : "border-r border-border bg-surface"}`}>
         <div className="px-4 py-4 text-base font-extrabold">{title}</div>
-        <nav className="flex flex-col gap-1 px-2 pb-4">{nav.map(link)}</nav>
+        <nav className="flex flex-col gap-1 px-2 pb-2">{nav.map(link)}</nav>
+        <form action={signOut} className="px-2 pb-4"><button className="min-h-11 w-full rounded-input px-3 text-left text-sm font-semibold opacity-70 hover:bg-primary-tint hover:text-primary">Sign out</button></form>
       </aside>
       <main className="min-w-0 flex-1 p-4 md:p-8">{children}</main>
     </div>
