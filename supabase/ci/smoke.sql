@@ -82,3 +82,135 @@ begin
     if sqlerrm not like '%already%' then raise; end if;
   end;
 end $$;
+
+-- ===== Phase 3: orders, pricing parity with packages/shared, status rules, privacy, quotes =====
+insert into auth.users (id, email, raw_user_meta_data) values
+  ('00000000-0000-0000-0000-0000000000c1', 'cust@x.ng', '{"name":"Cust"}'),
+  ('00000000-0000-0000-0000-0000000000a3', 'p3@x.ng', '{"name":"Wash"}');
+
+select set_config('request.jwt.sub', '00000000-0000-0000-0000-0000000000a3', false);
+select register_provider('individual', 'laundry', 'Wash Co', array['Yaba'], 'standard', null, '12345678901', '10987654321');
+select set_config('request.jwt.sub', '00000000-0000-0000-0000-0000000000ad', false);
+select review_provider((select id from providers where slug = 'wash-co'), true);
+
+-- Laundry prices (same numbers as pricing.test.ts)
+insert into laundry_prices (provider_id, item_id, service, price)
+select p.id, v.item, v.svc::laundry_service, v.price
+from providers p, (values ('shirt','dry',1500), ('native','dry',3500), ('trousers','iron',400)) as v(item, svc, price)
+where p.slug = 'wash-co';
+
+select set_config('request.jwt.sub', '00000000-0000-0000-0000-0000000000c1', false);
+select create_laundry_order((select id from providers where slug = 'wash-co'),
+  '[{"item":"shirt","service":"dry","qty":3},{"item":"native","service":"dry","qty":2},{"item":"trousers","service":"iron","qty":4}]',
+  false, '12 Test Street', 'Yaba', now() + interval '1 day') as laundry_std \gset
+select create_laundry_order((select id from providers where slug = 'wash-co'),
+  '[{"item":"shirt","service":"dry","qty":3},{"item":"native","service":"dry","qty":2},{"item":"trousers","service":"iron","qty":4}]',
+  true, '12 Test Street', 'Yaba', null) as laundry_exp \gset
+
+do $$ begin
+  assert (select total from orders where id = :'laundry_std') = 14600, 'laundry standard total (TS: 14600)';
+  assert (select delivery_fee from orders where id = :'laundry_std') = 1500, 'delivery fee';
+  assert (select total from orders where id = :'laundry_exp') = 21150, 'laundry express total (TS: 19650 + 1500)';
+  assert (select surcharge from orders where id = :'laundry_exp') = 6550, 'express fee';
+  assert (select status from orders where id = :'laundry_std') = 'requested', 'starts requested';
+  assert (select count(*) from order_events where order_id = :'laundry_std') = 1, 'event recorded';
+end $$;
+
+-- A service the provider does not offer must be refused
+do $$ begin
+  begin
+    perform create_laundry_order((select id from providers where slug = 'wash-co'), '[{"item":"agbada","service":"wash","qty":1}]', false, 'x', null, null);
+    raise exception 'unoffered item was accepted';
+  exception when others then
+    if sqlerrm not like 'not offered%' then raise; end if;
+  end;
+end $$;
+
+-- Cleaning parity: 3 bed @5000, 1 sit @6000, 1 kit @6000, 2 bath @3500; deep + fridge + weekly = 51660
+select set_config('request.jwt.sub', '00000000-0000-0000-0000-0000000000ad', false);
+insert into cleaning_prices (provider_id, property_type, area_id, price, offered)
+select p.id, 'home', v.area, v.price, true
+from providers p, (values ('bed',5000), ('sit',6000), ('kit',6000), ('bath',3500)) as v(area, price)
+where p.slug = 'shine-cleaners';
+select set_config('request.jwt.sub', '00000000-0000-0000-0000-0000000000c1', false);
+select create_cleaning_order((select id from providers where slug = 'shine-cleaners'), 'home', 'deep', 'week',
+  '[{"area":"bed","qty":3},{"area":"sit","qty":1},{"area":"kit","qty":1},{"area":"bath","qty":2}]',
+  array['fridge'], '5 Test Road', 'Lekki', null) as clean_deep \gset
+select create_cleaning_order((select id from providers where slug = 'shine-cleaners'), 'home', 'regular', 'once',
+  '[{"area":"bath","qty":1}]', '{}', '5 Test Road', 'Lekki', null) as clean_min \gset
+do $$ begin
+  assert (select total from orders where id = :'clean_deep') = 51660, 'cleaning deep+extra+weekly (TS: 51660)';
+  assert (select discount from orders where id = :'clean_deep') = 5740, 'discount';
+  assert (select surcharge from orders where id = :'clean_deep') = 20400, 'deep uplift';
+  assert (select total from orders where id = :'clean_min') = 10000, 'minimum order applies';
+  assert (select min_applied from orders where id = :'clean_min'), 'min_applied flag';
+end $$;
+
+-- Status rules
+do $$ begin
+  begin  -- customer cannot accept
+    perform advance_order(:'clean_deep', 'accepted');
+    raise exception 'customer accepted own order';
+  exception when others then if sqlerrm not like 'cannot move%' then raise; end if; end;
+end $$;
+
+-- Row-level security as real users
+select set_config('request.jwt.sub', '00000000-0000-0000-0000-0000000000a1', false);
+set role authenticated;
+select count(*) as n_addr_before from order_addresses where order_id = :'clean_deep' \gset
+select count(*) as n_orders_seen from orders \gset
+select count(*) as n_other_orders from orders where provider_id <> (select id from providers where slug = 'shine-cleaners') \gset
+reset role;
+select 1 / (case when :n_addr_before = 0 then 1 else 0 end) as address_hidden_until_accepted;
+select 1 / (case when :n_other_orders = 0 then 1 else 0 end) as provider_sees_only_own_orders;
+
+select advance_order(:'clean_deep', 'accepted');  -- provider accepts
+set role authenticated;
+select count(*) as n_addr_after from order_addresses where order_id = :'clean_deep' \gset
+reset role;
+select 1 / (case when :n_addr_after = 1 then 1 else 0 end) as address_revealed_after_accept;
+
+-- Other customers cannot see someone else's order
+select set_config('request.jwt.sub', '00000000-0000-0000-0000-0000000000a2', false);
+set role authenticated;
+select count(*) as n_foreign from orders where id = :'clean_deep' \gset
+reset role;
+select 1 / (case when :n_foreign = 0 then 1 else 0 end) as orders_are_private;
+
+-- Messaging + quote flow
+select set_config('request.jwt.sub', '00000000-0000-0000-0000-0000000000c1', false);
+select start_thread((select id from providers where slug = 'shine-cleaners')) as tid \gset
+select send_message(:'tid', 'Hello, can you do a 4-bedroom flat?');
+select set_config('request.jwt.sub', '00000000-0000-0000-0000-0000000000a1', false);
+select send_quote(:'tid', 45000, '4-bed deep clean');
+select id as qid from messages where kind = 'quote' \gset
+select set_config('request.jwt.sub', '00000000-0000-0000-0000-0000000000c1', false);
+select accept_quote(:qid, '9 Quote Close', 'Lekki', null) as quote_order \gset
+do $$ begin
+  assert (select total from orders where id = :'quote_order') = 45000, 'quote order total';
+  assert (select status from orders where id = :'quote_order') = 'accepted', 'quote order accepted';
+  assert (select quote_status from messages where id = :qid) = 'accepted', 'quote marked accepted';
+  begin
+    perform accept_quote(:qid, 'again', null, null);
+    raise exception 'quote accepted twice';
+  exception when others then if sqlerrm not like '%no longer open%' then raise; end if; end;
+  begin  -- customers cannot send quotes
+    perform send_quote(:'tid', 1000, 'x');
+    raise exception 'customer sent a quote';
+  exception when others then if sqlerrm not like 'only the provider%' then raise; end if; end;
+end $$;
+
+-- Car wash: rejected until admin sets rates, then priced from the rate table
+do $$ begin
+  begin
+    perform create_carwash_request('full', 'saloon', true, '1 Test', null, null, null);
+    raise exception 'car wash allowed without rates';
+  exception when others then if sqlerrm not like '%not available%' then raise; end if; end;
+end $$;
+insert into carwash_rates values ('full', 'saloon', 6000, 4000);
+update carwash_settings set service_fee = 500;
+select create_carwash_request('full', 'saloon', true, '1 Test', 'Yaba', null, 'gate code 1234') as wash \gset
+do $$ begin
+  assert (select total from orders where id = :'wash') = 6500, 'car wash total = price + fee';
+  assert (select provider_id from orders where id = :'wash') is null, 'unassigned';
+end $$;
