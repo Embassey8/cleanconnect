@@ -21,6 +21,8 @@ export async function registerProvider(_: JoinState, form: FormData): Promise<Jo
     bvn: String(form.get("bvn") ?? ""),
   };
   const errors = validateRegistration(input);
+  const phone = String(form.get("phone") ?? "").trim();
+  if (phone && !/^\+?[0-9\s-]{7,15}$/.test(phone)) errors.phone = "Enter a valid phone number.";
   if (Object.keys(errors).length) return { errors };
 
   const supabase = await createClient();
@@ -32,5 +34,10 @@ export async function registerProvider(_: JoinState, form: FormData): Promise<Jo
     p_bvn: type === "individual" && service === "laundry" ? input.bvn : null,
   });
   if (error) return { error: error.message };
+  if (phone) {
+    const { data: claims } = await supabase.auth.getClaims();
+    const id = claims?.claims?.sub;
+    if (id) await supabase.from("users").update({ phone }).eq("id", id);
+  }
   redirect("/provider");
 }
