@@ -30,8 +30,8 @@ language plpgsql security definer set search_path = '' as $$
 declare
   uid uuid := auth.uid();
   pid uuid;
-  base text;
-  slug text;
+  v_base text;
+  v_slug text;
   n int := 0;
 begin
   if uid is null then raise exception 'not signed in'; end if;
@@ -53,16 +53,16 @@ begin
     raise exception 'BVN must be 11 digits for laundry individuals';
   end if;
 
-  base := trim(both '-' from regexp_replace(lower(p_display_name), '[^a-z0-9]+', '-', 'g'));
-  if base = '' then base := 'provider'; end if;
-  slug := base;
-  while exists (select 1 from public.providers where providers.slug = slug) loop
+  v_base := trim(both '-' from regexp_replace(lower(p_display_name), '[^a-z0-9]+', '-', 'g'));
+  if v_base = '' then v_base := 'provider'; end if;
+  v_slug := v_base;
+  while exists (select 1 from public.providers p where p.slug = v_slug) loop
     n := n + 1;
-    slug := base || '-' || n;
+    v_slug := v_base || '-' || n;
   end loop;
 
   insert into public.providers (owner_id, type, service, plan, slug, display_name, areas)
-  values (uid, p_type, p_service, 'standard', slug, trim(p_display_name), coalesce(p_areas, '{}'))
+  values (uid, p_type, p_service, 'standard', v_slug, trim(p_display_name), coalesce(p_areas, '{}'))
   returning id into pid;
 
   if p_type = 'business' then
