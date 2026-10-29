@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CleanConnect mobile — Admin</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#EEF2F0}
+a{color:#0B6B57}a:hover{color:#084F40}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; min-height: 2140px; box-sizing: border-box; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #10201B; background: #EEF2F0; display: flex; flex-direction: column">
+
+<div style="background: #10201B; color: #FFFFFF; padding: 14px 16px 18px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; gap: 10px">
+<button aria-label="Open menu" aria-expanded="{{menuOpen}}" onClick="{{openMenu}}" style="width: 44px; height: 44px; border-radius: 12px; border: 0; background: #22352F; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
+<span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 17px; font-weight: 800">{{viewTitle}}</span><span style="font-size: 12px; color: #A9B7B2">{{viewSub}}</span></span>
+<button aria-label="Search" style="width: 44px; height: 44px; border-radius: 12px; border: 0; background: #22352F; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg></button>
+</div>
+<sc-if value="{{notOverview}}" hint-placeholder-val="{{false}}"><button onClick="{{goOverview}}" style="align-self: start; min-height: 36px; display: flex; align-items: center; gap: 6px; padding: 0 12px 0 8px; border-radius: 999px; border: 1px solid #3A4E47; background: transparent; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 600"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>Overview</button></sc-if>
+<sc-if value="{{showProfit}}" hint-placeholder-val="{{true}}">
+<div style="background: #0B6B57; border-radius: 16px; padding: 16px; display: flex; justify-content: space-between; align-items: end; gap: 10px">
+<span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #CDEBE1">Net profit</span><span style="font-size: 28px; font-weight: 800">₦6.1m</span><span style="font-size: 12px; color: #CDEBE1">33% margin · income ₦18.4m</span></span>
+<span style="font-size: 12px; font-weight: 700; padding: 5px 9px; border-radius: 999px; background: #E3F1EC; color: #0B6B57">+12.5%</span>
+</div>
+</sc-if>
+</div>
+
+<div style="padding: 16px; display: flex; flex-direction: column; gap: 16px; flex: 1">
+
+<sc-if value="{{showKpis}}" hint-placeholder-val="{{true}}">
+<section aria-label="Key numbers" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<div style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 12px; color: #4F5E58">Total users</span><span style="font-size: 22px; font-weight: 800">12,480</span></div>
+<div style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 12px; color: #4F5E58">Online now</span><span style="font-size: 22px; font-weight: 800">342</span></div>
+<div style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 12px; color: #4F5E58">Providers</span><span style="font-size: 22px; font-weight: 800">1,126</span></div>
+<div style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 12px; color: #4F5E58">Employees</span><span style="font-size: 22px; font-weight: 800">48</span></div>
+</section>
+</sc-if>
+
+<sc-if value="{{showFinance}}" hint-placeholder-val="{{true}}">
+<section aria-labelledby="ma-calc" style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<h2 id="ma-calc" style="margin: 0; font-size: 16px; font-weight: 800">Profit calculation · October</h2>
+<dl style="margin: 0; display: flex; flex-direction: column; gap: 8px; font-size: 14px">
+<div style="display: flex; justify-content: space-between"><dt style="color: #4F5E58">Commission</dt><dd style="margin: 0; font-weight: 600">₦7.2m</dd></div>
+<div style="display: flex; justify-content: space-between"><dt style="color: #4F5E58">Car wash revenue</dt><dd style="margin: 0; font-weight: 600">₦8.1m</dd></div>
+<div style="display: flex; justify-content: space-between"><dt style="color: #4F5E58">VIP + advertising</dt><dd style="margin: 0; font-weight: 600">₦3.1m</dd></div>
+<div style="display: flex; justify-content: space-between"><dt style="color: #4F5E58">Payouts, salaries, ops</dt><dd style="margin: 0; font-weight: 600; color: #A23A1E">−₦12.3m</dd></div>
+<div style="display: flex; justify-content: space-between; border-top: 1px solid #DCE3E0; padding-top: 8px"><dt style="font-weight: 700">Net profit</dt><dd style="margin: 0; font-weight: 800; color: #0B6B57">₦6.1m</dd></div>
+</dl>
+</section>
+</sc-if>
+
+<sc-if value="{{showApprovals}}" hint-placeholder-val="{{true}}">
+<section aria-labelledby="ma-appr" style="display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: center"><h2 id="ma-appr" style="margin: 0; font-size: 16px; font-weight: 800">Provider approvals <span style="font-size: 12px; font-weight: 700; background: #F2A93B; border-radius: 999px; padding: 2px 8px">18</span></h2><sc-if value="{{isOverview}}" hint-placeholder-val="{{true}}"><button onClick="{{goApprovals}}" style="border: 0; background: transparent; color: #0B6B57; font: inherit; font-size: 14px; font-weight: 600; min-height: 40px">See all</button></sc-if></div>
+<article style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; gap: 8px"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 700">[Laundry shop name]</span><span style="font-size: 12px; color: #4F5E58">Shop · Dry clean, Ironing · 2h ago</span></span><span style="align-self: start; font-size: 10px; font-weight: 800; padding: 3px 6px; border-radius: 5px; background: #FBF1DC; color: #8A5A00">VIP</span></div>
+<span style="align-self: start; font-size: 12px; font-weight: 700; padding: 4px 8px; border-radius: 6px; background: #E3F1EC; color: #0B6B57">CAC ✓ matched</span>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px"><button style="min-height: 44px; border-radius: 10px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 13px">Docs</button><button style="min-height: 44px; border-radius: 10px; border: 1px solid #E8B4A6; background: #FFFFFF; color: #A23A1E; font: inherit; font-size: 13px">Reject</button><button style="min-height: 44px; border-radius: 10px; border: 0; background: #0B6B57; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700">Approve</button></div>
+</article>
+<article style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 700">[Individual name]</span><span style="font-size: 12px; color: #4F5E58">Individual · Wash only · 5h ago</span></div>
+<span style="display: flex; gap: 6px"><span style="font-size: 12px; font-weight: 700; padding: 4px 8px; border-radius: 6px; background: #E3F1EC; color: #0B6B57">NIN ✓</span><span style="font-size: 12px; font-weight: 700; padding: 4px 8px; border-radius: 6px; background: #FDF0DA; color: #7A4B00">BVN pending</span></span>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px"><button style="min-height: 44px; border-radius: 10px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 13px">Docs</button><button style="min-height: 44px; border-radius: 10px; border: 1px solid #E8B4A6; background: #FFFFFF; color: #A23A1E; font: inherit; font-size: 13px">Reject</button><button style="min-height: 44px; border-radius: 10px; border: 0; background: #0B6B57; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700">Approve</button></div>
+</article>
+</section>
+</sc-if>
+
+<sc-if value="{{showRequests}}" hint-placeholder-val="{{true}}">
+<section aria-labelledby="ma-req" style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<h2 id="ma-req" style="margin: 0; font-size: 16px; font-weight: 800">Car wash requests</h2>
+<div style="display: flex; flex-direction: column; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid #EEF2F0">
+<span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600">Full wash · SUV</span><span style="font-size: 12px; color: #4F5E58">[Customer] · Lekki Ph 1 · Today 2–4 pm</span></span>
+<span style="display: flex; gap: 6px"><select aria-label="Partner" style="flex: 1; min-width: 0; font: inherit; font-size: 13px; min-height: 44px; padding: 0 8px; border: 1px solid #DCE3E0; border-radius: 10px; background: #FFFFFF"><option>Choose partner</option><option>[Partner A] · 1.2 km</option></select><button style="min-height: 44px; padding: 0 14px; border-radius: 10px; border: 0; background: #1F5FAF; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700">Assign</button></span>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600">Exterior · Bus</span><span style="font-size: 12px; color: #4F5E58">Yaba · [Partner B]</span></span><span style="font-size: 11px; font-weight: 700; padding: 4px 9px; border-radius: 999px; background: #E3F1EC; color: #0B6B57">Assigned</span></div>
+</section>
+</sc-if>
+
+<sc-if value="{{showActivity}}" hint-placeholder-val="{{true}}">
+<section aria-labelledby="ma-act" style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<h2 id="ma-act" style="margin: 0; font-size: 16px; font-weight: 800">Registrations &amp; logins</h2>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; text-align: center">
+<span style="background: #F5F7F6; border-radius: 10px; padding: 10px 4px; display: flex; flex-direction: column"><span style="font-size: 18px; font-weight: 800">86</span><span style="font-size: 11px; color: #4F5E58">Sign-ups</span></span>
+<span style="background: #F5F7F6; border-radius: 10px; padding: 10px 4px; display: flex; flex-direction: column"><span style="font-size: 18px; font-weight: 800">2,914</span><span style="font-size: 11px; color: #4F5E58">Logins</span></span>
+<span style="background: #FBE6E0; border-radius: 10px; padding: 10px 4px; display: flex; flex-direction: column"><span style="font-size: 18px; font-weight: 800; color: #A23A1E">23</span><span style="font-size: 11px; color: #7A2C17">Failed</span></span>
+</div>
+<div style="display: flex; justify-content: space-between; font-size: 13px; padding-top: 4px"><span><span style="font-weight: 700; color: #A23A1E">Locked</span> · [email] · 5 failed tries</span><span style="color: #4F5E58">10:31</span></div>
+<div style="display: flex; justify-content: space-between; font-size: 13px"><span><span style="font-weight: 700; color: #0B6B57">Sign-up</span> · [Shop name] · provider</span><span style="color: #4F5E58">10:18</span></div>
+</section>
+</sc-if>
+
+<sc-if value="{{showLocations}}" hint-placeholder-val="{{true}}">
+<section aria-labelledby="ma-loc" style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<h2 id="ma-loc" style="margin: 0; font-size: 16px; font-weight: 800">Providers &amp; staff by location</h2>
+<div style="display: flex; flex-direction: column; gap: 4px; font-size: 13px"><span style="display: flex; justify-content: space-between"><span style="font-weight: 600">Lagos — Island</span><span style="color: #4F5E58">412 · 19 staff</span></span><span style="height: 8px; background: #EEF2F0; border-radius: 999px; display: block"><span style="display: block; height: 8px; width: 37%; background: #0B6B57; border-radius: 999px"></span></span></div>
+<div style="display: flex; flex-direction: column; gap: 4px; font-size: 13px"><span style="display: flex; justify-content: space-between"><span style="font-weight: 600">Lagos — Mainland</span><span style="color: #4F5E58">356 · 14 staff</span></span><span style="height: 8px; background: #EEF2F0; border-radius: 999px; display: block"><span style="display: block; height: 8px; width: 32%; background: #0B6B57; border-radius: 999px"></span></span></div>
+<div style="display: flex; flex-direction: column; gap: 4px; font-size: 13px"><span style="display: flex; justify-content: space-between"><span style="font-weight: 600">Abuja</span><span style="color: #4F5E58">224 · 9 staff</span></span><span style="height: 8px; background: #EEF2F0; border-radius: 999px; display: block"><span style="display: block; height: 8px; width: 20%; background: #0B6B57; border-radius: 999px"></span></span></div>
+<div style="display: flex; flex-direction: column; gap: 4px; font-size: 13px"><span style="display: flex; justify-content: space-between"><span style="font-weight: 600">Port Harcourt</span><span style="color: #4F5E58">134 · 6 staff</span></span><span style="height: 8px; background: #EEF2F0; border-radius: 999px; display: block"><span style="display: block; height: 8px; width: 12%; background: #0B6B57; border-radius: 999px"></span></span></div>
+</section>
+</sc-if>
+
+<sc-if value="{{showQueues}}" hint-placeholder-val="{{true}}">
+<section aria-label="Queues" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<button onClick="{{goJobs}}" style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; align-items: start; gap: 4px; font: inherit; color: #10201B; text-align: left"><span style="font-size: 13px; color: #4F5E58">Job applications</span><span style="font-size: 20px; font-weight: 800">9</span><span style="font-size: 12px; color: #4F5E58">2 interviews this week</span></button>
+<button onClick="{{goVip}}" style="background: #FFFFFF; border: 1px solid #E9D6A8; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; align-items: start; gap: 4px; font: inherit; color: #10201B; text-align: left"><span style="font-size: 13px; color: #8A5A00; font-weight: 600">VIP calls</span><span style="font-size: 20px; font-weight: 800">3</span><span style="font-size: 12px; color: #4F5E58">Next at 11:30 am</span></button>
+<button onClick="{{goSupport}}" style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; align-items: start; gap: 4px; font: inherit; color: #10201B; text-align: left"><span style="font-size: 13px; color: #4F5E58">Support tickets</span><span style="font-size: 20px; font-weight: 800">12</span><span style="font-size: 12px; color: #A23A1E; font-weight: 600">2 high priority</span></button>
+<button onClick="{{goRequests}}" style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; align-items: start; gap: 4px; font: inherit; color: #10201B; text-align: left"><span style="font-size: 13px; color: #4F5E58">User requests</span><span style="font-size: 20px; font-weight: 800">7</span><span style="font-size: 12px; color: #4F5E58">Awaiting a partner</span></button>
+</section>
+</sc-if>
+
+<sc-if value="{{showJobs}}" hint-placeholder-val="{{false}}">
+<section aria-labelledby="ma-jobs" style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 4px">
+<h2 id="ma-jobs" style="margin: 0 0 6px; font-size: 16px; font-weight: 800">Job applications · 9</h2>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid #EEF2F0"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600">[Applicant] · Car wash partner</span><span style="font-size: 12px; color: #4F5E58">Site inspection due Thu</span></span><span style="font-size: 11px; font-weight: 700; padding: 4px 9px; border-radius: 999px; background: #FDF0DA; color: #7A4B00">Inspection</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid #EEF2F0"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600">[Applicant] · Support agent</span><span style="font-size: 12px; color: #4F5E58">Interview Fri, 10 am</span></span><span style="font-size: 11px; font-weight: 700; padding: 4px 9px; border-radius: 999px; background: #E8EEF8; color: #1F5FAF">Interview</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 0"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600">[Applicant] · House cleaner</span><span style="font-size: 12px; color: #4F5E58">References received</span></span><button style="min-height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 600">Review</button></div>
+</section>
+</sc-if>
+
+<sc-if value="{{showVip}}" hint-placeholder-val="{{false}}">
+<section aria-labelledby="ma-vip" style="background: #FFFFFF; border: 1px solid #E9D6A8; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 4px">
+<h2 id="ma-vip" style="margin: 0 0 6px; font-size: 16px; font-weight: 800; color: #8A5A00">VIP calls · 86 active VIPs</h2>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid #EEF2F0"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600">[Provider] · Upgrade enquiry</span><span style="font-size: 12px; color: #4F5E58">Callback · 11:30 am</span></span><button style="min-height: 40px; padding: 0 14px; border-radius: 10px; border: 0; background: #8A5A00; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700">Call</button></div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid #EEF2F0"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600">[Provider] · Email campaign</span><span style="font-size: 12px; color: #4F5E58">High-value customers</span></span><button style="min-height: 40px; padding: 0 14px; border-radius: 10px; border: 0; background: #8A5A00; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700">Call</button></div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 0"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600">[Provider] · Renewal in 3 days</span><span style="font-size: 12px; color: #4F5E58">Homepage spot ends Oct 30</span></span><button style="min-height: 40px; padding: 0 14px; border-radius: 10px; border: 1px solid #E9D6A8; background: #FFFFFF; color: #8A5A00; font: inherit; font-size: 13px; font-weight: 700">Remind</button></div>
+</section>
+</sc-if>
+
+<sc-if value="{{showSupport}}" hint-placeholder-val="{{false}}">
+<section aria-labelledby="ma-sup" style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 4px">
+<h2 id="ma-sup" style="margin: 0 0 6px; font-size: 16px; font-weight: 800">Support tickets · 12 open</h2>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid #EEF2F0"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600">Wallet top-up not reflected</span><span style="font-size: 12px; color: #4F5E58">Customer · unassigned</span></span><span style="font-size: 11px; font-weight: 700; padding: 4px 9px; border-radius: 999px; background: #FBE6E0; color: #A23A1E">High</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid #EEF2F0"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600">Cleaner arrived late</span><span style="font-size: 12px; color: #4F5E58">Customer · [Agent]</span></span><span style="font-size: 11px; font-weight: 700; padding: 4px 9px; border-radius: 999px; background: #FBE6E0; color: #A23A1E">High</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 0"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600">Payout schedule question</span><span style="font-size: 12px; color: #4F5E58">Provider · [Agent]</span></span><span style="font-size: 11px; font-weight: 700; padding: 4px 9px; border-radius: 999px; background: #EEF2F0; color: #3E4D47">Normal</span></div>
+</section>
+</sc-if>
+
+<sc-if value="{{showChat}}" hint-placeholder-val="{{true}}">
+<section aria-labelledby="ma-chat" style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column">
+<div style="padding: 12px 14px; border-bottom: 1px solid #DCE3E0; display: flex; justify-content: space-between; align-items: center"><h2 id="ma-chat" style="margin: 0; font-size: 15px; font-weight: 800">Chat · [Customer name]</h2><span style="font-size: 12px; color: #0B6B57; font-weight: 600">Online</span></div>
+<div style="padding: 12px; display: flex; flex-direction: column; gap: 8px; background: #FAFBFA">
+<div style="align-self: start; max-width: 85%; background: #FFFFFF; border: 1px solid #DCE3E0; padding: 9px 12px; border-radius: 12px 12px 12px 4px; font-size: 14px; line-height: 1.45">My top-up hasn't shown in my wallet.</div>
+<div style="align-self: end; max-width: 85%; background: #10201B; color: #FFFFFF; padding: 9px 12px; border-radius: 12px 12px 4px 12px; font-size: 14px; line-height: 1.45">Checking with our payment provider now.</div>
+</div>
+<form style="padding: 10px; border-top: 1px solid #DCE3E0; display: flex; gap: 8px"><label style="flex: 1; display: flex; min-width: 0"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Reply</span><input type="text" placeholder="Type a reply…" style="flex: 1; min-width: 0; font: inherit; font-size: 14px; min-height: 44px; padding: 0 12px; border: 1px solid #DCE3E0; border-radius: 10px"></label><button type="button" style="min-height: 44px; padding: 0 14px; border-radius: 10px; border: 0; background: #0B6B57; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700">Send</button></form>
+</section>
+</sc-if>
+</div>
+
+<nav aria-label="Admin tabs" style="background: #FFFFFF; border-top: 1px solid #DCE3E0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 6px 4px 22px">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="5">
+<sc-if value="{{t.active}}" hint-placeholder-val="{{false}}"><button aria-current="page" onClick="{{t.go}}" style="min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border: 0; background: transparent; color: #0B6B57; font: inherit; font-size: 11px; font-weight: 800"><span aria-hidden="true" style="width: 22px; height: 4px; border-radius: 999px; background: #0B6B57"></span>{{t.label}}</button></sc-if>
+<sc-if value="{{t.inactive}}" hint-placeholder-val="{{true}}"><button onClick="{{t.go}}" style="min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border: 0; background: transparent; color: #4F5E58; font: inherit; font-size: 11px; font-weight: 600"><span aria-hidden="true" style="width: 22px; height: 4px; border-radius: 999px; background: transparent"></span>{{t.label}}</button></sc-if>
+</sc-for>
+</nav>
+
+<sc-if value="{{menuOpen}}" hint-placeholder-val="{{false}}">
+<div style="position: absolute; inset: 0; background: rgba(16,32,27,0.55); display: flex">
+<nav aria-label="All admin sections" style="width: 300px; background: #10201B; color: #FFFFFF; padding: 16px 12px; display: flex; flex-direction: column; gap: 2px; box-sizing: border-box">
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 0 4px 12px"><span style="font-size: 17px; font-weight: 800">Admin menu</span><button aria-label="Close menu" onClick="{{closeMenu}}" style="width: 44px; height: 44px; border-radius: 12px; border: 0; background: #22352F; color: #FFFFFF; font: inherit; font-size: 20px">✕</button></div>
+<sc-for list="{{nav}}" as="n" hint-placeholder-count="10">
+<sc-if value="{{n.groupStart}}" hint-placeholder-val="{{false}}"><span style="font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: #A9B7B2; padding: 14px 12px 6px">{{n.group}}</span></sc-if>
+<sc-if value="{{n.active}}" hint-placeholder-val="{{false}}"><button aria-current="page" onClick="{{n.go}}" style="display: flex; align-items: center; justify-content: space-between; min-height: 46px; padding: 0 12px; border-radius: 8px; border: 0; border-left: 3px solid #F2A93B; background: #22352F; color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 700; text-align: left">{{n.label}}<sc-if value="{{n.hasBadge}}" hint-placeholder-val="{{false}}"><span style="font-size: 12px; font-weight: 700; background: #F2A93B; color: #10201B; border-radius: 999px; padding: 2px 8px">{{n.badge}}</span></sc-if></button></sc-if>
+<sc-if value="{{n.inactive}}" hint-placeholder-val="{{true}}"><button onClick="{{n.go}}" style="display: flex; align-items: center; justify-content: space-between; min-height: 46px; padding: 0 12px; border-radius: 8px; border: 0; border-left: 3px solid transparent; background: transparent; color: #D5DEDA; font: inherit; font-size: 15px; font-weight: 500; text-align: left">{{n.label}}<sc-if value="{{n.hasBadge}}" hint-placeholder-val="{{false}}"><span style="font-size: 12px; font-weight: 700; background: #3A4E47; color: #FFFFFF; border-radius: 999px; padding: 2px 8px">{{n.badge}}</span></sc-if></button></sc-if>
+</sc-for>
+</nav>
+<button aria-label="Close menu" onClick="{{closeMenu}}" style="flex: 1; border: 0; background: transparent"></button>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":2140}}'>
+const NAV = [
+  { id: 'overview', label: 'Overview', group: 'DASHBOARD', title: 'Admin overview', sub: 'Sample data · This month', show: ['profit', 'kpis', 'finance', 'approvals', 'requests', 'activity', 'locations', 'queues', 'chat'] },
+  { id: 'approvals', label: 'Provider approvals', badge: '18', group: 'PEOPLE', title: 'Provider approvals', sub: 'CAC, NIN & BVN checks', show: ['approvals'] },
+  { id: 'activity', label: 'Registrations & logins', title: 'Registrations & logins', sub: 'Today', show: ['kpis', 'activity'] },
+  { id: 'jobs', label: 'Job applications', title: 'Job applications', sub: 'Partners & staff', show: ['jobs'] },
+  { id: 'locations', label: 'Staff & locations', title: 'Staff & locations', sub: 'By city / area', show: ['locations'] },
+  { id: 'requests', label: 'User requests', badge: '7', group: 'OPERATIONS', title: 'User requests', sub: 'Car wash · assign a partner', show: ['requests'] },
+  { id: 'vip', label: 'VIP calls', title: 'VIP calls', sub: 'Upgrades & renewals', show: ['vip'] },
+  { id: 'finance', label: 'Income & profit', group: 'MONEY', title: 'Income & profit', sub: 'October', show: ['profit', 'kpis', 'finance'] },
+  { id: 'support', label: 'Support & help', badge: '12', group: 'SUPPORT', title: 'Support & help', sub: 'Tickets & live chat', show: ['support', 'chat'] },
+  { id: 'chat', label: 'Chat', title: 'Chat', sub: 'Live conversations', show: ['chat'] }
+];
+const TABS = [
+  { id: 'overview', label: 'Overview' },
+  { id: 'approvals', label: 'Approvals' },
+  { id: 'finance', label: 'Finance' },
+  { id: 'support', label: 'Support' },
+  { id: 'menu', label: 'More' }
+];
+
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const view = s.view || 'overview';
+    const menuOpen = !!s.menuOpen;
+    const cur = NAV.find((n) => n.id === view) || NAV[0];
+    const on = (k) => cur.show.indexOf(k) !== -1;
+    const go = (id) => () => this.setState({ view: id, menuOpen: false });
+    const inTabs = TABS.some((t) => t.id === view);
+    return {
+      nav: NAV.map((n) => ({
+        label: n.label,
+        badge: n.badge || '',
+        hasBadge: !!n.badge,
+        group: n.group || '',
+        groupStart: !!n.group && n.id !== 'overview',
+        active: n.id === view,
+        inactive: n.id !== view,
+        go: go(n.id)
+      })),
+      tabs: TABS.map((t) => {
+        const active = t.id === 'menu' ? (menuOpen || !inTabs) : (!menuOpen && t.id === view);
+        return {
+          label: t.label,
+          active: active,
+          inactive: !active,
+          go: t.id === 'menu' ? () => this.setState({ menuOpen: true }) : go(t.id)
+        };
+      }),
+      menuOpen: menuOpen,
+      openMenu: () => this.setState({ menuOpen: true }),
+      closeMenu: () => this.setState({ menuOpen: false }),
+      viewTitle: cur.title,
+      viewSub: cur.sub,
+      isOverview: view === 'overview',
+      notOverview: view !== 'overview',
+      goOverview: go('overview'),
+      goApprovals: go('approvals'),
+      goJobs: go('jobs'),
+      goVip: go('vip'),
+      goSupport: go('support'),
+      goRequests: go('requests'),
+      showProfit: on('profit'),
+      showKpis: on('kpis'),
+      showFinance: on('finance'),
+      showApprovals: on('approvals'),
+      showRequests: on('requests'),
+      showActivity: on('activity'),
+      showLocations: on('locations'),
+      showQueues: on('queues'),
+      showJobs: on('jobs'),
+      showVip: on('vip'),
+      showSupport: on('support'),
+      showChat: on('chat')
+    };
+  }
+}
+</script>
+</body>
+</html>

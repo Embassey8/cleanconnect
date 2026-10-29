@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CleanConnect mobile — Become a provider</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F7F6}
+a{color:#0B6B57}a:hover{color:#084F40}
+</style>
+</helmet>
+<div style="width: 390px; min-height: 1960px; box-sizing: border-box; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #10201B; background: #F5F7F6; display: flex; flex-direction: column">
+
+<div style="background: #FFFFFF; border-bottom: 1px solid #DCE3E0; padding: 12px 16px 14px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; gap: 8px">
+<a href="MobileHome.dc.html" aria-label="Back" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 12px; color: #10201B"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+<h1 style="margin: 0; font-size: 19px; font-weight: 800; flex: 1">Become a provider</h1>
+</div>
+<p style="margin: 0; font-size: 14px; line-height: 1.5; color: #4F5E58">Register as a business or individual. Customers can book you once we approve your verification.</p>
+</div>
+
+<form style="padding: 18px 16px 24px; display: flex; flex-direction: column; gap: 22px; flex: 1">
+
+<fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px">
+<legend style="font-size: 16px; font-weight: 800; margin-bottom: 10px">1. Service you offer</legend>
+<label style="display: flex; gap: 12px; align-items: center; padding: 14px; border: 2px solid #0B6B57; border-radius: 14px; background: #F2F9F6"><input type="radio" name="svc" checked style="accent-color: #0B6B57; width: 18px; height: 18px"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 700">House cleaning</span><span style="font-size: 12px; color: #4F5E58">Businesses &amp; individuals · you set the price</span></span></label>
+<label style="display: flex; gap: 12px; align-items: center; padding: 14px; border: 1px solid #DCE3E0; border-radius: 14px; background: #FFFFFF"><input type="radio" name="svc" style="accent-color: #0B6B57; width: 18px; height: 18px"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 700">Laundry</span><span style="font-size: 12px; color: #4F5E58">Dry clean, wash only, ironing</span></span></label>
+<label style="display: flex; gap: 12px; align-items: center; padding: 14px; border: 1px solid #DCE3E0; border-radius: 14px; background: #FFFFFF"><input type="radio" name="svc" style="accent-color: #0B6B57; width: 18px; height: 18px"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 700">Car wash partner</span><span style="font-size: 12px; color: #4F5E58">Apply to our hand-picked network</span></span></label>
+</fieldset>
+
+<fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px">
+<legend style="font-size: 16px; font-weight: 800; margin-bottom: 10px">2. Register as</legend>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<label style="display: flex; flex-direction: column; gap: 6px; padding: 14px; border: 1px solid #DCE3E0; border-radius: 14px; background: #FFFFFF"><span style="display: flex; justify-content: space-between; align-items: center"><span style="font-size: 15px; font-weight: 700">Business</span><input type="radio" name="kind" style="accent-color: #0B6B57; width: 18px; height: 18px"></span><span style="font-size: 12px; color: #4F5E58; line-height: 1.4">Verify with CAC</span></label>
+<label style="display: flex; flex-direction: column; gap: 6px; padding: 14px; border: 2px solid #0B6B57; border-radius: 14px; background: #F2F9F6"><span style="display: flex; justify-content: space-between; align-items: center"><span style="font-size: 15px; font-weight: 700">Individual</span><input type="radio" name="kind" checked style="accent-color: #0B6B57; width: 18px; height: 18px"></span><span style="font-size: 12px; color: #4F5E58; line-height: 1.4">Verify with NIN (+ BVN for laundry)</span></label>
+</div>
+</fieldset>
+
+<fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 12px">
+<legend style="font-size: 16px; font-weight: 800; margin-bottom: 10px">3. Verify your identity</legend>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600">Full name (as on ID)<input type="text" style="font: inherit; font-size: 15px; font-weight: 400; padding: 13px 12px; border: 1px solid #DCE3E0; border-radius: 10px; background: #FFFFFF"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600">NIN (11 digits)<input type="text" inputmode="numeric" placeholder="00000000000" style="font: inherit; font-size: 15px; font-weight: 400; padding: 13px 12px; border: 1px solid #DCE3E0; border-radius: 10px; background: #FFFFFF"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600">BVN (11 digits) <span style="font-weight: 400; font-size: 12px; color: #4F5E58">Required for laundry individuals</span><input type="text" inputmode="numeric" placeholder="00000000000" style="font: inherit; font-size: 15px; font-weight: 400; padding: 13px 12px; border: 1px solid #DCE3E0; border-radius: 10px; background: #FFFFFF"></label>
+<button type="button" style="min-height: 52px; display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: 12px; border: 1.5px dashed #0B6B57; background: #FFFFFF; color: #0B6B57; font: inherit; font-size: 15px; font-weight: 600"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg>Take a selfie for face match</button>
+</fieldset>
+
+<fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 12px">
+<legend style="font-size: 16px; font-weight: 800; margin-bottom: 10px">4. Prices &amp; coverage</legend>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600">Starting price (₦)<input type="number" placeholder="Your price" style="font: inherit; font-size: 15px; font-weight: 400; padding: 13px 12px; border: 1px solid #DCE3E0; border-radius: 10px; background: #FFFFFF"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600">Areas you cover<input type="text" placeholder="e.g. Lekki, Ajah, VI" style="font: inherit; font-size: 15px; font-weight: 400; padding: 13px 12px; border: 1px solid #DCE3E0; border-radius: 10px; background: #FFFFFF"></label>
+</fieldset>
+
+<fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 10px">
+<legend style="font-size: 16px; font-weight: 800; margin-bottom: 10px">5. Choose a plan</legend>
+<label style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 6px">
+<span style="display: flex; justify-content: space-between; align-items: center"><span style="font-size: 16px; font-weight: 700">Standard</span><input type="radio" name="plan" style="accent-color: #0B6B57; width: 18px; height: 18px"></span>
+<span style="font-size: 14px; color: #4F5E58">Free + [x]% per job · marketplace listing, chat, payouts</span>
+</label>
+<label style="background: #10201B; color: #FFFFFF; border: 2px solid #F2A93B; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<span style="display: flex; justify-content: space-between; align-items: center"><span style="display: flex; gap: 8px; align-items: center"><span style="font-size: 16px; font-weight: 700">VIP</span><span style="font-size: 10px; font-weight: 800; padding: 3px 6px; border-radius: 5px; background: #F2A93B; color: #10201B">RECOMMENDED</span></span><input type="radio" name="plan" checked style="accent-color: #F2A93B; width: 18px; height: 18px"></span>
+<span style="font-size: 22px; font-weight: 800">[₦ price] <span style="font-size: 13px; font-weight: 500; color: #C9D4D0">/ month</span></span>
+<ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 13px; line-height: 1.45; color: #E3ECE8">
+<li>Top placement in search results</li>
+<li>Featured on the homepage</li>
+<li>Promoted to high-value customers by web and email</li>
+<li>Gold VIP badge · priority support</li>
+</ul>
+</label>
+</fieldset>
+</form>
+
+<div style="background: #FFFFFF; border-top: 1px solid #DCE3E0; padding: 14px 16px 26px">
+<button type="submit" style="width: 100%; min-height: 52px; border-radius: 14px; border: 0; background: #0B6B57; color: #FFFFFF; font: inherit; font-size: 16px; font-weight: 700">Submit for approval</button>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1960}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

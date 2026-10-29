@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CleanConnect — Laundry provider profile</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F7F6}
+a{color:#0B6B57}a:hover{color:#084F40}
+button:disabled{opacity:.4;cursor:not-allowed}
+</style>
+</helmet>
+<div style="font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #10201B; background: #F5F7F6; min-height: 100vh">
+
+<header style="background: #FFFFFF; border-bottom: 1px solid #DCE3E0">
+<div style="max-width: 1240px; margin: 0 auto; padding: 14px 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 16px 28px">
+<a href="Main.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #10201B; font-weight: 800; font-size: 20px">
+<span style="width: 36px; height: 36px; border-radius: 10px; background: #0B6B57; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4z"></path></svg></span>
+CleanConnect
+</a>
+<nav aria-label="Main" style="display: flex; flex-wrap: wrap; gap: 4px; flex: 1 1 auto">
+<a href="Main.dc.html" style="padding: 10px 14px; border-radius: 8px; text-decoration: none; color: #3E4D47; font-weight: 500; font-size: 15px">Home</a>
+<a href="Marketplace.dc.html" style="padding: 10px 14px; border-radius: 8px; text-decoration: none; color: #0B6B57; background: #E3F1EC; font-weight: 600; font-size: 15px">Marketplace</a>
+<a href="CarWash.dc.html" style="padding: 10px 14px; border-radius: 8px; text-decoration: none; color: #3E4D47; font-weight: 500; font-size: 15px">Car wash</a>
+<a href="Messages.dc.html" style="padding: 10px 14px; border-radius: 8px; text-decoration: none; color: #3E4D47; font-weight: 500; font-size: 15px">Messages</a>
+<a href="Profile.dc.html" style="padding: 10px 14px; border-radius: 8px; text-decoration: none; color: #3E4D47; font-weight: 500; font-size: 15px">My orders</a>
+</nav>
+<a href="Profile.dc.html" style="padding: 9px 14px; border: 1px solid #DCE3E0; border-radius: 999px; text-decoration: none; color: #10201B; font-size: 14px; font-weight: 600">Wallet ₦45,000</a>
+</div>
+</header>
+
+<main style="max-width: 1240px; margin: 0 auto; padding: 24px 24px 72px; display: flex; flex-direction: column; gap: 22px">
+<nav aria-label="Breadcrumb" style="font-size: 14px; color: #4F5E58"><a href="Marketplace.dc.html">Marketplace</a> › <a href="Marketplace.dc.html">Laundry</a> › [Laundry shop name]</nav>
+
+<section aria-label="Provider summary" style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 20px; padding: 26px; display: flex; flex-wrap: wrap; gap: 24px; align-items: center">
+<span style="width: 96px; height: 96px; border-radius: 24px; background: #F1ECF8; color: #6A3FA0; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 800">[L]</span>
+<div style="flex: 1 1 420px; display: flex; flex-direction: column; gap: 10px; min-width: 0">
+<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center"><h1 style="margin: 0; font-size: 30px; font-weight: 800">[Laundry shop name]</h1><span style="font-size: 11px; font-weight: 800; padding: 4px 8px; border-radius: 6px; background: #FBF1DC; color: #8A5A00">VIP</span></div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<span style="display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 700; padding: 5px 10px; border-radius: 999px; background: #E3F1EC; color: #0B6B57"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>CAC verified shop</span>
+<span style="font-size: 13px; font-weight: 700; padding: 5px 10px; border-radius: 999px; background: #F1ECF8; color: #6A3FA0">Top rated</span>
+<span style="font-size: 13px; font-weight: 700; padding: 5px 10px; border-radius: 999px; background: #E8EEF8; color: #1F5FAF">Fast responder</span>
+<span style="font-size: 13px; font-weight: 700; padding: 5px 10px; border-radius: 999px; background: #F5F7F6; color: #3E4D47">500+ orders</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 14px; color: #3E4D47">
+<span><strong style="color: #10201B">★ 4.8</strong> (318 reviews)</span><span><strong style="color: #10201B">98%</strong> on-time delivery</span><span>Replies in <strong style="color: #10201B">~10 min</strong></span><span>Lekki · VI · Ikoyi · Yaba</span><span>Member since 2024</span>
+</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button aria-label="Save provider" style="width: 48px; height: 48px; border-radius: 12px; border: 1px solid #DCE3E0; background: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10201B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button>
+<button aria-label="Share" style="width: 48px; height: 48px; border-radius: 12px; border: 1px solid #DCE3E0; background: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10201B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"></path><path d="M5 13v7h14v-7"></path></svg></button>
+<a href="Messages.dc.html" style="min-height: 48px; display: flex; align-items: center; padding: 0 20px; border-radius: 12px; border: 1px solid #DCE3E0; color: #10201B; text-decoration: none; font-size: 15px; font-weight: 600">Message</a>
+</div>
+</section>
+
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: start">
+
+<div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 22px">
+
+<section aria-labelledby="about-h" style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+<h2 id="about-h" style="margin: 0; font-size: 20px; font-weight: 800">About this shop</h2>
+<p style="margin: 0; font-size: 15px; line-height: 1.65; color: #3E4D47">[Short description written by the provider — e.g. specialities, years in business, what makes them different.]</p>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px">
+<div style="background: #F5F7F6; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #4F5E58">Standard turnaround</span><span style="font-size: 16px; font-weight: 700">48 hours</span></div>
+<div style="background: #F5F7F6; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #4F5E58">Express</span><span style="font-size: 16px; font-weight: 700">Same day · +50%</span></div>
+<div style="background: #F5F7F6; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #4F5E58">Pickup &amp; delivery</span><span style="font-size: 16px; font-weight: 700">₦1,500 · free over ₦20k</span></div>
+<div style="background: #F5F7F6; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #4F5E58">Shop hours</span><span style="font-size: 16px; font-weight: 700">Mon–Sat · 8am–7pm</span></div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center"><span style="font-size: 14px; font-weight: 700; margin-right: 4px">Fabrics handled:</span><span style="font-size: 13px; padding: 5px 10px; border-radius: 999px; background: #F1ECF8; color: #6A3FA0">Native &amp; aso-oke</span><span style="font-size: 13px; padding: 5px 10px; border-radius: 999px; background: #F1ECF8; color: #6A3FA0">Beaded &amp; lace</span><span style="font-size: 13px; padding: 5px 10px; border-radius: 999px; background: #F1ECF8; color: #6A3FA0">Suits &amp; wool</span><span style="font-size: 13px; padding: 5px 10px; border-radius: 999px; background: #F1ECF8; color: #6A3FA0">Silk</span><span style="font-size: 13px; padding: 5px 10px; border-radius: 999px; background: #F1ECF8; color: #6A3FA0">Duvets &amp; curtains</span></div>
+</section>
+
+<section aria-labelledby="gal-h" style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px">
+<div style="display: flex; flex-direction: column; gap: 4px"><h2 id="gal-h" style="margin: 0; font-size: 20px; font-weight: 800">Photos &amp; videos from real orders</h2><span style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #4F5E58"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0B6B57" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg>Captured in the CleanConnect app only — no uploads, no stock photos</span></div>
+<div role="tablist" aria-label="Album" style="display: flex; gap: 6px; flex-wrap: wrap"><button role="tab" aria-selected="true" style="min-height: 38px; padding: 0 12px; border-radius: 999px; border: 0; background: #10201B; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 600">All · 64</button><button role="tab" aria-selected="false" style="min-height: 38px; padding: 0 12px; border-radius: 999px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 13px">Dry clean</button><button role="tab" aria-selected="false" style="min-height: 38px; padding: 0 12px; border-radius: 999px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 13px">Ironing</button><button role="tab" aria-selected="false" style="min-height: 38px; padding: 0 12px; border-radius: 999px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 13px">Videos · 6</button></div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px">
+<figure style="margin: 0; position: relative; aspect-ratio: 1; border-radius: 14px; background: #E5DDF0; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #4A2C73">[Photo · agbada after dry clean]
+<button aria-label="Save photo" style="position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; border-radius: 999px; border: 0; background: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="#D9485F" stroke="#D9485F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button>
+<figcaption style="position: absolute; left: 8px; bottom: 8px; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 6px; background: rgba(16,32,27,0.82); color: #FFFFFF">CleanConnect · Oct 2026</figcaption>
+</figure>
+<figure style="margin: 0; position: relative; aspect-ratio: 1; border-radius: 14px; background: #DDE6F3; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #23406B">[Before / after · stained shirt]
+<button aria-label="Save photo" style="position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; border-radius: 999px; border: 0; background: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10201B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button>
+<figcaption style="position: absolute; left: 8px; bottom: 8px; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 6px; background: rgba(16,32,27,0.82); color: #FFFFFF">CleanConnect · Oct 2026</figcaption>
+</figure>
+<figure style="margin: 0; position: relative; aspect-ratio: 1; border-radius: 14px; background: #10201B; overflow: hidden; display: flex; flex-direction: column; gap: 8px; align-items: center; justify-content: center; font-size: 13px; color: #C9D4D0">
+<span style="width: 48px; height: 48px; border-radius: 999px; background: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="#10201B" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg></span>[Video · ironing, 0:42]
+<button aria-label="Save video" style="position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; border-radius: 999px; border: 0; background: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10201B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button>
+<figcaption style="position: absolute; left: 8px; bottom: 8px; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 6px; background: rgba(255,255,255,0.9); color: #10201B">CleanConnect · Sep 2026</figcaption>
+</figure>
+<figure style="margin: 0; position: relative; aspect-ratio: 1; border-radius: 14px; background: #E3F1EC; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #084F40">[Photo · folded duvet set]
+<button aria-label="Save photo" style="position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; border-radius: 999px; border: 0; background: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10201B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button>
+<figcaption style="position: absolute; left: 8px; bottom: 8px; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 6px; background: rgba(16,32,27,0.82); color: #FFFFFF">CleanConnect · Sep 2026</figcaption>
+</figure>
+</div>
+<span style="font-size: 13px; color: #4F5E58">Tap ♡ to keep a photo or video in your Saved collection. Faces, house numbers and labels are blurred automatically.</span>
+</section>
+
+<section aria-labelledby="rev-h" style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 18px">
+<h2 id="rev-h" style="margin: 0; font-size: 20px; font-weight: 800">Ratings &amp; reviews</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 28px">
+<div style="display: flex; flex-direction: column; gap: 4px; min-width: 140px"><span style="font-size: 48px; font-weight: 800; line-height: 1">4.8</span><span style="font-size: 18px; color: #B7791F" aria-hidden="true">★★★★★</span><span style="font-size: 13px; color: #4F5E58">318 verified reviews</span></div>
+<div style="flex: 1 1 220px; display: flex; flex-direction: column; gap: 6px; font-size: 13px">
+<div style="display: flex; gap: 8px; align-items: center"><span style="width: 24px">5★</span><span style="flex: 1; height: 8px; background: #EEF2F0; border-radius: 999px"><span style="display: block; height: 8px; width: 82%; background: #0B6B57; border-radius: 999px"></span></span><span style="width: 32px; color: #4F5E58">82%</span></div>
+<div style="display: flex; gap: 8px; align-items: center"><span style="width: 24px">4★</span><span style="flex: 1; height: 8px; background: #EEF2F0; border-radius: 999px"><span style="display: block; height: 8px; width: 12%; background: #0B6B57; border-radius: 999px"></span></span><span style="width: 32px; color: #4F5E58">12%</span></div>
+<div style="display: flex; gap: 8px; align-items: center"><span style="width: 24px">3★</span><span style="flex: 1; height: 8px; background: #EEF2F0; border-radius: 999px"><span style="display: block; height: 8px; width: 4%; background: #0B6B57; border-radius: 999px"></span></span><span style="width: 32px; color: #4F5E58">4%</span></div>
+<div style="display: flex; gap: 8px; align-items: center"><span style="width: 24px">2★</span><span style="flex: 1; height: 8px; background: #EEF2F0; border-radius: 999px"><span style="display: block; height: 8px; width: 1%; background: #0B6B57; border-radius: 999px"></span></span><span style="width: 32px; color: #4F5E58">1%</span></div>
+<div style="display: flex; gap: 8px; align-items: center"><span style="width: 24px">1★</span><span style="flex: 1; height: 8px; background: #EEF2F0; border-radius: 999px"><span style="display: block; height: 8px; width: 1%; background: #0B6B57; border-radius: 999px"></span></span><span style="width: 32px; color: #4F5E58">1%</span></div>
+</div>
+<div style="flex: 1 1 200px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; font-size: 13px">
+<span style="background: #F5F7F6; border-radius: 10px; padding: 10px"><strong style="font-size: 16px">4.9</strong><br>Quality</span>
+<span style="background: #F5F7F6; border-radius: 10px; padding: 10px"><strong style="font-size: 16px">4.8</strong><br>On time</span>
+<span style="background: #F5F7F6; border-radius: 10px; padding: 10px"><strong style="font-size: 16px">4.7</strong><br>Communication</span>
+<span style="background: #F5F7F6; border-radius: 10px; padding: 10px"><strong style="font-size: 16px">4.6</strong><br>Value</span>
+</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px"><button style="min-height: 38px; padding: 0 12px; border-radius: 999px; border: 0; background: #10201B; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 600">All</button><button style="min-height: 38px; padding: 0 12px; border-radius: 999px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 13px">With photos</button><button style="min-height: 38px; padding: 0 12px; border-radius: 999px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 13px">Dry clean</button><button style="min-height: 38px; padding: 0 12px; border-radius: 999px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 13px">Ironing</button><button style="min-height: 38px; padding: 0 12px; border-radius: 999px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 13px">Wash &amp; fold</button></div>
+<article style="border-top: 1px solid #EEF2F0; padding-top: 16px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 700">[Customer first name] · <span style="color: #B7791F">★★★★★</span></span><span style="font-size: 12px; color: #4F5E58">Verified order · Dry clean, 6 items · Oct 2026</span></span><span style="display: flex; gap: 6px; flex-wrap: wrap"><span style="font-size: 12px; padding: 4px 8px; border-radius: 6px; background: #E3F1EC; color: #0B6B57">Careful with fabrics</span><span style="font-size: 12px; padding: 4px 8px; border-radius: 6px; background: #E3F1EC; color: #0B6B57">On time</span></span></div>
+<p style="margin: 0; font-size: 15px; line-height: 1.6; color: #3E4D47">"[Customer review text]"</p>
+<div style="display: flex; gap: 8px"><span style="width: 72px; height: 72px; border-radius: 10px; background: #E5DDF0; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #4A2C73">[In-app photo]</span><span style="width: 72px; height: 72px; border-radius: 10px; background: #E5DDF0; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #4A2C73">[In-app photo]</span></div>
+<div style="background: #F5F7F6; border-radius: 10px; padding: 12px; font-size: 14px; line-height: 1.5"><strong>Reply from [shop]:</strong> [Provider reply]</div>
+</article>
+<article style="border-top: 1px solid #EEF2F0; padding-top: 16px; display: flex; flex-direction: column; gap: 8px">
+<span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 700">[Customer first name] · <span style="color: #B7791F">★★★★</span><span style="color: #C9D4D0">★</span></span><span style="font-size: 12px; color: #4F5E58">Verified order · Ironing, 15 items · Sep 2026</span></span>
+<p style="margin: 0; font-size: 15px; line-height: 1.6; color: #3E4D47">"[Customer review text]"</p>
+</article>
+<a href="#" style="font-size: 14px; font-weight: 600; padding: 6px 0">See all 318 reviews →</a>
+</section>
+
+<section aria-labelledby="pol-h" style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+<h2 id="pol-h" style="margin: 0; font-size: 20px; font-weight: 800">Policies &amp; protection</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; font-size: 14px; line-height: 1.5">
+<div style="background: #E3F1EC; border-radius: 12px; padding: 14px"><strong>Payment held safely</strong><br><span style="color: #3E4D47">Your money is released only after you confirm delivery.</span></div>
+<div style="background: #F5F7F6; border-radius: 12px; padding: 14px"><strong>Item count on pickup</strong><br><span style="color: #3E4D47">The shop confirms your items and price in the app before cleaning.</span></div>
+<div style="background: #F5F7F6; border-radius: 12px; padding: 14px"><strong>Damage or loss</strong><br><span style="color: #3E4D47">[Provider's compensation policy, e.g. up to 10× the cleaning price.]</span></div>
+<div style="background: #F5F7F6; border-radius: 12px; padding: 14px"><strong>Cancellation</strong><br><span style="color: #3E4D47">Free before pickup. [Fee] after items are collected.</span></div>
+</div>
+<a href="#" style="align-self: start; font-size: 13px; color: #4F5E58; padding: 6px 0">Report this profile</a>
+</section>
+</div>
+
+<aside aria-labelledby="calc-h" style="flex: 1 1 380px; max-width: 440px; background: #FFFFFF; border: 1.5px solid #6A3FA0; border-radius: 20px; padding: 22px; display: flex; flex-direction: column; gap: 16px; box-sizing: border-box">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h2 id="calc-h" style="margin: 0; font-size: 20px; font-weight: 800">Build your order</h2>
+<span style="font-size: 13px; color: #4F5E58">Prices set by [Laundry shop name]. Pick a service, then add your clothes.</span>
+</div>
+
+<div role="tablist" aria-label="Service" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; background: #F5F7F6; border-radius: 12px; padding: 4px">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="3">
+<sc-if value="{{t.selected}}" hint-placeholder-val="{{false}}"><button role="tab" aria-selected="true" onClick="{{t.pick}}" style="min-height: 44px; border-radius: 9px; border: 0; background: #6A3FA0; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px">{{t.label}}<span style="font-size: 11px; font-weight: 500; color: #E5DAF3">{{t.countLabel}}</span></button></sc-if>
+<sc-if value="{{t.unselected}}" hint-placeholder-val="{{true}}"><button role="tab" aria-selected="false" onClick="{{t.pick}}" style="min-height: 44px; border-radius: 9px; border: 0; background: transparent; color: #3E4D47; font: inherit; font-size: 13px; font-weight: 600; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px">{{t.label}}<span style="font-size: 11px; font-weight: 500; color: #4F5E58">{{t.countLabel}}</span></button></sc-if>
+</sc-for>
+</div>
+
+<div style="display: flex; flex-direction: column">
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+<div style="display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #EEF2F0">
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600">{{r.name}}</span><span style="font-size: 12px; color: #4F5E58">{{r.unit}} each</span></span>
+<span style="display: flex; align-items: center; gap: 6px">
+<button aria-label="{{r.decLabel}}" disabled="{{r.isZero}}" onClick="{{r.dec}}" style="width: 36px; height: 36px; border-radius: 10px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 18px; color: #10201B; display: flex; align-items: center; justify-content: center">−</button>
+<span aria-live="polite" style="min-width: 22px; text-align: center; font-size: 15px; font-weight: 800">{{r.q}}</span>
+<button aria-label="{{r.incLabel}}" onClick="{{r.inc}}" style="width: 36px; height: 36px; border-radius: 10px; border: 0; background: #F1ECF8; font: inherit; font-size: 18px; color: #6A3FA0; font-weight: 700; display: flex; align-items: center; justify-content: center">+</button>
+</span>
+<span style="width: 70px; text-align: right; font-size: 14px; font-weight: 700">{{r.line}}</span>
+</div>
+</sc-for>
+</div>
+
+<label style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; border-radius: 12px; background: #FFF8EC; border: 1px solid #F2D9A8; font-size: 14px">
+<span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 700">Express (same day)</span><span style="font-size: 12px; color: #7A4B00">+50% on cleaning</span></span>
+<input type="checkbox" checked="{{express}}" onChange="{{toggleExpress}}" style="width: 22px; height: 22px; accent-color: #6A3FA0">
+</label>
+
+<div style="background: #F5F7F6; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; align-items: center"><span style="font-size: 14px; font-weight: 800">Your basket · {{itemCount}} items</span><sc-if value="{{hasItems}}" hint-placeholder-val="{{true}}"><button onClick="{{clearAll}}" style="border: 0; background: transparent; color: #A23A1E; font: inherit; font-size: 13px; font-weight: 600; min-height: 32px">Clear</button></sc-if></div>
+<sc-if value="{{noItems}}" hint-placeholder-val="{{false}}"><span style="font-size: 13px; color: #4F5E58">Add clothes above to see your price.</span></sc-if>
+<sc-for list="{{lines}}" as="l" hint-placeholder-count="3">
+<div style="display: flex; justify-content: space-between; gap: 8px; font-size: 13px"><span style="color: #3E4D47">{{l.label}} <span style="color: #4F5E58">· {{l.svc}}</span></span><span style="font-weight: 600">{{l.amount}}</span></div>
+</sc-for>
+<div style="border-top: 1px solid #DCE3E0; margin-top: 4px; padding-top: 8px; display: flex; flex-direction: column; gap: 6px; font-size: 13px">
+<div style="display: flex; justify-content: space-between"><span style="color: #4F5E58">Subtotal</span><span style="font-weight: 600">{{subtotal}}</span></div>
+<sc-if value="{{express}}" hint-placeholder-val="{{false}}"><div style="display: flex; justify-content: space-between"><span style="color: #4F5E58">Express (+50%)</span><span style="font-weight: 600">{{expressFee}}</span></div></sc-if>
+<div style="display: flex; justify-content: space-between"><span style="color: #4F5E58">Pickup &amp; delivery</span><span style="font-weight: 600">{{delivery}}</span></div>
+<span style="font-size: 12px; color: #0B6B57; font-weight: 600">{{deliveryNote}}</span>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid #DCE3E0; padding-top: 10px"><span style="font-size: 16px; font-weight: 800">Estimated total</span><span style="font-size: 26px; font-weight: 800">{{total}}</span></div>
+</div>
+
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600">Pickup time
+<select style="font: inherit; font-size: 14px; font-weight: 400; padding: 12px 10px; border: 1px solid #DCE3E0; border-radius: 10px; background: #FFFFFF"><option>Today · 2–4 pm</option><option>Today · 4–6 pm</option><option>Tomorrow · 9–11 am</option></select>
+</label>
+<a href="Profile.dc.html" style="min-height: 54px; display: flex; align-items: center; justify-content: center; border-radius: 14px; background: #0B6B57; color: #FFFFFF; text-decoration: none; font-size: 16px; font-weight: 700">Book pickup · {{total}}</a>
+<span style="font-size: 12px; line-height: 1.5; color: #4F5E58; text-align: center">The shop counts your clothes at pickup and confirms the final price in the app before cleaning. Paid from your wallet and held until delivery.</span>
+</aside>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2200}}'>
+const ITEMS = [
+  { id: 'shirt', name: 'Shirt / blouse', dry: 1500, wash: 800, iron: 400 },
+  { id: 'trousers', name: 'Trousers / skirt', dry: 1500, wash: 800, iron: 400 },
+  { id: 'native', name: 'Native wear (2-piece)', dry: 3500, wash: 2000, iron: 1000 },
+  { id: 'agbada', name: 'Agbada (3-piece)', dry: 6000, wash: null, iron: 2000 },
+  { id: 'suit', name: 'Suit (2-piece)', dry: 5000, wash: null, iron: 1500 },
+  { id: 'gown', name: 'Gown / dress', dry: 3000, wash: 1500, iron: 700 },
+  { id: 'bedsheet', name: 'Bedsheet set', dry: null, wash: 1500, iron: 800 },
+  { id: 'duvet', name: 'Duvet', dry: 7000, wash: 4500, iron: null },
+  { id: 'towel', name: 'Towel', dry: null, wash: 500, iron: null }
+];
+const SERVICES = [
+  { id: 'dry', label: 'Dry clean' },
+  { id: 'wash', label: 'Wash & fold' },
+  { id: 'iron', label: 'Iron only' }
+];
+const DEFAULT_QTY = { 'dry:shirt': 3, 'dry:native': 2, 'iron:trousers': 4 };
+const DELIVERY_FEE = 1500;
+const FREE_OVER = 20000;
+const fmt = (n) => '₦' + Math.round(n).toLocaleString('en-NG');
+
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const svc = s.svc || 'dry';
+    const qty = s.qty !== undefined ? s.qty : DEFAULT_QTY;
+    const express = !!s.express;
+    const setQty = (k, v) => {
+      const next = Object.assign({}, qty);
+      next[k] = Math.max(0, Math.min(99, v));
+      this.setState({ qty: next });
+    };
+
+    const rows = ITEMS.filter((i) => i[svc] != null).map((i) => {
+      const k = svc + ':' + i.id;
+      const q = qty[k] || 0;
+      return {
+        name: i.name,
+        unit: fmt(i[svc]),
+        q: q,
+        line: q ? fmt(q * i[svc]) : '—',
+        isZero: q === 0,
+        inc: () => setQty(k, q + 1),
+        dec: () => setQty(k, q - 1),
+        incLabel: 'Add one ' + i.name,
+        decLabel: 'Remove one ' + i.name
+      };
+    });
+
+    const lines = [];
+    let subtotal = 0;
+    let itemCount = 0;
+    SERVICES.forEach((sv) => {
+      ITEMS.forEach((i) => {
+        const q = qty[sv.id + ':' + i.id] || 0;
+        if (q > 0 && i[sv.id] != null) {
+          const amt = q * i[sv.id];
+          subtotal += amt;
+          itemCount += q;
+          lines.push({ label: q + ' × ' + i.name, svc: sv.label, amount: fmt(amt) });
+        }
+      });
+    });
+
+    const tabs = SERVICES.map((t) => {
+      let c = 0;
+      ITEMS.forEach((i) => { c += qty[t.id + ':' + i.id] || 0; });
+      return {
+        label: t.label,
+        countLabel: c ? c + ' added' : 'none yet',
+        selected: t.id === svc,
+        unselected: t.id !== svc,
+        pick: () => this.setState({ svc: t.id })
+      };
+    });
+
+    const expressFee = express ? subtotal * 0.5 : 0;
+    const cleaning = subtotal + expressFee;
+    const freeDelivery = cleaning >= FREE_OVER;
+    const delivery = itemCount === 0 ? 0 : (freeDelivery ? 0 : DELIVERY_FEE);
+    const total = cleaning + delivery;
+
+    return {
+      tabs: tabs,
+      rows: rows,
+      lines: lines,
+      itemCount: itemCount,
+      hasItems: itemCount > 0,
+      noItems: itemCount === 0,
+      express: express,
+      toggleExpress: () => this.setState({ express: !express }),
+      clearAll: () => this.setState({ qty: {} }),
+      subtotal: fmt(subtotal),
+      expressFee: fmt(expressFee),
+      delivery: delivery === 0 ? (itemCount === 0 ? '—' : 'Free') : fmt(delivery),
+      deliveryNote: itemCount === 0 ? '' : (freeDelivery ? 'You get free pickup & delivery' : 'Add ' + fmt(FREE_OVER - cleaning) + ' more for free pickup & delivery'),
+      total: fmt(total)
+    };
+  }
+}
+</script>
+</body>
+</html>

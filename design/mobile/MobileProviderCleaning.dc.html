@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Provider mobile — House cleaning</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F7F6}
+a{color:#0B6B57}a:hover{color:#084F40}
+</style>
+</helmet>
+<div style="width: 390px; min-height: 1700px; box-sizing: border-box; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #10201B; background: #F5F7F6; display: flex; flex-direction: column">
+
+<div style="background: #0B6B57; color: #FFFFFF; padding: 18px 16px 20px; display: flex; flex-direction: column; gap: 14px; border-radius: 0 0 22px 22px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px">
+<span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #CDEBE1">House cleaning · Business</span><span style="display: flex; gap: 6px; align-items: center"><span style="font-size: 18px; font-weight: 800">[Business name]</span><span style="font-size: 10px; font-weight: 800; padding: 3px 6px; border-radius: 5px; background: #FBF1DC; color: #8A5A00">VIP</span></span></span>
+<button aria-label="Notifications" style="width: 44px; height: 44px; border-radius: 12px; border: 0; background: #0E7E67; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"></path><path d="M10 20a2 2 0 0 0 4 0"></path></svg></button>
+</div>
+<button aria-pressed="true" style="min-height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; border-radius: 12px; border: 0; background: #FFFFFF; color: #0B6B57; font: inherit; font-size: 15px; font-weight: 700">Online — taking jobs<span style="width: 40px; height: 22px; border-radius: 999px; background: #0B6B57; display: flex; align-items: center; justify-content: end; padding: 2px; box-sizing: border-box"><span style="width: 18px; height: 18px; border-radius: 999px; background: #FFFFFF"></span></span></button>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; text-align: center">
+<span style="background: #0E7E67; border-radius: 12px; padding: 10px 4px; display: flex; flex-direction: column"><span style="font-size: 18px; font-weight: 800">3</span><span style="font-size: 11px; color: #CDEBE1">Jobs today</span></span>
+<span style="background: #0E7E67; border-radius: 12px; padding: 10px 4px; display: flex; flex-direction: column"><span style="font-size: 18px; font-weight: 800">★ 4.9</span><span style="font-size: 11px; color: #CDEBE1">Rating</span></span>
+<span style="background: #0E7E67; border-radius: 12px; padding: 10px 4px; display: flex; flex-direction: column"><span style="font-size: 18px; font-weight: 800">97%</span><span style="font-size: 11px; color: #CDEBE1">Completion</span></span>
+</div>
+</div>
+
+<div style="padding: 18px 16px 24px; display: flex; flex-direction: column; gap: 14px; flex: 1">
+<h1 style="margin: 0; font-size: 20px; font-weight: 800">Orders</h1>
+<div role="tablist" aria-label="Order status" style="display: flex; gap: 6px; overflow-x: auto; margin: 0 -16px; padding: 0 16px">
+<button role="tab" aria-selected="true" style="flex: 0 0 auto; min-height: 40px; padding: 0 12px; border-radius: 999px; border: 0; background: #0B6B57; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700">New · 3</button>
+<button role="tab" aria-selected="false" style="flex: 0 0 auto; min-height: 40px; padding: 0 12px; border-radius: 999px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 13px">Quotes · 2</button>
+<button role="tab" aria-selected="false" style="flex: 0 0 auto; min-height: 40px; padding: 0 12px; border-radius: 999px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 13px">Upcoming · 5</button>
+<button role="tab" aria-selected="false" style="flex: 0 0 auto; min-height: 40px; padding: 0 12px; border-radius: 999px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 13px">In progress · 1</button>
+<button role="tab" aria-selected="false" style="flex: 0 0 auto; min-height: 40px; padding: 0 12px; border-radius: 999px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 13px">To confirm · 2</button>
+<button role="tab" aria-selected="false" style="flex: 0 0 auto; min-height: 40px; padding: 0 12px; border-radius: 999px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 13px">Completed</button>
+</div>
+
+<article style="background: #FFFFFF; border: 1.5px solid #F2A93B; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; gap: 8px"><span style="font-size: 16px; font-weight: 700">Deep clean · 3-bed</span><span style="align-self: start; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 999px; background: #FDF0DA; color: #7A4B00; white-space: nowrap">⏱ 12:40</span></div>
+<span style="font-size: 13px; color: #4F5E58">[Customer] · Lekki Ph 1 · 2.4 km · Sat 9:00 am</span>
+<div style="display: flex; flex-wrap: wrap; gap: 6px"><span style="font-size: 12px; padding: 4px 8px; border-radius: 6px; background: #F5F7F6">3 bed · 2 bath</span><span style="font-size: 12px; padding: 4px 8px; border-radius: 6px; background: #F5F7F6">+ Fridge</span><span style="font-size: 12px; padding: 4px 8px; border-radius: 6px; background: #F5F7F6">Bring supplies</span></div>
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 20px; font-weight: 800">[₦ price]</span><span style="font-size: 12px; color: #4F5E58">You get [₦ amount]</span></div>
+<div style="display: grid; grid-template-columns: 44px repeat(2, minmax(0, 1fr)); gap: 8px">
+<button aria-label="Message customer" style="height: 44px; border-radius: 10px; border: 1px solid #DCE3E0; background: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10201B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H8l-4 4z"></path></svg></button>
+<button style="min-height: 44px; border-radius: 10px; border: 1px solid #E8B4A6; background: #FFFFFF; color: #A23A1E; font: inherit; font-size: 14px; font-weight: 600">Decline</button>
+<button style="min-height: 44px; border-radius: 10px; border: 0; background: #0B6B57; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700">Accept</button>
+</div>
+</article>
+
+<article style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; justify-content: space-between; gap: 8px"><span style="font-size: 15px; font-weight: 700">Regular · 2-bed</span><span style="font-size: 15px; font-weight: 800">[₦ price]</span></div>
+<span style="font-size: 13px; color: #4F5E58">[Customer] · Ikoyi · Tue 10:00 am · 5.1 km</span>
+</article>
+
+<article style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<span style="font-size: 11px; font-weight: 800; color: #7A4B00; letter-spacing: 0.05em">IN PROGRESS · 9:05 AM</span>
+<span style="font-size: 15px; font-weight: 700; margin-top: -6px">Post-construction · 4-bed duplex</span>
+<span style="font-size: 13px; color: #4F5E58; margin-top: -6px">Team: [Staff A], [Staff B], [Staff C]</span>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<label style="display: flex; gap: 10px; align-items: center; font-size: 14px"><input type="checkbox" checked style="width: 20px; height: 20px; accent-color: #0B6B57">Kitchen</label>
+<label style="display: flex; gap: 10px; align-items: center; font-size: 14px"><input type="checkbox" checked style="width: 20px; height: 20px; accent-color: #0B6B57">Bathrooms (3)</label>
+<label style="display: flex; gap: 10px; align-items: center; font-size: 14px"><input type="checkbox" style="width: 20px; height: 20px; accent-color: #0B6B57">Living &amp; dining</label>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<button style="min-height: 44px; border-radius: 10px; border: 1.5px dashed #A9B7B2; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 600; color: #0B6B57">+ Photos</button>
+<button style="min-height: 44px; border-radius: 10px; border: 0; background: #10201B; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700">Mark complete</button>
+</div>
+</article>
+
+<section aria-labelledby="mpe-h" style="background: #10201B; color: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; justify-content: space-between; align-items: center; gap: 10px">
+<span style="display: flex; flex-direction: column; gap: 2px"><h2 id="mpe-h" style="margin: 0; font-size: 12px; font-weight: 600; color: #C9D4D0">Available to withdraw</h2><span style="font-size: 22px; font-weight: 800">[₦ amount]</span></span>
+<button style="min-height: 44px; padding: 0 14px; border-radius: 10px; border: 0; background: #F2A93B; color: #10201B; font: inherit; font-size: 14px; font-weight: 700">Withdraw</button>
+</section>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<a href="MobileCleaningPrices.dc.html" style="min-height: 64px; background: #FFFFFF; border: 1.5px solid #0B6B57; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; justify-content: center; gap: 2px; text-decoration: none; color: #10201B"><span style="font-size: 14px; font-weight: 700">Set your prices</span><span style="font-size: 12px; color: #4F5E58">Homes · offices · schools · shops</span></a>
+<a href="#" style="min-height: 64px; background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; justify-content: center; gap: 2px; text-decoration: none; color: #10201B"><span style="font-size: 14px; font-weight: 700">Team</span><span style="font-size: 12px; color: #4F5E58">6 cleaners · 2 free</span></a>
+<a href="#" style="min-height: 64px; background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; justify-content: center; gap: 2px; text-decoration: none; color: #10201B"><span style="font-size: 14px; font-weight: 700">Availability</span><span style="font-size: 12px; color: #4F5E58">Mon–Sat · 4 areas</span></a>
+<a href="#" style="min-height: 64px; background: #FFFFFF; border: 1px solid #E9D6A8; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; justify-content: center; gap: 2px; text-decoration: none; color: #10201B"><span style="font-size: 14px; font-weight: 700; color: #8A5A00">VIP stats</span><span style="font-size: 12px; color: #4F5E58">27 bookings this month</span></a>
+</div>
+</div>
+
+<nav aria-label="Tabs" style="background: #FFFFFF; border-top: 1px solid #DCE3E0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 6px 4px 22px">
+<a href="#" style="min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #0B6B57; font-size: 11px; font-weight: 700"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"></rect><path d="M9 4h6v3H9z"></path></svg>Orders</a>
+<a href="#" style="min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4F5E58; font-size: 11px; font-weight: 600"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>Schedule</a>
+<a href="#" style="min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4F5E58; font-size: 11px; font-weight: 600"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="2"></rect><path d="M3 10h18"></path></svg>Earnings</a>
+<a href="#" style="min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4F5E58; font-size: 11px; font-weight: 600"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H8l-4 4z"></path></svg>Chats</a>
+<a href="#" style="min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4F5E58; font-size: 11px; font-weight: 600"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>Account</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1700}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

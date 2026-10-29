@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CleanConnect mobile — Orders and wallet</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F7F6}
+a{color:#0B6B57}a:hover{color:#084F40}
+</style>
+</helmet>
+<div style="width: 390px; min-height: 1560px; box-sizing: border-box; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #10201B; background: #F5F7F6; display: flex; flex-direction: column">
+
+<div style="padding: 20px 16px 0; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; align-items: center; gap: 12px">
+<span style="width: 52px; height: 52px; border-radius: 999px; background: #E3F1EC; color: #0B6B57; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 800">[CN]</span>
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 18px; font-weight: 800">[Customer name]</span><span style="font-size: 13px; color: #4F5E58">[phone]</span></span>
+<a href="#" aria-label="Settings" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #DCE3E0; background: #FFFFFF; display: flex; align-items: center; justify-content: center; color: #10201B"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"></path></svg></a>
+</div>
+
+<section aria-labelledby="mw-h" style="background: #10201B; color: #FFFFFF; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+<h2 id="mw-h" style="margin: 0; font-size: 13px; font-weight: 600; color: #C9D4D0">Wallet balance</h2>
+<span style="font-size: 32px; font-weight: 800; margin-top: -8px">₦45,000.00</span>
+<div style="display: flex; gap: 10px">
+<button style="flex: 1; min-height: 46px; border-radius: 12px; border: 0; background: #F2A93B; color: #10201B; font: inherit; font-size: 15px; font-weight: 700">Fund wallet</button>
+<button style="flex: 1; min-height: 46px; border-radius: 12px; border: 1px solid #5B6B65; background: transparent; color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 600">Withdraw</button>
+</div>
+</section>
+</div>
+
+<div style="padding: 20px 16px 24px; display: flex; flex-direction: column; gap: 14px; flex: 1">
+<div style="display: flex; justify-content: space-between; align-items: center"><h1 style="margin: 0; font-size: 20px; font-weight: 800">My orders</h1></div>
+<div role="tablist" aria-label="Order status" style="display: flex; gap: 4px; background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 12px; padding: 4px">
+<button role="tab" aria-selected="true" style="flex: 1; min-height: 40px; border-radius: 9px; border: 0; background: #0B6B57; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600">Ongoing (2)</button>
+<button role="tab" aria-selected="false" style="flex: 1; min-height: 40px; border-radius: 9px; border: 0; background: transparent; color: #3E4D47; font: inherit; font-size: 14px">Completed (14)</button>
+</div>
+
+<article style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; justify-content: space-between; gap: 8px">
+<span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 700">Deep cleaning · 3-bed</span><span style="font-size: 13px; color: #4F5E58">[Cleaning business] · Sat 9:00</span></span>
+<span style="align-self: start; font-size: 11px; font-weight: 700; padding: 5px 9px; border-radius: 999px; background: #FDF0DA; color: #7A4B00; white-space: nowrap">In progress</span>
+</div>
+<ol aria-label="Order progress" style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0">
+<li style="display: flex; gap: 12px; align-items: start"><span style="display: flex; flex-direction: column; align-items: center"><span style="width: 14px; height: 14px; border-radius: 999px; background: #0B6B57"></span><span style="width: 2px; height: 24px; background: #0B6B57"></span></span><span style="display: flex; justify-content: space-between; flex: 1; font-size: 14px; margin-top: -2px"><span style="font-weight: 600">Booked</span><span style="color: #4F5E58; font-size: 12px">Oct 25, 4:10 pm</span></span></li>
+<li style="display: flex; gap: 12px; align-items: start"><span style="display: flex; flex-direction: column; align-items: center"><span style="width: 14px; height: 14px; border-radius: 999px; background: #0B6B57"></span><span style="width: 2px; height: 24px; background: #F2A93B"></span></span><span style="display: flex; justify-content: space-between; flex: 1; font-size: 14px; margin-top: -2px"><span style="font-weight: 600">Confirmed</span><span style="color: #4F5E58; font-size: 12px">Oct 25, 4:32 pm</span></span></li>
+<li style="display: flex; gap: 12px; align-items: start"><span style="display: flex; flex-direction: column; align-items: center"><span style="width: 14px; height: 14px; border-radius: 999px; background: #F2A93B; box-shadow: 0 0 0 4px #FDF0DA"></span><span style="width: 2px; height: 24px; background: #DCE3E0"></span></span><span style="display: flex; justify-content: space-between; flex: 1; font-size: 14px; margin-top: -2px"><span style="font-weight: 700">In progress</span><span style="color: #4F5E58; font-size: 12px">Started 9:05 am</span></span></li>
+<li style="display: flex; gap: 12px; align-items: start"><span style="display: flex; flex-direction: column; align-items: center"><span style="width: 14px; height: 14px; border-radius: 999px; background: #DCE3E0"></span></span><span style="font-size: 14px; color: #4F5E58; margin-top: -2px">Completed</span></li>
+</ol>
+<div style="display: flex; gap: 8px">
+<a href="MobileMessages.dc.html" style="flex: 1; min-height: 44px; display: flex; align-items: center; justify-content: center; border: 1px solid #DCE3E0; border-radius: 10px; text-decoration: none; color: #10201B; font-size: 14px; font-weight: 600">Message</a>
+<a href="#" style="flex: 1; min-height: 44px; display: flex; align-items: center; justify-content: center; border: 1px solid #DCE3E0; border-radius: 10px; text-decoration: none; color: #10201B; font-size: 14px; font-weight: 600">Report issue</a>
+</div>
+</article>
+
+<article style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; gap: 8px">
+<span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 700">Dry clean · 6 items</span><span style="font-size: 13px; color: #4F5E58">[Laundry shop] · Pickup Oct 24</span></span>
+<span style="align-self: start; font-size: 11px; font-weight: 700; padding: 5px 9px; border-radius: 999px; background: #E8EEF8; color: #1F5FAF; white-space: nowrap">Out for delivery</span>
+</div>
+<span style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px"><span style="height: 5px; border-radius: 999px; background: #0B6B57"></span><span style="height: 5px; border-radius: 999px; background: #0B6B57"></span><span style="height: 5px; border-radius: 999px; background: #F2A93B"></span><span style="height: 5px; border-radius: 999px; background: #DCE3E0"></span></span>
+</article>
+
+<section aria-labelledby="mc-h" style="display: flex; flex-direction: column; gap: 10px">
+<h2 id="mc-h" style="margin: 6px 0 0; font-size: 16px; font-weight: 800">Recently completed</h2>
+<div style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 16px; padding: 4px 16px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 12px 0; border-bottom: 1px solid #EEF2F0"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600">Full car wash</span><span style="font-size: 12px; color: #4F5E58">Oct 22 · [₦ amount]</span></span><a href="MobileCarWash.dc.html" style="min-height: 40px; display: flex; align-items: center; padding: 0 12px; border-radius: 8px; background: #E3F1EC; text-decoration: none; font-size: 13px; font-weight: 600">Rebook</a></div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 12px 0; border-bottom: 1px solid #EEF2F0"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600">Ironing · 12 items</span><span style="font-size: 12px; color: #4F5E58">Oct 15 · ★ 5.0</span></span><a href="MobileMarketplace.dc.html" style="min-height: 40px; display: flex; align-items: center; padding: 0 12px; border-radius: 8px; background: #E3F1EC; text-decoration: none; font-size: 13px; font-weight: 600">Rebook</a></div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 12px 0"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600">Regular cleaning</span><span style="font-size: 12px; color: #4F5E58">Oct 9 · not rated</span></span><a href="#" style="min-height: 40px; display: flex; align-items: center; padding: 0 12px; border-radius: 8px; border: 1px solid #DCE3E0; text-decoration: none; color: #10201B; font-size: 13px; font-weight: 600">Rate</a></div>
+</div>
+</section>
+</div>
+
+<nav aria-label="Tabs" style="background: #FFFFFF; border-top: 1px solid #DCE3E0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 6px 4px 22px">
+<a href="MobileHome.dc.html" style="min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4F5E58; font-size: 11px; font-weight: 600"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"></path><path d="M5 10v10h14V10"></path></svg>Home</a>
+<a href="MobileMarketplace.dc.html" style="min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4F5E58; font-size: 11px; font-weight: 600"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>Explore</a>
+<a href="MobileCarWash.dc.html" style="min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4F5E58; font-size: 11px; font-weight: 600"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 16V12l2-5h10l2 5v4"></path><path d="M3 16h18v3H3z"></path></svg>Car wash</a>
+<a href="MobileMessages.dc.html" style="min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4F5E58; font-size: 11px; font-weight: 600"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H8l-4 4z"></path></svg>Chats</a>
+<a href="MobileProfile.dc.html" style="min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #0B6B57; font-size: 11px; font-weight: 700"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>Account</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1560}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

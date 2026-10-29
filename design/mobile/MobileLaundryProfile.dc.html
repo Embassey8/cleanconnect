@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CleanConnect mobile — Laundry provider profile</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F7F6}
+a{color:#0B6B57}a:hover{color:#084F40}
+button:disabled{opacity:.4;cursor:not-allowed}
+</style>
+</helmet>
+<div style="width: 390px; min-height: 2700px; box-sizing: border-box; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #10201B; background: #F5F7F6; display: flex; flex-direction: column">
+
+<div style="background: #FFFFFF; padding: 12px 12px 18px; display: flex; flex-direction: column; gap: 14px; border-bottom: 1px solid #DCE3E0">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<a href="MobileMarketplace.dc.html" aria-label="Back" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 12px; color: #10201B"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+<span style="display: flex; gap: 6px">
+<button aria-label="Save provider" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #DCE3E0; background: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10201B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button>
+<button aria-label="Share" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #DCE3E0; background: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10201B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"></path><path d="M5 13v7h14v-7"></path></svg></button>
+</span>
+</div>
+<div style="display: flex; gap: 14px; align-items: center; padding: 0 4px">
+<span style="width: 68px; height: 68px; flex: 0 0 auto; border-radius: 18px; background: #F1ECF8; color: #6A3FA0; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800">[L]</span>
+<span style="display: flex; flex-direction: column; gap: 4px; min-width: 0">
+<span style="display: flex; gap: 6px; align-items: center"><h1 style="margin: 0; font-size: 20px; font-weight: 800">[Laundry shop]</h1><span style="font-size: 10px; font-weight: 800; padding: 3px 6px; border-radius: 5px; background: #FBF1DC; color: #8A5A00">VIP</span></span>
+<span style="font-size: 13px; color: #3E4D47"><strong style="color: #10201B">★ 4.8</strong> (318) · 500+ orders</span>
+<span style="align-self: start; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: #E3F1EC; color: #0B6B57">✓ CAC verified shop</span>
+</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; text-align: center; padding: 0 4px">
+<span style="background: #F5F7F6; border-radius: 10px; padding: 8px 4px; display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 800">48 h</span><span style="font-size: 11px; color: #4F5E58">Turnaround</span></span>
+<span style="background: #F5F7F6; border-radius: 10px; padding: 8px 4px; display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 800">98%</span><span style="font-size: 11px; color: #4F5E58">On time</span></span>
+<span style="background: #F5F7F6; border-radius: 10px; padding: 8px 4px; display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 800">~10 min</span><span style="font-size: 11px; color: #4F5E58">Replies</span></span>
+</div>
+</div>
+
+<div style="padding: 18px 16px 24px; display: flex; flex-direction: column; gap: 20px; flex: 1">
+
+<section aria-labelledby="mcalc-h" style="background: #FFFFFF; border: 1.5px solid #6A3FA0; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 2px"><h2 id="mcalc-h" style="margin: 0; font-size: 18px; font-weight: 800">Build your order</h2><span style="font-size: 12px; color: #4F5E58">Prices set by this shop</span></div>
+<div role="tablist" aria-label="Service" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; background: #F5F7F6; border-radius: 12px; padding: 4px">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="3">
+<sc-if value="{{t.selected}}" hint-placeholder-val="{{false}}"><button role="tab" aria-selected="true" onClick="{{t.pick}}" style="min-height: 44px; border-radius: 9px; border: 0; background: #6A3FA0; color: #FFFFFF; font: inherit; font-size: 12px; font-weight: 700; display: flex; flex-direction: column; align-items: center; justify-content: center">{{t.label}}<span style="font-size: 10px; font-weight: 500; color: #E5DAF3">{{t.countLabel}}</span></button></sc-if>
+<sc-if value="{{t.unselected}}" hint-placeholder-val="{{true}}"><button role="tab" aria-selected="false" onClick="{{t.pick}}" style="min-height: 44px; border-radius: 9px; border: 0; background: transparent; color: #3E4D47; font: inherit; font-size: 12px; font-weight: 600; display: flex; flex-direction: column; align-items: center; justify-content: center">{{t.label}}<span style="font-size: 10px; font-weight: 500; color: #4F5E58">{{t.countLabel}}</span></button></sc-if>
+</sc-for>
+</div>
+<div style="display: flex; flex-direction: column">
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+<div style="display: flex; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid #EEF2F0">
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600">{{r.name}}</span><span style="font-size: 12px; color: #4F5E58">{{r.unit}} each · {{r.line}}</span></span>
+<button aria-label="{{r.decLabel}}" disabled="{{r.isZero}}" onClick="{{r.dec}}" style="width: 40px; height: 40px; border-radius: 10px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 18px; color: #10201B">−</button>
+<span aria-live="polite" style="min-width: 22px; text-align: center; font-size: 15px; font-weight: 800">{{r.q}}</span>
+<button aria-label="{{r.incLabel}}" onClick="{{r.inc}}" style="width: 40px; height: 40px; border-radius: 10px; border: 0; background: #F1ECF8; font: inherit; font-size: 18px; color: #6A3FA0; font-weight: 700">+</button>
+</div>
+</sc-for>
+</div>
+<label style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px; border-radius: 12px; background: #FFF8EC; border: 1px solid #F2D9A8; font-size: 14px">
+<span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 700">Express (same day)</span><span style="font-size: 12px; color: #7A4B00">+50% on cleaning</span></span>
+<input type="checkbox" checked="{{express}}" onChange="{{toggleExpress}}" style="width: 22px; height: 22px; accent-color: #6A3FA0">
+</label>
+<div style="background: #F5F7F6; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 6px; font-size: 13px">
+<div style="display: flex; justify-content: space-between; align-items: center"><strong style="font-size: 14px">Basket · {{itemCount}} items</strong><sc-if value="{{hasItems}}" hint-placeholder-val="{{true}}"><button onClick="{{clearAll}}" style="border: 0; background: transparent; color: #A23A1E; font: inherit; font-size: 13px; font-weight: 600; min-height: 32px">Clear</button></sc-if></div>
+<sc-if value="{{noItems}}" hint-placeholder-val="{{false}}"><span style="color: #4F5E58">Add clothes above to see your price.</span></sc-if>
+<sc-for list="{{lines}}" as="l" hint-placeholder-count="3">
+<div style="display: flex; justify-content: space-between; gap: 8px"><span style="color: #3E4D47">{{l.label}} · {{l.svc}}</span><span style="font-weight: 600">{{l.amount}}</span></div>
+</sc-for>
+<div style="display: flex; justify-content: space-between; border-top: 1px solid #DCE3E0; padding-top: 6px; margin-top: 2px"><span style="color: #4F5E58">Subtotal</span><span style="font-weight: 600">{{subtotal}}</span></div>
+<sc-if value="{{express}}" hint-placeholder-val="{{false}}"><div style="display: flex; justify-content: space-between"><span style="color: #4F5E58">Express (+50%)</span><span style="font-weight: 600">{{expressFee}}</span></div></sc-if>
+<div style="display: flex; justify-content: space-between"><span style="color: #4F5E58">Pickup &amp; delivery</span><span style="font-weight: 600">{{delivery}}</span></div>
+<span style="font-size: 12px; color: #0B6B57; font-weight: 600">{{deliveryNote}}</span>
+</div>
+</section>
+
+<section aria-labelledby="mgal-h" style="display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; flex-direction: column; gap: 2px"><h2 id="mgal-h" style="margin: 0; font-size: 17px; font-weight: 800">Photos &amp; videos</h2><span style="font-size: 12px; color: #4F5E58">Taken in the app on real orders · tap ♡ to save</span></div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<figure style="margin: 0; position: relative; aspect-ratio: 1; border-radius: 14px; background: #E5DDF0; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #4A2C73; text-align: center; padding: 8px; box-sizing: border-box">[Agbada after dry clean]
+<button aria-label="Save photo" style="position: absolute; top: 6px; right: 6px; width: 36px; height: 36px; border-radius: 999px; border: 0; background: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="#D9485F" stroke="#D9485F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button>
+<figcaption style="position: absolute; left: 6px; bottom: 6px; font-size: 10px; font-weight: 700; padding: 3px 6px; border-radius: 5px; background: rgba(16,32,27,0.82); color: #FFFFFF">CleanConnect · Oct</figcaption></figure>
+<figure style="margin: 0; position: relative; aspect-ratio: 1; border-radius: 14px; background: #10201B; display: flex; flex-direction: column; gap: 6px; align-items: center; justify-content: center; font-size: 12px; color: #C9D4D0">
+<span style="width: 40px; height: 40px; border-radius: 999px; background: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="#10201B" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg></span>[Ironing · 0:42]
+<button aria-label="Save video" style="position: absolute; top: 6px; right: 6px; width: 36px; height: 36px; border-radius: 999px; border: 0; background: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10201B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button></figure>
+<figure style="margin: 0; position: relative; aspect-ratio: 1; border-radius: 14px; background: #DDE6F3; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #23406B; text-align: center; padding: 8px; box-sizing: border-box">[Before / after shirt]
+<button aria-label="Save photo" style="position: absolute; top: 6px; right: 6px; width: 36px; height: 36px; border-radius: 999px; border: 0; background: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10201B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button></figure>
+<a href="#" style="aspect-ratio: 1; border-radius: 14px; background: #FFFFFF; border: 1px solid #DCE3E0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; color: #10201B"><span style="font-size: 22px; font-weight: 800">+61</span><span style="font-size: 12px; color: #4F5E58">See all</span></a>
+</div>
+</section>
+
+<section aria-labelledby="mrev-h" style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<h2 id="mrev-h" style="margin: 0; font-size: 17px; font-weight: 800">Ratings &amp; reviews</h2>
+<div style="display: flex; gap: 16px; align-items: center">
+<span style="display: flex; flex-direction: column"><span style="font-size: 38px; font-weight: 800; line-height: 1">4.8</span><span style="font-size: 12px; color: #4F5E58">318 verified</span></span>
+<div style="flex: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; font-size: 12px">
+<span style="background: #F5F7F6; border-radius: 8px; padding: 6px 8px"><strong>4.9</strong> Quality</span>
+<span style="background: #F5F7F6; border-radius: 8px; padding: 6px 8px"><strong>4.8</strong> On time</span>
+<span style="background: #F5F7F6; border-radius: 8px; padding: 6px 8px"><strong>4.7</strong> Comms</span>
+<span style="background: #F5F7F6; border-radius: 8px; padding: 6px 8px"><strong>4.6</strong> Value</span>
+</div>
+</div>
+<article style="border-top: 1px solid #EEF2F0; padding-top: 12px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 14px; font-weight: 700">[Customer] · <span style="color: #B7791F">★★★★★</span></span>
+<span style="font-size: 12px; color: #4F5E58">Verified · Dry clean, 6 items · Oct 2026</span>
+<p style="margin: 0; font-size: 14px; line-height: 1.55; color: #3E4D47">"[Customer review text]"</p>
+<div style="background: #F5F7F6; border-radius: 8px; padding: 10px; font-size: 13px"><strong>Shop reply:</strong> [Provider reply]</div>
+</article>
+<a href="#" style="font-size: 14px; font-weight: 600; padding: 6px 0">See all reviews →</a>
+</section>
+
+<section aria-labelledby="mpol-h" style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; line-height: 1.5">
+<h2 id="mpol-h" style="margin: 0 0 4px; font-size: 17px; font-weight: 800">Policies</h2>
+<span><strong>Payment held</strong> until you confirm delivery.</span>
+<span><strong>Item count</strong> confirmed in the app at pickup.</span>
+<span><strong>Damage or loss:</strong> [provider policy].</span>
+<span><strong>Cancellation:</strong> free before pickup.</span>
+<a href="#" style="color: #4F5E58; padding: 6px 0">Report this profile</a>
+</section>
+</div>
+
+<div style="background: #FFFFFF; border-top: 1px solid #DCE3E0; padding: 12px 16px 26px; display: flex; align-items: center; gap: 12px; box-shadow: 0 -6px 18px rgba(16,32,27,0.06)">
+<span style="display: flex; flex-direction: column; flex: 1"><span style="font-size: 12px; color: #4F5E58">{{itemCount}} items · est. total</span><span style="font-size: 20px; font-weight: 800">{{total}}</span></span>
+<a href="MobileMessages.dc.html" aria-label="Message shop" style="width: 48px; height: 48px; border-radius: 12px; border: 1px solid #DCE3E0; display: flex; align-items: center; justify-content: center; color: #10201B"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H8l-4 4z"></path></svg></a>
+<a href="MobileProfile.dc.html" style="min-height: 48px; display: flex; align-items: center; padding: 0 18px; border-radius: 12px; background: #0B6B57; color: #FFFFFF; text-decoration: none; font-size: 15px; font-weight: 700">Book pickup</a>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":2700}}'>
+const ITEMS = [
+  { id: 'shirt', name: 'Shirt / blouse', dry: 1500, wash: 800, iron: 400 },
+  { id: 'trousers', name: 'Trousers / skirt', dry: 1500, wash: 800, iron: 400 },
+  { id: 'native', name: 'Native wear (2-piece)', dry: 3500, wash: 2000, iron: 1000 },
+  { id: 'agbada', name: 'Agbada (3-piece)', dry: 6000, wash: null, iron: 2000 },
+  { id: 'suit', name: 'Suit (2-piece)', dry: 5000, wash: null, iron: 1500 },
+  { id: 'gown', name: 'Gown / dress', dry: 3000, wash: 1500, iron: 700 },
+  { id: 'bedsheet', name: 'Bedsheet set', dry: null, wash: 1500, iron: 800 },
+  { id: 'duvet', name: 'Duvet', dry: 7000, wash: 4500, iron: null },
+  { id: 'towel', name: 'Towel', dry: null, wash: 500, iron: null }
+];
+const SERVICES = [
+  { id: 'dry', label: 'Dry clean' },
+  { id: 'wash', label: 'Wash & fold' },
+  { id: 'iron', label: 'Iron only' }
+];
+const DEFAULT_QTY = { 'dry:shirt': 3, 'dry:native': 2, 'iron:trousers': 4 };
+const DELIVERY_FEE = 1500;
+const FREE_OVER = 20000;
+const fmt = (n) => '₦' + Math.round(n).toLocaleString('en-NG');
+
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const svc = s.svc || 'dry';
+    const qty = s.qty !== undefined ? s.qty : DEFAULT_QTY;
+    const express = !!s.express;
+    const setQty = (k, v) => {
+      const next = Object.assign({}, qty);
+      next[k] = Math.max(0, Math.min(99, v));
+      this.setState({ qty: next });
+    };
+
+    const rows = ITEMS.filter((i) => i[svc] != null).map((i) => {
+      const k = svc + ':' + i.id;
+      const q = qty[k] || 0;
+      return {
+        name: i.name,
+        unit: fmt(i[svc]),
+        q: q,
+        line: q ? fmt(q * i[svc]) : '₦0',
+        isZero: q === 0,
+        inc: () => setQty(k, q + 1),
+        dec: () => setQty(k, q - 1),
+        incLabel: 'Add one ' + i.name,
+        decLabel: 'Remove one ' + i.name
+      };
+    });
+
+    const lines = [];
+    let subtotal = 0;
+    let itemCount = 0;
+    SERVICES.forEach((sv) => {
+      ITEMS.forEach((i) => {
+        const q = qty[sv.id + ':' + i.id] || 0;
+        if (q > 0 && i[sv.id] != null) {
+          const amt = q * i[sv.id];
+          subtotal += amt;
+          itemCount += q;
+          lines.push({ label: q + ' × ' + i.name, svc: sv.label, amount: fmt(amt) });
+        }
+      });
+    });
+
+    const tabs = SERVICES.map((t) => {
+      let c = 0;
+      ITEMS.forEach((i) => { c += qty[t.id + ':' + i.id] || 0; });
+      return {
+        label: t.label,
+        countLabel: c ? c + ' added' : 'none yet',
+        selected: t.id === svc,
+        unselected: t.id !== svc,
+        pick: () => this.setState({ svc: t.id })
+      };
+    });
+
+    const expressFee = express ? subtotal * 0.5 : 0;
+    const cleaning = subtotal + expressFee;
+    const freeDelivery = cleaning >= FREE_OVER;
+    const delivery = itemCount === 0 ? 0 : (freeDelivery ? 0 : DELIVERY_FEE);
+    const total = cleaning + delivery;
+
+    return {
+      tabs: tabs,
+      rows: rows,
+      lines: lines,
+      itemCount: itemCount,
+      hasItems: itemCount > 0,
+      noItems: itemCount === 0,
+      express: express,
+      toggleExpress: () => this.setState({ express: !express }),
+      clearAll: () => this.setState({ qty: {} }),
+      subtotal: fmt(subtotal),
+      expressFee: fmt(expressFee),
+      delivery: delivery === 0 ? (itemCount === 0 ? '—' : 'Free') : fmt(delivery),
+      deliveryNote: itemCount === 0 ? '' : (freeDelivery ? 'You get free pickup & delivery' : 'Add ' + fmt(FREE_OVER - cleaning) + ' more for free pickup & delivery'),
+      total: fmt(total)
+    };
+  }
+}
+</script>
+</body>
+</html>
