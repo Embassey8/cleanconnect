@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { HeaderActions } from "./HeaderActions";
 import { NavLinks } from "./NavLinks";
+import { MobileMenu } from "./MobileMenu";
 
 export function Logo() {
   return (
@@ -20,11 +21,16 @@ export function Logo() {
 export function PublicShell({ children, bare = false }: { children: React.ReactNode; bare?: boolean }) {
   return (
     <>
-      <header className="border-b border-border bg-surface">
-        <div className="mx-auto flex max-w-[1240px] flex-wrap items-center gap-x-7 gap-y-3 px-6 py-3.5">
+      <header className="relative border-b border-border bg-surface">
+        <div className="mx-auto flex max-w-[1240px] items-center gap-x-7 px-4 py-3 md:px-6 md:py-3.5">
           <Logo />
-          <Suspense fallback={<div className="flex-1" />}><NavLinks /></Suspense>
-          <Suspense fallback={<div className="h-11" />}><HeaderActions /></Suspense>
+          <div className="hidden flex-1 md:block"><Suspense fallback={null}><NavLinks /></Suspense></div>
+          <div className="hidden md:block"><Suspense fallback={<div className="h-11" />}><HeaderActions /></Suspense></div>
+          <div className="ml-auto md:hidden">
+            <Suspense fallback={<div className="size-11" />}>
+              <MobileMenu><Suspense fallback={<div className="h-11" />}><HeaderActions stacked /></Suspense></MobileMenu>
+            </Suspense>
+          </div>
         </div>
       </header>
       {bare ? children : <main className="mx-auto w-full max-w-[1240px] flex-1 px-4 py-8 md:px-6">{children}</main>}
