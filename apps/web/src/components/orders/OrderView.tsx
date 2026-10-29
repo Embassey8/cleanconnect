@@ -33,7 +33,8 @@ export async function OrderView({ id, viewer }: { id: string; viewer: "customer"
   const actions = availableActions(service, status, viewer).filter(
     (a) => !(viewer === "provider" && a === "accepted" && !canProviderAccept(service, escrow)),
   );
-  const canPay = viewer === "customer" && unpaid && ["requested", "assigning", "accepted"].includes(status);
+  // Car wash is only charged once a partner is assigned.
+  const canPay = viewer === "customer" && unpaid && (service === "carwash" ? status === "assigning" : ["requested", "accepted"].includes(status));
   let available = 0;
   if (canPay) {
     const { data: bal } = await supabase.from("wallet_balances").select("available");
@@ -60,6 +61,12 @@ export async function OrderView({ id, viewer }: { id: string; viewer: "customer"
 
       {canPay && <PayCard orderId={o.id} total={o.total} available={available} />}
       <ActionButtons orderId={o.id} actions={actions} />
+      {viewer === "customer" && service === "carwash" && status === "requested" && (
+        <p className="text-sm text-muted">We&apos;re finding a partner for you. You&apos;ll only be charged once one confirms.</p>
+      )}
+      {viewer === "customer" && service === "carwash" && status === "assigning" && unpaid && (
+        <p className="text-sm text-muted">A partner has been offered your job. Pay now to confirm faster, or we&apos;ll charge your wallet when they accept.</p>
+      )}
       {viewer === "customer" && status === "requested" && service !== "carwash" && !unpaid && (
         <p className="text-sm text-muted">Paid. The provider has a few minutes to respond; you&apos;re refunded in full if they can&apos;t take it.</p>
       )}
