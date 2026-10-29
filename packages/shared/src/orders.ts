@@ -82,3 +82,49 @@ export const ACTION_LABEL: Partial<Record<OrderStatus, string>> = {
   washing: "Start washing", awaiting_signoff: "Ask for sign-off",
   completed: "Confirm completion", disputed: "Report a problem", cancelled: "Cancel order",
 };
+
+/** Four-step summary shown on order cards (the full status list is on the order page). */
+export const SUMMARY_STEPS: Record<OrderService, [string, string, string, string]> = {
+  cleaning: ["Booked", "Confirmed", "In progress", "Completed"],
+  laundry: ["Booked", "Picked up", "Cleaning", "Delivered"],
+  carwash: ["Requested", "Partner assigned", "Washing", "Completed"],
+};
+
+const SUMMARY_INDEX: Record<OrderService, Partial<Record<OrderStatus, number>>> = {
+  cleaning: { requested: 0, accepted: 1, upcoming: 1, in_progress: 2, awaiting_confirmation: 2 },
+  laundry: {
+    requested: 0, accepted: 0, pickup_scheduled: 1, received: 1, awaiting_price_approval: 1,
+    cleaning: 2, ironing: 2, ready: 2, out_for_delivery: 3, delivered: 3,
+  },
+  carwash: {
+    requested: 0, assigning: 0, assigned: 1, en_route: 1, arrived: 1, condition_checked: 2, washing: 2, awaiting_signoff: 2,
+  },
+};
+
+/**
+ * Index of the step currently in progress (0-3), 4 when everything is done, or null for orders that
+ * ended without completing (cancelled, declined, expired, disputed).
+ */
+export function summaryStep(service: OrderService, status: OrderStatus): number | null {
+  if (status === "completed") return 4;
+  return SUMMARY_INDEX[service][status] ?? null;
+}
+
+/** Which summary step a status event belongs to, for showing timestamps under the steps. */
+export function summaryStepOf(service: OrderService, status: OrderStatus): number | null {
+  const i = summaryStep(service, status);
+  return i === null ? null : Math.min(i, 3);
+}
+
+export const ORDER_PREFIX: Record<OrderService, string> = { cleaning: "HC", laundry: "LD", carwash: "CW" };
+
+/** Short order reference like HC-3F9A2B. */
+export const orderRef = (service: OrderService, id: string): string => `${ORDER_PREFIX[service]}-${id.replace(/-/g, "").slice(0, 6).toUpperCase()}`;
+
+export type OrderTab = "ongoing" | "completed" | "cancelled";
+
+export function orderTab(status: OrderStatus): OrderTab {
+  if (status === "completed") return "completed";
+  if (status === "cancelled" || status === "declined" || status === "expired") return "cancelled";
+  return "ongoing"; // includes disputed: still unresolved
+}
