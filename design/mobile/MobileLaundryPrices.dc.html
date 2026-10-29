@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Provider mobile — Set laundry prices</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F7F6}
+a{color:#6A3FA0}a:hover{color:#55318A}
+</style>
+</helmet>
+<div style="width: 390px; min-height: 2200px; box-sizing: border-box; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #10201B; background: #F5F7F6; display: flex; flex-direction: column">
+
+<div style="background: #FFFFFF; border-bottom: 1px solid #DCE3E0; padding: 12px 12px 14px; display: flex; align-items: center; gap: 8px">
+<a href="MobileProviderLaundry.dc.html" aria-label="Back" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 12px; color: #10201B"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+<span style="flex: 1; display: flex; flex-direction: column"><h1 style="margin: 0; font-size: 19px; font-weight: 800">Your price list</h1><span style="font-size: 12px; color: #4F5E58">Leave a box empty if you don't offer it</span></span>
+</div>
+
+<div style="padding: 16px; display: flex; flex-direction: column; gap: 12px; flex: 1">
+<sc-for list="{{plRows}}" as="it" hint-placeholder-count="9">
+<section style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 14px; font-weight: 700">{{it.name}}</span>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px">
+<sc-for list="{{it.cells}}" as="c" hint-placeholder-count="3">
+<label style="display: flex; flex-direction: column; gap: 3px; font-size: 11px; font-weight: 600; color: #4F5E58">{{c.short}}
+<span style="display: flex; align-items: center; gap: 1px; border: 1px solid #DCE3E0; border-radius: 9px; padding: 0 7px; background: #FFFFFF"><span style="font-size: 13px">₦</span><input type="number" inputmode="numeric" min="0" step="100" placeholder="—" aria-label="{{c.label}}" value="{{c.val}}" onChange="{{c.set}}" style="width: 100%; min-width: 0; border: 0; font: inherit; font-size: 15px; font-weight: 700; color: #10201B; padding: 10px 0; outline: none; background: transparent"></span>
+</label>
+</sc-for>
+</div>
+</section>
+</sc-for>
+
+<section aria-labelledby="mlx-h" style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+<h2 id="mlx-h" style="margin: 0; font-size: 15px; font-weight: 800">Express &amp; delivery</h2>
+<label style="display: flex; justify-content: space-between; align-items: center; font-size: 14px"><span>Express surcharge</span><span style="display: flex; align-items: center; gap: 2px; border: 1px solid #DCE3E0; border-radius: 10px; padding: 0 8px">+<input type="number" min="0" step="5" value="{{expressPct}}" onChange="{{setExpress}}" style="width: 44px; border: 0; font: inherit; font-size: 15px; font-weight: 700; padding: 9px 0; outline: none">%</span></label>
+<label style="display: flex; justify-content: space-between; align-items: center; font-size: 14px"><span>Pickup &amp; delivery fee</span><span style="display: flex; align-items: center; gap: 2px; border: 1px solid #DCE3E0; border-radius: 10px; padding: 0 8px">₦<input type="number" min="0" step="100" value="{{fee}}" onChange="{{setFee}}" style="width: 64px; border: 0; font: inherit; font-size: 15px; font-weight: 700; padding: 9px 0; outline: none"></span></label>
+<label style="display: flex; justify-content: space-between; align-items: center; font-size: 14px"><span>Free delivery over</span><span style="display: flex; align-items: center; gap: 2px; border: 1px solid #DCE3E0; border-radius: 10px; padding: 0 8px">₦<input type="number" min="0" step="1000" value="{{freeOver}}" onChange="{{setFreeOver}}" style="width: 64px; border: 0; font: inherit; font-size: 15px; font-weight: 700; padding: 9px 0; outline: none"></span></label>
+</section>
+
+<section aria-labelledby="mlp-h2" style="background: #10201B; color: #FFFFFF; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 8px; font-size: 14px">
+<h2 id="mlp-h2" style="margin: 0; font-size: 12px; font-weight: 700; color: #C9D4D0; letter-spacing: 0.05em">WHAT CUSTOMERS WILL SEE</h2>
+<span style="font-size: 13px; color: #C9D4D0">5 shirts + 2 native wear dry cleaned, 4 trousers ironed</span>
+<div style="display: flex; justify-content: space-between"><span>Standard</span><strong>{{exStandard}}</strong></div>
+<div style="display: flex; justify-content: space-between"><span>Express</span><strong>{{exExpress}}</strong></div>
+<div style="display: flex; justify-content: space-between; border-top: 1px solid #3A4E47; padding-top: 8px"><span>You receive (standard)</span><strong style="color: #F2A93B">{{exEarn}}</strong></div>
+</section>
+</div>
+
+<div style="background: #FFFFFF; border-top: 1px solid #DCE3E0; padding: 12px 16px 26px">
+<sc-if value="{{plDirty}}" hint-placeholder-val="{{false}}"><button onClick="{{publish}}" style="width: 100%; min-height: 52px; border-radius: 14px; border: 0; background: #6A3FA0; color: #FFFFFF; font: inherit; font-size: 16px; font-weight: 700">Publish new prices</button></sc-if>
+<sc-if value="{{plSaved}}" hint-placeholder-val="{{true}}"><span style="min-height: 52px; display: flex; align-items: center; justify-content: center; border-radius: 14px; background: #F1ECF8; color: #6A3FA0; font-size: 15px; font-weight: 700">✓ Prices are live on your profile</span></sc-if>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":2200}}'>
+const ITEMS = [
+  { id: 'shirt', name: 'Shirt / blouse', dry: 1500, wash: 800, iron: 400 },
+  { id: 'trousers', name: 'Trousers / skirt', dry: 1500, wash: 800, iron: 400 },
+  { id: 'native', name: 'Native wear (2-piece)', dry: 3500, wash: 2000, iron: 1000 },
+  { id: 'agbada', name: 'Agbada (3-piece)', dry: 6000, wash: null, iron: 2000 },
+  { id: 'suit', name: 'Suit (2-piece)', dry: 5000, wash: null, iron: 1500 },
+  { id: 'gown', name: 'Gown / dress', dry: 3000, wash: 1500, iron: 700 },
+  { id: 'bedsheet', name: 'Bedsheet set', dry: null, wash: 1500, iron: 800 },
+  { id: 'duvet', name: 'Duvet', dry: 7000, wash: 4500, iron: null },
+  { id: 'towel', name: 'Towel', dry: null, wash: 500, iron: null }
+];
+const SVCS = [
+  { id: 'dry', label: 'Dry clean', short: 'Dry clean' },
+  { id: 'wash', label: 'Wash & fold', short: 'Wash & fold' },
+  { id: 'iron', label: 'Iron only', short: 'Iron only' }
+];
+const EXAMPLE = [
+  { item: 'shirt', svc: 'dry', q: 5 },
+  { item: 'native', svc: 'dry', q: 2 },
+  { item: 'trousers', svc: 'iron', q: 4 }
+];
+const COMMISSION = 0.15;
+const fmt = (n) => '₦' + Math.round(n).toLocaleString('en-NG');
+
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const prices = s.prices || {};
+    const expressPct = s.expressPct !== undefined ? s.expressPct : 50;
+    const fee = s.fee !== undefined ? s.fee : 1500;
+    const freeOver = s.freeOver !== undefined ? s.freeOver : 20000;
+    const plDirty = !!s.plDirty;
+    const change = (patch) => this.setState(Object.assign({ plDirty: true }, patch));
+    const priceOf = (itemId, svc) => {
+      const k = itemId + ':' + svc;
+      const it = ITEMS.find((i) => i.id === itemId);
+      return prices[k] !== undefined ? prices[k] : it[svc];
+    };
+
+    const plRows = ITEMS.map((i) => ({
+      name: i.name,
+      cells: SVCS.map((sv) => {
+        const k = i.id + ':' + sv.id;
+        const p = priceOf(i.id, sv.id);
+        return {
+          short: sv.short,
+          val: p === null || p === undefined ? '' : p,
+          label: sv.label + ' price for ' + i.name,
+          set: (e) => {
+            const n = Object.assign({}, prices);
+            const v = e.target.value;
+            n[k] = v === '' ? null : Math.max(0, Number(v) || 0);
+            change({ prices: n });
+          }
+        };
+      })
+    }));
+
+    let exSub = 0;
+    EXAMPLE.forEach((x) => { const p = priceOf(x.item, x.svc); if (p) exSub += p * x.q; });
+    const del = (sub) => (sub >= freeOver ? 0 : fee);
+    const expSub = exSub * (1 + expressPct / 100);
+
+    return {
+      plRows: plRows,
+      expressPct: expressPct,
+      fee: fee,
+      freeOver: freeOver,
+      setExpress: (e) => change({ expressPct: Math.max(0, Number(e.target.value) || 0) }),
+      setFee: (e) => change({ fee: Math.max(0, Number(e.target.value) || 0) }),
+      setFreeOver: (e) => change({ freeOver: Math.max(0, Number(e.target.value) || 0) }),
+      exStandard: fmt(exSub + del(exSub)),
+      exExpress: fmt(expSub + del(expSub)),
+      exEarn: fmt(exSub * (1 - COMMISSION) + del(exSub)),
+      plDirty: plDirty,
+      plSaved: !plDirty,
+      publish: () => this.setState({ plDirty: false })
+    };
+  }
+}
+</script>
+</body>
+</html>

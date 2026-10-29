@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Provider dashboard — Laundry</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F7F6}
+a{color:#0B6B57}a:hover{color:#084F40}
+</style>
+</helmet>
+<div style="font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #10201B; background: #F5F7F6; min-height: 100vh; display: flex; flex-wrap: wrap; align-items: stretch">
+
+<aside aria-label="Provider navigation" style="flex: 1 1 230px; max-width: 250px; background: #FFFFFF; border-right: 1px solid #DCE3E0; padding: 20px 12px; display: flex; flex-direction: column; gap: 18px; box-sizing: border-box">
+<div style="display: flex; align-items: center; gap: 10px; padding: 0 8px">
+<span style="width: 34px; height: 34px; border-radius: 10px; background: #0B6B57; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4z"></path></svg></span>
+<span style="display: flex; flex-direction: column"><span style="font-weight: 800; font-size: 16px">CleanConnect</span><span style="font-size: 12px; color: #4F5E58">Provider · Laundry</span></span>
+</div>
+<nav style="display: flex; flex-direction: column; gap: 2px">
+<a href="#" style="min-height: 42px; display: flex; align-items: center; padding: 0 12px; border-radius: 8px; background: #F1ECF8; color: #6A3FA0; text-decoration: none; font-size: 14px; font-weight: 700">Orders board</a>
+<a href="#" style="min-height: 42px; display: flex; align-items: center; padding: 0 12px; border-radius: 8px; color: #3E4D47; text-decoration: none; font-size: 14px">Price list</a>
+<a href="#" style="min-height: 42px; display: flex; align-items: center; padding: 0 12px; border-radius: 8px; color: #3E4D47; text-decoration: none; font-size: 14px">Pickup &amp; delivery</a>
+<a href="#" style="min-height: 42px; display: flex; align-items: center; padding: 0 12px; border-radius: 8px; color: #3E4D47; text-decoration: none; font-size: 14px">Opening hours &amp; capacity</a>
+<a href="#" style="min-height: 42px; display: flex; align-items: center; padding: 0 12px; border-radius: 8px; color: #3E4D47; text-decoration: none; font-size: 14px">Earnings &amp; payouts</a>
+<a href="#" style="min-height: 42px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; border-radius: 8px; color: #3E4D47; text-decoration: none; font-size: 14px">Messages <span style="font-size: 12px; font-weight: 700; background: #6A3FA0; color: #FFFFFF; border-radius: 999px; padding: 2px 8px">2</span></a>
+<a href="#" style="min-height: 42px; display: flex; align-items: center; padding: 0 12px; border-radius: 8px; color: #3E4D47; text-decoration: none; font-size: 14px">Reviews</a>
+<a href="#" style="min-height: 42px; display: flex; align-items: center; padding: 0 12px; border-radius: 8px; color: #3E4D47; text-decoration: none; font-size: 14px">Profile &amp; verification</a>
+<a href="#" style="min-height: 42px; display: flex; align-items: center; padding: 0 12px; border-radius: 8px; color: #8A5A00; text-decoration: none; font-size: 14px; font-weight: 600">VIP</a>
+<a href="#" style="min-height: 42px; display: flex; align-items: center; padding: 0 12px; border-radius: 8px; color: #3E4D47; text-decoration: none; font-size: 14px">Support</a>
+</nav>
+</aside>
+
+<main style="flex: 999 1 640px; min-width: 0; padding: 28px; display: flex; flex-direction: column; gap: 22px; box-sizing: border-box">
+
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 26px; font-weight: 800">[Laundry shop name]</h1>
+<span style="font-size: 14px; color: #4F5E58">Shop · CAC verified · Dry clean, wash &amp; fold, ironing · ★ 4.8</span>
+</div>
+<div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap">
+<button aria-pressed="true" style="min-height: 44px; display: flex; align-items: center; gap: 10px; padding: 0 14px; border-radius: 999px; border: 1px solid #0B6B57; background: #E3F1EC; color: #0B6B57; font: inherit; font-size: 14px; font-weight: 700"><span style="width: 36px; height: 20px; border-radius: 999px; background: #0B6B57; display: flex; align-items: center; justify-content: end; padding: 2px; box-sizing: border-box"><span style="width: 16px; height: 16px; border-radius: 999px; background: #FFFFFF"></span></span>Open — accepting orders</button>
+<button style="min-height: 44px; padding: 0 16px; border-radius: 10px; border: 0; background: #10201B; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700">+ Walk-in order</button>
+</div>
+</div>
+
+<section aria-label="Today at a glance" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px">
+<div style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; color: #4F5E58">Items in shop</span><span style="font-size: 26px; font-weight: 800">146</span><span style="font-size: 12px; color: #4F5E58">Across 19 orders</span></div>
+<div style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; color: #4F5E58">Pickups today</span><span style="font-size: 26px; font-weight: 800">5</span><span style="font-size: 12px; color: #4F5E58">Next at 11:00 am</span></div>
+<div style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; color: #4F5E58">Due today</span><span style="font-size: 26px; font-weight: 800">7</span><span style="font-size: 12px; color: #A23A1E; font-weight: 600">2 express orders</span></div>
+<div style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; color: #4F5E58">Capacity used</span><span style="font-size: 26px; font-weight: 800">72%</span><span style="font-size: 12px; color: #4F5E58">of 60 kg / day</span></div>
+</section>
+
+<section aria-labelledby="board-h" style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px">
+<h2 id="board-h" style="margin: 0; font-size: 20px; font-weight: 800">Orders board</h2>
+<div style="display: flex; gap: 6px; flex-wrap: wrap">
+<button style="min-height: 40px; padding: 0 12px; border-radius: 999px; border: 0; background: #10201B; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 600">All services</button>
+<button style="min-height: 40px; padding: 0 12px; border-radius: 999px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 13px">Dry clean</button>
+<button style="min-height: 40px; padding: 0 12px; border-radius: 999px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 13px">Wash only</button>
+<button style="min-height: 40px; padding: 0 12px; border-radius: 999px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 13px">Ironing</button>
+</div>
+</div>
+<div style="overflow-x: auto; padding-bottom: 6px">
+<div style="display: grid; grid-template-columns: repeat(6, minmax(190px, 1fr)); gap: 12px; min-width: 1180px">
+
+<div style="background: #FFF8EC; border: 1px solid #F2D9A8; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 10px">
+<span style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 800"><span>New requests</span><span style="color: #7A4B00">2</span></span>
+<div style="background: #FFFFFF; border: 1.5px solid #F2A93B; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 14px; font-weight: 700">[Customer] · 8 items</span>
+<span style="font-size: 12px; color: #4F5E58">Dry clean · pickup today 2 pm · Lekki</span>
+<span style="font-size: 12px; font-weight: 700; color: #7A4B00">Respond in 9:15</span>
+<span style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px"><button style="min-height: 38px; border-radius: 8px; border: 1px solid #E8B4A6; background: #FFFFFF; color: #A23A1E; font: inherit; font-size: 12px">Decline</button><button style="min-height: 38px; border-radius: 8px; border: 0; background: #0B6B57; color: #FFFFFF; font: inherit; font-size: 12px; font-weight: 700">Accept</button></span>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 14px; font-weight: 700">[Customer] · ~6 kg</span>
+<span style="font-size: 12px; color: #4F5E58">Wash only · drop-off</span>
+</div>
+</div>
+
+<div style="background: #EEF2F0; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 10px">
+<span style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 800"><span>Pickup scheduled</span><span style="color: #4F5E58">5</span></span>
+<div style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 14px; font-weight: 700">#LD-[id] · 12 items</span>
+<span style="font-size: 12px; color: #4F5E58">Ironing · 11:00 am · Yaba</span>
+<span style="font-size: 12px; color: #4F5E58">Rider: [Rider name]</span>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 14px; font-weight: 700">#LD-[id] · 4 items</span>
+<span style="font-size: 12px; color: #4F5E58">Dry clean · 1:30 pm · VI</span>
+</div>
+</div>
+
+<div style="background: #EEF2F0; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 10px">
+<span style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 800"><span>Received &amp; tagged</span><span style="color: #4F5E58">3</span></span>
+<div style="background: #FFFFFF; border: 2px solid #6A3FA0; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 14px; font-weight: 700">#LD-2041 · 9 items</span>
+<span style="font-size: 12px; color: #4F5E58">Dry clean · Tag 0412–0420</span>
+<span style="align-self: start; font-size: 11px; font-weight: 800; padding: 3px 7px; border-radius: 5px; background: #FBE6E0; color: #A23A1E">EXPRESS · due 6 pm</span>
+</div>
+</div>
+
+<div style="background: #EEF2F0; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 10px">
+<span style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 800"><span>Cleaning</span><span style="color: #4F5E58">6</span></span>
+<div style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 14px; font-weight: 700">#LD-[id] · 7 kg</span>
+<span style="font-size: 12px; color: #4F5E58">Wash only · due tomorrow</span>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 14px; font-weight: 700">#LD-[id] · 3 items</span>
+<span style="font-size: 12px; color: #4F5E58">Dry clean · agbada set</span>
+</div>
+</div>
+
+<div style="background: #EEF2F0; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 10px">
+<span style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 800"><span>Ironing</span><span style="color: #4F5E58">3</span></span>
+<div style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 14px; font-weight: 700">#LD-[id] · 15 items</span>
+<span style="font-size: 12px; color: #4F5E58">Shirts &amp; trousers · due 4 pm</span>
+</div>
+</div>
+
+<div style="background: #E3F1EC; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 10px">
+<span style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 800"><span>Ready / out for delivery</span><span style="color: #0B6B57">4</span></span>
+<div style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 14px; font-weight: 700">#LD-[id] · 6 items</span>
+<span style="font-size: 12px; color: #4F5E58">Ready · customer notified</span>
+<button style="min-height: 38px; border-radius: 8px; border: 0; background: #0B6B57; color: #FFFFFF; font: inherit; font-size: 12px; font-weight: 700">Send for delivery</button>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 14px; font-weight: 700">#LD-[id] · 10 items</span>
+<span style="font-size: 12px; color: #1F5FAF; font-weight: 600">Out for delivery · [Rider]</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: start">
+<section aria-labelledby="det-h" style="flex: 3 1 560px; min-width: 0; background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px">
+<div style="display: flex; flex-direction: column; gap: 4px"><h2 id="det-h" style="margin: 0; font-size: 18px; font-weight: 800">#LD-2041 · Item intake</h2><span style="font-size: 14px; color: #4F5E58">[Customer] · Received 9:40 am · Express, due 6 pm</span></div>
+<span style="align-self: start; font-size: 12px; font-weight: 700; padding: 5px 10px; border-radius: 999px; background: #F1ECF8; color: #6A3FA0">Counting items</span>
+</div>
+<p style="margin: 0; font-size: 14px; color: #3E4D47; background: #F5F7F6; border-radius: 10px; padding: 10px 12px">Customer booked <strong>{{bookedCount}} items</strong> · estimate <strong>{{bookedTotal}}</strong>. Count what you received — prices come from your price list.</p>
+
+<div style="overflow-x: auto">
+<div style="min-width: 640px; display: flex; flex-direction: column">
+<div style="display: grid; grid-template-columns: 90px minmax(0, 2fr) minmax(0, 1fr) 70px 140px 80px 90px; gap: 10px; padding: 0 0 8px; border-bottom: 1px solid #DCE3E0; font-size: 12px; font-weight: 600; color: #4F5E58">
+<span>Tags</span><span>Item</span><span>Service</span><span>Booked</span><span>Counted</span><span>Unit</span><span style="text-align: right">Line</span>
+</div>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+<div style="display: grid; grid-template-columns: 90px minmax(0, 2fr) minmax(0, 1fr) 70px 140px 80px 90px; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid #EEF2F0; font-size: 14px">
+<span style="font-size: 13px; color: #4F5E58">{{r.tags}}</span>
+<span style="display: flex; flex-direction: column; gap: 2px; min-width: 0"><span style="font-weight: 600">{{r.name}}</span><span style="font-size: 12px; color: #A23A1E">{{r.note}}</span></span>
+<span>{{r.svc}}</span>
+<span style="color: #4F5E58">{{r.booked}}</span>
+<span style="display: flex; align-items: center; gap: 6px">
+<button aria-label="{{r.decLabel}}" disabled="{{r.isZero}}" onClick="{{r.dec}}" style="width: 34px; height: 34px; border-radius: 8px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 16px">−</button>
+<span aria-live="polite" style="min-width: 20px; text-align: center; font-weight: 800">{{r.count}}</span>
+<button aria-label="{{r.incLabel}}" onClick="{{r.inc}}" style="width: 34px; height: 34px; border-radius: 8px; border: 0; background: #F1ECF8; color: #6A3FA0; font: inherit; font-size: 16px; font-weight: 700">+</button>
+<sc-if value="{{r.changed}}" hint-placeholder-val="{{false}}"><span style="font-size: 11px; font-weight: 800; padding: 2px 6px; border-radius: 5px; background: #FDF0DA; color: #7A4B00">{{r.diffLabel}}</span></sc-if>
+</span>
+<span style="color: #4F5E58">{{r.unit}}</span>
+<span style="text-align: right; font-weight: 700">{{r.line}}</span>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 16px">
+<div style="flex: 1 1 260px; background: #F5F7F6; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 7px; font-size: 14px">
+<div style="display: flex; justify-content: space-between"><span style="color: #4F5E58">Counted · {{itemCount}} items</span><span style="font-weight: 600">{{subtotal}}</span></div>
+<div style="display: flex; justify-content: space-between"><span style="color: #4F5E58">Express (+{{expressPct}}%)</span><span style="font-weight: 600">{{expressFee}}</span></div>
+<div style="display: flex; justify-content: space-between"><span style="color: #4F5E58">Pickup &amp; delivery</span><span style="font-weight: 600">{{delivery}}</span></div>
+<div style="display: flex; justify-content: space-between; border-top: 1px solid #DCE3E0; padding-top: 8px"><span style="font-weight: 800">Customer pays</span><span style="font-size: 20px; font-weight: 800">{{total}}</span></div>
+<sc-if value="{{changed}}" hint-placeholder-val="{{true}}"><span style="font-size: 13px; font-weight: 600; color: #7A4B00; background: #FDF0DA; border-radius: 8px; padding: 8px 10px">{{diffText}} — customer must approve before cleaning.</span></sc-if>
+<sc-if value="{{unchanged}}" hint-placeholder-val="{{false}}"><span style="font-size: 13px; font-weight: 600; color: #0B6B57; background: #E3F1EC; border-radius: 8px; padding: 8px 10px">Matches the booking — no approval needed.</span></sc-if>
+</div>
+<div style="flex: 1 1 220px; background: #10201B; color: #FFFFFF; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 7px; font-size: 14px">
+<div style="display: flex; justify-content: space-between"><span style="color: #C9D4D0">Cleaning total</span><span>{{cleaning}}</span></div>
+<div style="display: flex; justify-content: space-between"><span style="color: #C9D4D0">CleanConnect fee (15%)</span><span>−{{commission}}</span></div>
+<div style="display: flex; justify-content: space-between"><span style="color: #C9D4D0">Delivery fee (yours)</span><span>{{deliveryEarn}}</span></div>
+<div style="display: flex; justify-content: space-between; border-top: 1px solid #3A4E47; padding-top: 8px"><span style="font-weight: 700">You receive</span><span style="font-size: 20px; font-weight: 800; color: #F2A93B">{{earn}}</span></div>
+</div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; justify-content: end; gap: 8px; border-top: 1px solid #EEF2F0; padding-top: 14px">
+<button style="min-height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600">+ Note / stain photo</button>
+<button onClick="{{reset}}" style="min-height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600">Reset to booking</button>
+<sc-if value="{{changed}}" hint-placeholder-val="{{true}}"><button style="min-height: 44px; padding: 0 16px; border-radius: 10px; border: 0; background: #F2A93B; color: #10201B; font: inherit; font-size: 14px; font-weight: 700">Send new total for approval</button></sc-if>
+<sc-if value="{{unchanged}}" hint-placeholder-val="{{false}}"><button style="min-height: 44px; padding: 0 16px; border-radius: 10px; border: 0; background: #6A3FA0; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700">Confirm &amp; move to Cleaning</button></sc-if>
+</div>
+</section>
+
+<div style="flex: 2 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+<section aria-labelledby="pl-h" style="background: #FFFFFF; border: 1.5px solid #6A3FA0; border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 2px"><h2 id="pl-h" style="margin: 0; font-size: 16px; font-weight: 800">Your price list</h2><span style="font-size: 12px; color: #4F5E58">Per item. Leave a box empty if you don't offer that service. Customers and the intake sheet use these prices.</span></div>
+<div style="display: flex; flex-direction: column">
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) repeat(3, 76px); gap: 6px; padding-bottom: 6px; border-bottom: 1px solid #DCE3E0; font-size: 11px; font-weight: 700; color: #4F5E58"><span>Item</span><span>Dry clean</span><span>Wash &amp; fold</span><span>Iron only</span></div>
+<sc-for list="{{plRows}}" as="it" hint-placeholder-count="9">
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) repeat(3, 76px); gap: 6px; align-items: center; padding: 5px 0; border-bottom: 1px solid #EEF2F0">
+<span style="font-size: 13px; font-weight: 600">{{it.name}}</span>
+<sc-for list="{{it.cells}}" as="c" hint-placeholder-count="3">
+<label style="display: flex; align-items: center; gap: 1px; border: 1px solid #DCE3E0; border-radius: 7px; padding: 0 5px; background: #FFFFFF"><span style="font-size: 12px; color: #4F5E58">₦</span><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">{{c.label}}</span><input type="number" min="0" step="100" placeholder="—" value="{{c.val}}" onChange="{{c.set}}" style="width: 100%; min-width: 0; border: 0; font: inherit; font-size: 13px; font-weight: 700; padding: 7px 0; outline: none; background: transparent"></label>
+</sc-for>
+</div>
+</sc-for>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; font-weight: 700">Express, pickup &amp; delivery</span>
+<label style="display: flex; justify-content: space-between; align-items: center; font-size: 13px"><span style="color: #3E4D47">Express surcharge (same day)</span><span style="display: flex; align-items: center; gap: 2px; border: 1px solid #DCE3E0; border-radius: 8px; padding: 0 6px">+<input type="number" min="0" step="5" value="{{expressPct}}" onChange="{{setExpress}}" style="width: 44px; border: 0; font: inherit; font-size: 14px; font-weight: 700; padding: 7px 0; outline: none">%</span></label>
+<label style="display: flex; justify-content: space-between; align-items: center; font-size: 13px"><span style="color: #3E4D47">Pickup &amp; delivery fee</span><span style="display: flex; align-items: center; gap: 2px; border: 1px solid #DCE3E0; border-radius: 8px; padding: 0 6px">₦<input type="number" min="0" step="100" value="{{fee}}" onChange="{{setFee}}" style="width: 64px; border: 0; font: inherit; font-size: 14px; font-weight: 700; padding: 7px 0; outline: none"></span></label>
+<label style="display: flex; justify-content: space-between; align-items: center; font-size: 13px"><span style="color: #3E4D47">Free delivery over</span><span style="display: flex; align-items: center; gap: 2px; border: 1px solid #DCE3E0; border-radius: 8px; padding: 0 6px">₦<input type="number" min="0" step="1000" value="{{freeOver}}" onChange="{{setFreeOver}}" style="width: 64px; border: 0; font: inherit; font-size: 14px; font-weight: 700; padding: 7px 0; outline: none"></span></label>
+<div style="display: flex; justify-content: space-between; font-size: 13px"><span style="color: #3E4D47">Standard turnaround · areas</span><span style="font-weight: 700">48 h · Lekki, VI, Ikoyi, Yaba</span></div>
+</div>
+<div style="background: #F5F7F6; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px; font-size: 13px">
+<span style="font-size: 12px; font-weight: 700; color: #4F5E58">CUSTOMER PREVIEW</span>
+<span style="color: #3E4D47">Example: 5 shirts + 2 native wear dry cleaned, 4 trousers ironed</span>
+<div style="display: flex; justify-content: space-between"><span>Standard</span><strong>{{exStandard}}</strong></div>
+<div style="display: flex; justify-content: space-between"><span>Express</span><strong>{{exExpress}}</strong></div>
+<div style="display: flex; justify-content: space-between"><span style="color: #4F5E58">You receive (standard, after 15%)</span><strong style="color: #0B6B57">{{exEarn}}</strong></div>
+</div>
+<sc-if value="{{plDirty}}" hint-placeholder-val="{{false}}"><button onClick="{{publish}}" style="min-height: 46px; border-radius: 10px; border: 0; background: #6A3FA0; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700">Publish new prices</button></sc-if>
+<sc-if value="{{plSaved}}" hint-placeholder-val="{{true}}"><span style="min-height: 46px; display: flex; align-items: center; justify-content: center; border-radius: 10px; background: #F1ECF8; color: #6A3FA0; font-size: 14px; font-weight: 700">✓ Live on your profile</span></sc-if>
+</section>
+<section aria-labelledby="le-h" style="background: #10201B; color: #FFFFFF; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 10px">
+<h2 id="le-h" style="margin: 0; font-size: 14px; font-weight: 600; color: #C9D4D0">Available to withdraw</h2>
+<span style="font-size: 28px; font-weight: 800; margin-top: -4px">[₦ amount]</span>
+<span style="font-size: 13px; color: #C9D4D0">[₦ amount] released after delivery is confirmed</span>
+<button style="min-height: 46px; border-radius: 10px; border: 0; background: #F2A93B; color: #10201B; font: inherit; font-size: 15px; font-weight: 700">Withdraw to bank</button>
+</section>
+</div>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2100}}'>
+const ITEMS = [
+  { id: 'shirt', name: 'Shirt / blouse', dry: 1500, wash: 800, iron: 400 },
+  { id: 'trousers', name: 'Trousers / skirt', dry: 1500, wash: 800, iron: 400 },
+  { id: 'native', name: 'Native wear (2-pc)', dry: 3500, wash: 2000, iron: 1000 },
+  { id: 'agbada', name: 'Agbada (3-pc)', dry: 6000, wash: null, iron: 2000 },
+  { id: 'suit', name: 'Suit (2-pc)', dry: 5000, wash: null, iron: 1500 },
+  { id: 'gown', name: 'Gown / dress', dry: 3000, wash: 1500, iron: 700 },
+  { id: 'bedsheet', name: 'Bedsheet set', dry: null, wash: 1500, iron: 800 },
+  { id: 'duvet', name: 'Duvet', dry: 7000, wash: 4500, iron: null },
+  { id: 'towel', name: 'Towel', dry: null, wash: 500, iron: null }
+];
+const SVCS = [
+  { id: 'dry', label: 'Dry clean' },
+  { id: 'wash', label: 'Wash & fold' },
+  { id: 'iron', label: 'Iron only' }
+];
+const LINES = [
+  { id: 'suit', item: 'suit', svc: 'dry', booked: 1, note: '' },
+  { id: 'shirt', item: 'shirt', svc: 'dry', booked: 4, note: '1 collar stain' },
+  { id: 'native', item: 'native', svc: 'dry', booked: 3, note: 'Delicate beads' },
+  { id: 'duvet', item: 'duvet', svc: 'wash', booked: 1, note: '' },
+  { id: 'trousers', item: 'trousers', svc: 'dry', booked: 0, note: '' },
+  { id: 'gown', item: 'gown', svc: 'dry', booked: 0, note: '' }
+];
+const EXAMPLE = [
+  { item: 'shirt', svc: 'dry', q: 5 },
+  { item: 'native', svc: 'dry', q: 2 },
+  { item: 'trousers', svc: 'iron', q: 4 }
+];
+const START_COUNT = { suit: 1, shirt: 5, native: 3, duvet: 1, trousers: 0, gown: 0 };
+const COMMISSION = 0.15;
+const FIRST_TAG = 412;
+const fmt = (n) => '₦' + Math.round(n).toLocaleString('en-NG');
+const pad = (n) => String(n).padStart(4, '0');
+
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const prices = s.prices || {};
+    const expressPct = s.expressPct !== undefined ? s.expressPct : 50;
+    const fee = s.fee !== undefined ? s.fee : 1500;
+    const freeOver = s.freeOver !== undefined ? s.freeOver : 20000;
+    const plDirty = !!s.plDirty;
+    const change = (patch) => this.setState(Object.assign({ plDirty: true }, patch));
+    const itemById = (id) => ITEMS.find((i) => i.id === id);
+    const priceOf = (itemId, svc) => {
+      const k = itemId + ':' + svc;
+      return prices[k] !== undefined ? prices[k] : itemById(itemId)[svc];
+    };
+    const unitOf = (l) => priceOf(l.item, l.svc) || 0;
+    const price = (counts, express) => {
+      let sub = 0;
+      let items = 0;
+      LINES.forEach((l) => { sub += (counts[l.id] || 0) * unitOf(l); items += counts[l.id] || 0; });
+      const exp = express ? sub * expressPct / 100 : 0;
+      const cleaning = sub + exp;
+      const delivery = items === 0 || cleaning >= freeOver ? 0 : fee;
+      return { sub: sub, items: items, exp: exp, cleaning: cleaning, delivery: delivery, total: cleaning + delivery };
+    };
+
+    const plRows = ITEMS.map((i) => ({
+      name: i.name,
+      cells: SVCS.map((sv) => {
+        const k = i.id + ':' + sv.id;
+        const p = priceOf(i.id, sv.id);
+        return {
+          val: p === null || p === undefined ? '' : p,
+          label: sv.label + ' price for ' + i.name,
+          set: (e) => {
+            const n = Object.assign({}, prices);
+            const v = e.target.value;
+            n[k] = v === '' ? null : Math.max(0, Number(v) || 0);
+            change({ prices: n });
+          }
+        };
+      })
+    }));
+
+    let exSub = 0;
+    EXAMPLE.forEach((x) => { const p = priceOf(x.item, x.svc); if (p) exSub += p * x.q; });
+    const exDel = (sub) => (sub >= freeOver ? 0 : fee);
+    const exStd = exSub + exDel(exSub);
+    const exExpSub = exSub * (1 + expressPct / 100);
+    const exExp = exExpSub + exDel(exExpSub);
+
+    const counts = s.counts || START_COUNT;
+    const setCount = (id, v) => {
+      const next = Object.assign({}, counts);
+      next[id] = Math.max(0, Math.min(99, v));
+      this.setState({ counts: next });
+    };
+    const bookedCounts = {};
+    LINES.forEach((l) => { bookedCounts[l.id] = l.booked; });
+    const booked = price(bookedCounts, true);
+    const now = price(counts, true);
+
+    let tag = FIRST_TAG;
+    const rows = LINES.map((l) => {
+      const c = counts[l.id] || 0;
+      const it = itemById(l.item);
+      const unit = unitOf(l);
+      let tags = '—';
+      if (c === 1) tags = pad(tag);
+      if (c > 1) tags = pad(tag) + '–' + pad(tag + c - 1);
+      tag += c;
+      const d = c - l.booked;
+      return {
+        name: it.name,
+        note: l.note,
+        svc: (SVCS.find((x) => x.id === l.svc) || {}).label,
+        booked: l.booked,
+        count: c,
+        tags: tags,
+        unit: fmt(unit),
+        line: c ? fmt(c * unit) : '—',
+        isZero: c === 0,
+        changed: d !== 0,
+        diffLabel: (d > 0 ? '+' : '') + d,
+        inc: () => setCount(l.id, c + 1),
+        dec: () => setCount(l.id, c - 1),
+        incLabel: 'Add one ' + it.name,
+        decLabel: 'Remove one ' + it.name
+      };
+    });
+
+    const diff = now.total - booked.total;
+    const commission = now.cleaning * COMMISSION;
+    return {
+      plRows: plRows,
+      expressPct: expressPct,
+      fee: fee,
+      freeOver: freeOver,
+      setExpress: (e) => change({ expressPct: Math.max(0, Number(e.target.value) || 0) }),
+      setFee: (e) => change({ fee: Math.max(0, Number(e.target.value) || 0) }),
+      setFreeOver: (e) => change({ freeOver: Math.max(0, Number(e.target.value) || 0) }),
+      exStandard: fmt(exStd),
+      exExpress: fmt(exExp),
+      exEarn: fmt(exSub * (1 - COMMISSION) + exDel(exSub)),
+      plDirty: plDirty,
+      plSaved: !plDirty,
+      publish: () => this.setState({ plDirty: false }),
+      rows: rows,
+      bookedCount: booked.items,
+      bookedTotal: fmt(booked.total),
+      itemCount: now.items,
+      subtotal: fmt(now.sub),
+      expressFee: fmt(now.exp),
+      delivery: now.items === 0 ? '—' : (now.delivery === 0 ? 'Free' : fmt(now.delivery)),
+      total: fmt(now.total),
+      cleaning: fmt(now.cleaning),
+      commission: fmt(commission),
+      deliveryEarn: fmt(now.delivery),
+      earn: fmt(now.cleaning - commission + now.delivery),
+      changed: diff !== 0,
+      unchanged: diff === 0,
+      diffText: (diff > 0 ? '+' : '−') + fmt(Math.abs(diff)) + ' vs. booking',
+      reset: () => this.setState({ counts: bookedCounts })
+    };
+  }
+}
+</script>
+</body>
+</html>

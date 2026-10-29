@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CleanConnect mobile — Marketplace</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F7F6}
+a{color:#0B6B57}a:hover{color:#084F40}
+</style>
+</helmet>
+<div style="width: 390px; min-height: 1560px; box-sizing: border-box; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #10201B; background: #F5F7F6; display: flex; flex-direction: column">
+
+<div style="background: #FFFFFF; border-bottom: 1px solid #DCE3E0; padding: 14px 16px 14px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; gap: 8px">
+<a href="MobileHome.dc.html" aria-label="Back" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 12px; color: #10201B"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+<h1 style="margin: 0; font-size: 19px; font-weight: 800; flex: 1">Find a provider</h1>
+</div>
+<div style="display: flex; gap: 8px">
+<label style="flex: 1; display: flex; align-items: center; gap: 8px; background: #F5F7F6; border-radius: 12px; padding: 0 12px; min-height: 46px">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4F5E58" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+<input type="search" aria-label="Search providers" placeholder="Name, area or service" style="flex: 1; min-width: 0; border: 0; font: inherit; font-size: 15px; outline: none; background: transparent">
+</label>
+<button aria-label="Filters, 3 active" style="position: relative; width: 46px; height: 46px; border-radius: 12px; border: 0; background: #0B6B57; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16"></path><path d="M7 12h10"></path><path d="M10 18h4"></path></svg><span style="position: absolute; top: -4px; right: -4px; width: 18px; height: 18px; border-radius: 999px; background: #F2A93B; color: #10201B; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center">3</span></button>
+</div>
+<div role="tablist" aria-label="Service" style="display: flex; gap: 8px; overflow-x: auto; margin: 0 -16px; padding: 0 16px">
+<button role="tab" aria-selected="true" style="flex: 0 0 auto; min-height: 40px; padding: 0 14px; border-radius: 999px; border: 0; background: #0B6B57; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600">House cleaning</button>
+<button role="tab" aria-selected="false" style="flex: 0 0 auto; min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 14px">Dry clean</button>
+<button role="tab" aria-selected="false" style="flex: 0 0 auto; min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 14px">Wash only</button>
+<button role="tab" aria-selected="false" style="flex: 0 0 auto; min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 14px">Ironing</button>
+</div>
+</div>
+
+<div style="padding: 14px 16px 24px; display: flex; flex-direction: column; gap: 12px; flex: 1">
+<div style="display: flex; gap: 6px; flex-wrap: wrap">
+<span style="font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 999px; background: #E3F1EC; color: #0B6B57">Shops + individuals ✕</span>
+<span style="font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 999px; background: #E3F1EC; color: #0B6B57">★ 4.0+ ✕</span>
+<span style="font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 999px; background: #E3F1EC; color: #0B6B57">Within 10 km ✕</span>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #4F5E58"><span>[N] providers near you</span>
+<label style="display: flex; align-items: center; gap: 4px">Sort<select style="font: inherit; font-size: 13px; color: #10201B; border: 0; background: transparent; font-weight: 600; min-height: 36px"><option>Recommended</option><option>Price: low to high</option><option>Highest rated</option><option>Nearest</option></select></label></div>
+
+<article style="background: #FFFFFF; border: 1.5px solid #E1B65A; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; gap: 12px; align-items: center">
+<span style="width: 52px; height: 52px; flex: 0 0 auto; border-radius: 14px; background: #E3F1EC; color: #0B6B57; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 800">[A]</span>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+<span style="display: flex; gap: 6px; align-items: center"><span style="font-size: 16px; font-weight: 700">[Business name]</span><span style="font-size: 10px; font-weight: 800; padding: 3px 6px; border-radius: 5px; background: #FBF1DC; color: #8A5A00">VIP</span></span>
+<span style="font-size: 13px; color: #4F5E58">★ 4.9 · CAC verified · [2.4] km</span>
+</div>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
+<span style="display: flex; flex-direction: column"><span style="font-size: 12px; color: #4F5E58">from</span><span style="font-size: 19px; font-weight: 800">[₦ price]</span></span>
+<span style="display: flex; gap: 8px"><a href="MobileMessages.dc.html" aria-label="Message [Business name]" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #DCE3E0; display: flex; align-items: center; justify-content: center; color: #10201B"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H8l-4 4z"></path></svg></a><a href="MobileProfile.dc.html" style="min-height: 44px; display: flex; align-items: center; padding: 0 20px; border-radius: 12px; background: #0B6B57; color: #FFFFFF; text-decoration: none; font-size: 14px; font-weight: 700">Book</a></span>
+</div>
+</article>
+
+<article style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; gap: 12px; align-items: center">
+<span style="width: 52px; height: 52px; flex: 0 0 auto; border-radius: 999px; background: #F1ECF8; color: #6A3FA0; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 800">[B]</span>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 16px; font-weight: 700">[Individual cleaner]</span>
+<span style="font-size: 13px; color: #4F5E58">★ 4.7 · NIN verified · [3.1] km</span>
+</div>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
+<span style="display: flex; flex-direction: column"><span style="font-size: 12px; color: #4F5E58">from</span><span style="font-size: 19px; font-weight: 800">[₦ price]</span></span>
+<span style="display: flex; gap: 8px"><a href="MobileMessages.dc.html" aria-label="Message [Individual cleaner]" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #DCE3E0; display: flex; align-items: center; justify-content: center; color: #10201B"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H8l-4 4z"></path></svg></a><a href="MobileProfile.dc.html" style="min-height: 44px; display: flex; align-items: center; padding: 0 20px; border-radius: 12px; background: #0B6B57; color: #FFFFFF; text-decoration: none; font-size: 14px; font-weight: 700">Book</a></span>
+</div>
+</article>
+
+<article style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; gap: 12px; align-items: center">
+<span style="width: 52px; height: 52px; flex: 0 0 auto; border-radius: 14px; background: #E8EEF8; color: #1F5FAF; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 800">[C]</span>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 16px; font-weight: 700">[Business name]</span>
+<span style="font-size: 13px; color: #4F5E58">★ 4.6 · CAC verified · [5.8] km</span>
+</div>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
+<span style="display: flex; flex-direction: column"><span style="font-size: 12px; color: #4F5E58">from</span><span style="font-size: 19px; font-weight: 800">[₦ price]</span></span>
+<span style="display: flex; gap: 8px"><a href="MobileMessages.dc.html" aria-label="Message [Business name]" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #DCE3E0; display: flex; align-items: center; justify-content: center; color: #10201B"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H8l-4 4z"></path></svg></a><a href="MobileProfile.dc.html" style="min-height: 44px; display: flex; align-items: center; padding: 0 20px; border-radius: 12px; background: #0B6B57; color: #FFFFFF; text-decoration: none; font-size: 14px; font-weight: 700">Book</a></span>
+</div>
+</article>
+
+<section aria-labelledby="sheet-h" style="background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 20px; padding: 18px 16px; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 -6px 24px rgba(16,32,27,0.08)">
+<span style="align-self: center; width: 40px; height: 4px; border-radius: 999px; background: #DCE3E0"></span>
+<div style="display: flex; justify-content: space-between; align-items: center"><h2 id="sheet-h" style="margin: 0; font-size: 17px; font-weight: 800">Filters</h2><button style="border: 0; background: transparent; color: #0B6B57; font: inherit; font-size: 14px; font-weight: 600; min-height: 44px">Clear</button></div>
+<div style="display: flex; flex-direction: column; gap: 8px"><span style="font-size: 14px; font-weight: 700">Price range (₦)</span><div style="display: flex; gap: 8px"><input type="number" aria-label="Minimum price" placeholder="Min" style="flex: 1; min-width: 0; font: inherit; font-size: 15px; padding: 11px; border: 1px solid #DCE3E0; border-radius: 10px"><input type="number" aria-label="Maximum price" placeholder="Max" style="flex: 1; min-width: 0; font: inherit; font-size: 15px; padding: 11px; border: 1px solid #DCE3E0; border-radius: 10px"></div></div>
+<div style="display: flex; flex-direction: column; gap: 8px"><span style="font-size: 14px; font-weight: 700">Provider type</span><div style="display: flex; gap: 8px"><button style="flex: 1; min-height: 44px; border-radius: 10px; border: 1px solid #0B6B57; background: #E3F1EC; color: #0B6B57; font: inherit; font-size: 14px; font-weight: 600">Shop (CAC)</button><button style="flex: 1; min-height: 44px; border-radius: 10px; border: 1px solid #0B6B57; background: #E3F1EC; color: #0B6B57; font: inherit; font-size: 14px; font-weight: 600">Individual</button></div></div>
+<div style="display: flex; flex-direction: column; gap: 8px"><span style="font-size: 14px; font-weight: 700">Rating</span><div style="display: flex; gap: 8px"><button style="flex: 1; min-height: 44px; border-radius: 10px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 14px">Any</button><button style="flex: 1; min-height: 44px; border-radius: 10px; border: 1px solid #0B6B57; background: #E3F1EC; color: #0B6B57; font: inherit; font-size: 14px; font-weight: 600">4.0+</button><button style="flex: 1; min-height: 44px; border-radius: 10px; border: 1px solid #DCE3E0; background: #FFFFFF; font: inherit; font-size: 14px">4.5+</button></div></div>
+<button style="min-height: 50px; border-radius: 12px; border: 0; background: #0B6B57; color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 700">Show [N] results</button>
+</section>
+</div>
+
+<nav aria-label="Tabs" style="background: #FFFFFF; border-top: 1px solid #DCE3E0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 6px 4px 22px">
+<a href="MobileHome.dc.html" style="min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4F5E58; font-size: 11px; font-weight: 600"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"></path><path d="M5 10v10h14V10"></path></svg>Home</a>
+<a href="MobileMarketplace.dc.html" style="min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #0B6B57; font-size: 11px; font-weight: 700"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>Explore</a>
+<a href="MobileCarWash.dc.html" style="min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4F5E58; font-size: 11px; font-weight: 600"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 16V12l2-5h10l2 5v4"></path><path d="M3 16h18v3H3z"></path></svg>Car wash</a>
+<a href="MobileMessages.dc.html" style="min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4F5E58; font-size: 11px; font-weight: 600"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H8l-4 4z"></path></svg>Chats</a>
+<a href="MobileProfile.dc.html" style="min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #4F5E58; font-size: 11px; font-weight: 600"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>Account</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1560}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

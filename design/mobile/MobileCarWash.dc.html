@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CleanConnect mobile — Request a car wash</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F7F6}
+a{color:#0B6B57}a:hover{color:#084F40}
+</style>
+</helmet>
+<div style="width: 390px; min-height: 1500px; box-sizing: border-box; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #10201B; background: #F5F7F6; display: flex; flex-direction: column">
+
+<div style="background: #FFFFFF; border-bottom: 1px solid #DCE3E0; padding: 14px 16px; display: flex; align-items: center; gap: 8px">
+<a href="MobileHome.dc.html" aria-label="Back" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 12px; color: #10201B"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+<h1 style="margin: 0; font-size: 19px; font-weight: 800; flex: 1">Request a car wash</h1>
+<span style="font-size: 10px; font-weight: 800; padding: 4px 7px; border-radius: 5px; background: #E8EEF8; color: #1F5FAF">MANAGED</span>
+</div>
+
+<form style="padding: 18px 16px 24px; display: flex; flex-direction: column; gap: 20px; flex: 1">
+<p style="margin: 0; font-size: 14px; line-height: 1.55; color: #4F5E58">Pick a package at our fixed price. We'll hand-pick a vetted partner near you.</p>
+
+<fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 10px">
+<legend style="font-size: 16px; font-weight: 800; margin-bottom: 10px">Vehicle type</legend>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<label style="display: flex; align-items: center; gap: 8px; min-height: 50px; padding: 0 12px; border: 2px solid #1F5FAF; border-radius: 12px; background: #F2F6FC; font-size: 14px; font-weight: 600"><input type="radio" name="veh" checked style="accent-color: #1F5FAF; width: 18px; height: 18px">Saloon</label>
+<label style="display: flex; align-items: center; gap: 8px; min-height: 50px; padding: 0 12px; border: 1px solid #DCE3E0; border-radius: 12px; background: #FFFFFF; font-size: 14px"><input type="radio" name="veh" style="accent-color: #1F5FAF; width: 18px; height: 18px">SUV / jeep</label>
+<label style="display: flex; align-items: center; gap: 8px; min-height: 50px; padding: 0 12px; border: 1px solid #DCE3E0; border-radius: 12px; background: #FFFFFF; font-size: 14px"><input type="radio" name="veh" style="accent-color: #1F5FAF; width: 18px; height: 18px">Bus / van</label>
+<label style="display: flex; align-items: center; gap: 8px; min-height: 50px; padding: 0 12px; border: 1px solid #DCE3E0; border-radius: 12px; background: #FFFFFF; font-size: 14px"><input type="radio" name="veh" style="accent-color: #1F5FAF; width: 18px; height: 18px">Pickup / truck</label>
+</div>
+</fieldset>
+
+<fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 10px">
+<legend style="font-size: 16px; font-weight: 800; margin-bottom: 10px">Package</legend>
+<label style="display: flex; gap: 12px; align-items: center; padding: 14px; border: 1px solid #DCE3E0; border-radius: 14px; background: #FFFFFF">
+<input type="radio" name="pkg" style="accent-color: #1F5FAF; width: 18px; height: 18px">
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 700">Exterior wash</span><span style="font-size: 12px; color: #4F5E58">Body, rims, tyre shine, windows</span></span>
+<span style="font-size: 15px; font-weight: 800">[₦ price]</span>
+</label>
+<label style="display: flex; gap: 12px; align-items: center; padding: 14px; border: 2px solid #1F5FAF; border-radius: 14px; background: #F2F6FC">
+<input type="radio" name="pkg" checked style="accent-color: #1F5FAF; width: 18px; height: 18px">
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 700">Full wash</span><span style="font-size: 12px; color: #4F5E58">Exterior + vacuum, dashboard, mats</span></span>
+<span style="font-size: 15px; font-weight: 800">[₦ price]</span>
+</label>
+<label style="display: flex; gap: 12px; align-items: center; padding: 14px; border: 1px solid #DCE3E0; border-radius: 14px; background: #FFFFFF">
+<input type="radio" name="pkg" style="accent-color: #1F5FAF; width: 18px; height: 18px">
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 700">Detailing</span><span style="font-size: 12px; color: #4F5E58">Deep interior, seats, polish, wax</span></span>
+<span style="font-size: 15px; font-weight: 800">[₦ price]</span>
+</label>
+</fieldset>
+
+<fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 12px">
+<legend style="font-size: 16px; font-weight: 800; margin-bottom: 10px">Where and when</legend>
+<div role="radiogroup" aria-label="Location" style="display: flex; background: #FFFFFF; border: 1px solid #DCE3E0; border-radius: 12px; padding: 4px">
+<label style="flex: 1; min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 9px; background: #1F5FAF; color: #FFFFFF; font-size: 14px; font-weight: 600"><input type="radio" name="loc" checked style="position: absolute; opacity: 0; width: 1px; height: 1px">Come to me</label>
+<label style="flex: 1; min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 9px; color: #3E4D47; font-size: 14px"><input type="radio" name="loc" style="position: absolute; opacity: 0; width: 1px; height: 1px">I'll drop off</label>
+</div>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600">Address<input type="text" placeholder="House number, street, area" style="font: inherit; font-size: 15px; font-weight: 400; padding: 13px 12px; border: 1px solid #DCE3E0; border-radius: 10px; background: #FFFFFF"></label>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600">Date<input type="date" style="font: inherit; font-size: 14px; font-weight: 400; padding: 12px 8px; border: 1px solid #DCE3E0; border-radius: 10px; background: #FFFFFF; min-width: 0"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600">Time<select style="font: inherit; font-size: 14px; font-weight: 400; padding: 12px 8px; border: 1px solid #DCE3E0; border-radius: 10px; background: #FFFFFF; min-width: 0"><option>8–10 am</option><option>10–12 pm</option><option>12–2 pm</option><option>2–4 pm</option></select></label>
+</div>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600">Notes (optional)<textarea rows="2" placeholder="Car colour, plate number, gate code…" style="font: inherit; font-size: 15px; font-weight: 400; padding: 12px; border: 1px solid #DCE3E0; border-radius: 10px; background: #FFFFFF; resize: vertical"></textarea></label>
+</fieldset>
+
+<div style="background: #F2F6FC; border-radius: 12px; padding: 14px; display: flex; gap: 10px; font-size: 13px; line-height: 1.5; color: #23406B">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1F5FAF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: 0 0 auto"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"></path><path d="M9 12l2 2 4-4"></path></svg>
+<span>You're only charged when a partner is assigned.</span>
+</div>
+</form>
+
+<div style="background: #FFFFFF; border-top: 1px solid #DCE3E0; padding: 14px 16px 26px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 13px; color: #4F5E58">Full wash · Saloon · from wallet</span><span style="font-size: 20px; font-weight: 800">[₦ total]</span></div>
+<a href="MobileProfile.dc.html" style="min-height: 52px; display: flex; align-items: center; justify-content: center; border-radius: 14px; background: #1F5FAF; color: #FFFFFF; text-decoration: none; font-size: 16px; font-weight: 700">Send request</a>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1500}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

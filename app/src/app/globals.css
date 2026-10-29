@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+/* Design tokens — BUILD_BRIEF §12 */
+@theme {
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+
+  --color-primary: #0b6b57;
+  --color-primary-hover: #084f40;
+  --color-primary-tint: #e3f1ec;
+  --color-primary-tint-2: #f2f9f6;
+  --color-accent: #f2a93b;
+  --color-ink: #10201b;
+  --color-text-2: #3e4d47;
+  --color-muted: #4f5e58;
+  --color-bg: #f5f7f6;
+  --color-bg-admin: #eef2f0;
+  --color-surface: #ffffff;
+  --color-border: #dce3e0;
+
+  --color-carwash: #1f5fae;
+  --color-carwash-bg: #e8eef8;
+  --color-laundry: #6a3fa0;
+  --color-laundry-bg: #f1ecf8;
+  --color-vip: #8a5a00;
+  --color-vip-bg: #fbf1dc;
+  --color-vip-border: #e9d6a8;
+  --color-warning: #7a4b00;
+  --color-warning-bg: #fdf0da;
+  --color-danger: #a23a1e;
+  --color-danger-bg: #fbe6e0;
+
+  --radius-input: 10px;
+  --radius-card: 14px;
+  --radius-panel: 20px;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+}
