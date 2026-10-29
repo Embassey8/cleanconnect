@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { ROUTE_ACCESS } from "@/lib/auth/roles";
+import { ROUTE_ACCESS } from "@cleanconnect/shared";
 
 /** Refresh the Supabase session cookie and bounce signed-out visitors from private areas.
  *  Role checks happen in the layouts (requireRole); this is only the optimistic first gate. */

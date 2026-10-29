@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth/session";
-import { homeFor } from "@/lib/auth/roles";
+import { homeFor } from "@cleanconnect/shared";
 
 export interface AuthState { error?: string }
 

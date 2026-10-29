@@ -10,3 +10,10 @@ You are building the CleanConnect marketplace (cleaning, laundry, car wash) for 
 - Never display NIN, BVN or CAC numbers on public pages — only "verified" badges.
 - Money: integers in naira, a ledger for every wallet movement, prices snapshotted on order lines.
 - Work in the phases in BUILD_BRIEF §13. Ask before choosing between options listed in BUILD_BRIEF §14 (open decisions); use the placeholder values meanwhile.
+
+## Web + mobile layout
+
+- Monorepo (pnpm workspace): `apps/web` (Next.js), `packages/shared` (pure TypeScript), `supabase/` (migrations, shared by web and the future Expo app in `apps/mobile`).
+- Put pricing, roles, validation and types in `packages/shared`. It must not import DOM, Node, Next or React Native modules.
+- Keep data access behind the Supabase client and database rules (RLS) so the mobile app can reuse it; avoid logic that exists only in Next server actions.
+- Build UI responsive-first with 44 px touch targets (BUILD_BRIEF §12).
