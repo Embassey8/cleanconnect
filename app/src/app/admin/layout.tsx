@@ -1,3 +1,4 @@
+import { Guard } from "@/components/auth/Guard";
 import { DashboardShell } from "@/components/shell/DashboardShell";
 
 const NAV = [
@@ -7,5 +8,5 @@ const NAV = [
 ].map(([s, label]) => ({ href: `/admin/${s}`, label }));
 
 export default function AdminLayout({ children }: LayoutProps<"/admin">) {
-  return <DashboardShell title="Admin" nav={NAV} dark>{children}</DashboardShell>;
+  return <DashboardShell title="Admin" nav={NAV} dark><Guard roles={["admin"]}>{children}</Guard></DashboardShell>;
 }
