@@ -2,16 +2,16 @@
 -- Verification here is a deterministic stand-in for a KYC provider (Smile ID / Dojah / Prembly).
 -- Raw ID numbers are never stored: only the last 4 digits, for admin reference.
 
-create function public.mock_verify(kind verification_kind, ref text)
-returns verification_status
-language sql immutable as $$
+create function public.mock_verify(kind public.verification_kind, ref text)
+returns public.verification_status
+language sql immutable set search_path = '' as $$
   select case
-    when ref is null or ref = '' then 'failed'::verification_status
+    when ref is null or ref = '' then 'failed'::public.verification_status
     -- BVN is slower in the real world: leave pending for admin follow-up
-    when kind = 'bvn' then 'pending'::verification_status
+    when kind = 'bvn' then 'pending'::public.verification_status
     -- test hook: IDs ending in 0 simulate a name mismatch
-    when right(ref, 1) = '0' then 'mismatch'::verification_status
-    else 'verified'::verification_status
+    when right(ref, 1) = '0' then 'mismatch'::public.verification_status
+    else 'verified'::public.verification_status
   end
 $$;
 
@@ -102,7 +102,7 @@ begin
     raise exception 'a rejection reason is required';
   end if;
   update public.providers
-     set status = case when p_approve then 'approved'::provider_status else 'rejected'::provider_status end,
+     set status = case when p_approve then 'approved'::public.provider_status else 'rejected'::public.provider_status end,
          approved_at = case when p_approve then now() else null end,
          rejection_reason = case when p_approve then null else trim(p_reason) end
    where id = p_provider;
