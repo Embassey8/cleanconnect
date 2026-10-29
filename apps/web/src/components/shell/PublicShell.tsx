@@ -1,21 +1,42 @@
+import { Suspense } from "react";
 import Link from "next/link";
+import { HeaderActions } from "./HeaderActions";
+import { NavLinks } from "./NavLinks";
 
-export function PublicShell({ children }: { children: React.ReactNode }) {
+export function Logo() {
+  return (
+    <Link href="/" className="flex items-center gap-2.5 text-xl font-extrabold text-ink">
+      <span className="flex size-9 items-center justify-center rounded-[10px] bg-primary">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4z" /><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z" />
+        </svg>
+      </span>
+      CleanConnect
+    </Link>
+  );
+}
+
+/** Site header and footer from the designs. `bare` lets a page (the home hero) manage its own width. */
+export function PublicShell({ children, bare = false }: { children: React.ReactNode; bare?: boolean }) {
   return (
     <>
-      <header className="bg-surface border-b border-border">
-        <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-4">
-          <Link href="/" className="text-lg font-extrabold text-primary">CleanConnect</Link>
-          <nav className="flex items-center gap-4 text-sm font-semibold text-text-2">
-            <Link href="/marketplace">Find a provider</Link>
-            <Link href="/car-wash">Car wash</Link>
-            <Link href="/providers/join" className="rounded-input bg-primary px-4 py-2.5 text-white hover:bg-primary-hover">
-              Become a provider
-            </Link>
-          </nav>
+      <header className="border-b border-border bg-surface">
+        <div className="mx-auto flex max-w-[1240px] flex-wrap items-center gap-x-7 gap-y-3 px-6 py-3.5">
+          <Logo />
+          <NavLinks />
+          <Suspense fallback={<div className="h-11" />}><HeaderActions /></Suspense>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-[1200px] flex-1 px-4 py-8">{children}</main>
+      {bare ? children : <main className="mx-auto w-full max-w-[1240px] flex-1 px-4 py-8 md:px-6">{children}</main>}
+      <footer className="mt-auto border-t border-border bg-surface">
+        <div className="mx-auto flex max-w-[1240px] flex-wrap justify-between gap-3 px-6 py-6 text-sm text-muted">
+          <span>© CleanConnect</span>
+          <span className="flex flex-wrap gap-5">
+            <Link href="/support">Help &amp; support</Link><Link href="/providers/join">For providers</Link>
+            <Link href="/apply?kind=partner">Car wash partners</Link>
+          </span>
+        </div>
+      </footer>
     </>
   );
 }
