@@ -35,3 +35,6 @@ export function dayLabel(iso: string): string {
 
 export const clockTime = (iso: string): string =>
   new Date(iso).toLocaleTimeString("en-NG", { timeZone: "Africa/Lagos", hour: "2-digit", minute: "2-digit", hour12: false });
+
+/** Today's date in Lagos as YYYY-MM-DD, for `min` on date inputs. */
+export const lagosToday = (): string => lagosDay(new Date());

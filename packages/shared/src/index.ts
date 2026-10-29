@@ -8,3 +8,4 @@ export * from "./wallet";
 export * from "./ops";
 export * from "./media";
 export * from "./reviews";
+export * from "./marketplace";
