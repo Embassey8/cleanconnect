@@ -9,8 +9,8 @@ export function QuoteActions({ messageId, threadId }: { messageId: number; threa
   const [state, action, pending] = useActionState<MsgState, FormData>(acceptQuote.bind(null, messageId), {});
   const [declining, startDecline] = useTransition();
   return (
-    <details className="mt-3">
-      <summary className="min-h-11 cursor-pointer py-2 text-sm font-bold text-primary">Accept this quote</summary>
+    <details className="mt-1">
+      <summary className="inline-flex min-h-11 cursor-pointer list-none items-center rounded-input bg-primary px-4 text-sm font-semibold text-white">Accept &amp; pay</summary>
       <form action={action} className="mt-2 space-y-3">
         <DeliveryFields />
         {state.error && (
