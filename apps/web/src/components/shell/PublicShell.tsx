@@ -23,7 +23,7 @@ export function PublicShell({ children, bare = false }: { children: React.ReactN
       <header className="border-b border-border bg-surface">
         <div className="mx-auto flex max-w-[1240px] flex-wrap items-center gap-x-7 gap-y-3 px-6 py-3.5">
           <Logo />
-          <NavLinks />
+          <Suspense fallback={<div className="flex-1" />}><NavLinks /></Suspense>
           <Suspense fallback={<div className="h-11" />}><HeaderActions /></Suspense>
         </div>
       </header>
