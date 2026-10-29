@@ -1,12 +1,12 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { formatNaira } from "@cleanconnect/shared";
+import { formatNaira, starsText } from "@cleanconnect/shared";
 import { PublicShell } from "@/components/shell/PublicShell";
 import { createClient } from "@/lib/supabase/server";
 
 interface Row {
   id: string; slug: string; display_name: string; type: string; service: string; plan: string;
-  areas: string[]; min_price: number | null;
+  areas: string[]; min_price: number | null; rating?: number | null; reviews?: number;
 }
 
 const input = "min-h-11 rounded-input border border-border bg-surface px-3 text-sm";
@@ -18,6 +18,7 @@ async function Results({ searchParams }: { searchParams: PageProps<"/marketplace
   const type = ["business", "individual"].includes(one("type")) ? one("type") : "";
   const max = Number(one("max")) > 0 ? Number(one("max")) : null;
   const area = one("area").trim().toLowerCase();
+  const minRating = Number(one("rating")) > 0 ? Number(one("rating")) : null;
 
   const supabase = await createClient();
   let q = supabase.from("provider_listing").select("id, slug, display_name, type, service, plan, areas, min_price").neq("service", "carwash").limit(200);
@@ -28,6 +29,10 @@ async function Results({ searchParams }: { searchParams: PageProps<"/marketplace
   if (error) return <p role="alert" className="text-danger">Could not load providers: {error.message}</p>;
 
   let rows = (data ?? []) as Row[];
+  const { data: stats } = await supabase.from("provider_stats").select("provider_id, rating_avg, rating_count").in("provider_id", rows.map((r) => r.id));
+  const byId = new Map((stats ?? []).map((s) => [s.provider_id, s]));
+  rows = rows.map((r) => ({ ...r, rating: byId.get(r.id)?.rating_avg == null ? null : Number(byId.get(r.id)!.rating_avg), reviews: byId.get(r.id)?.rating_count ?? 0 }));
+  if (minRating) rows = rows.filter((r) => (r.rating ?? 0) >= minRating);
   if (area) rows = rows.filter((r) => r.areas.some((a) => a.toLowerCase().includes(area)));
   // VIP first, then cheapest starting price, then name
   rows.sort((a, b) =>
@@ -48,6 +53,7 @@ async function Results({ searchParams }: { searchParams: PageProps<"/marketplace
             <p className="text-sm text-muted">
               {r.service === "laundry" ? "Laundry" : "Cleaning"} · {r.type === "business" ? "Business" : "Individual"}
             </p>
+            <p className="mt-1 text-sm font-semibold">{starsText(r.rating ?? null)}{r.reviews ? <span className="font-normal text-muted"> ({r.reviews})</span> : null}</p>
             {r.areas.length > 0 && <p className="mt-1 text-sm text-text-2">{r.areas.slice(0, 3).join(", ")}</p>}
             <p className="mt-3 font-bold text-primary">{r.min_price != null ? `From ${formatNaira(r.min_price)}` : "Prices coming soon"}</p>
           </Link>
@@ -74,9 +80,12 @@ export default function Marketplace(props: PageProps<"/marketplace">) {
         <label className="text-sm font-semibold">Starting price up to (₦)
           <input name="max" inputMode="numeric" className={`${input} mt-1 block w-36`} />
         </label>
+        <label className="text-sm font-semibold">Rating
+          <select name="rating" className={`${input} mt-1 block`}><option value="">Any</option><option value="4.5">4.5 ★ and up</option><option value="4">4 ★ and up</option><option value="3">3 ★ and up</option></select>
+        </label>
         <button className="min-h-11 rounded-input bg-accent px-5 text-sm font-bold text-ink">Search</button>
       </form>
-      <p className="mb-4 text-sm text-muted">VIP providers are listed first. Ratings, distance and date filters arrive with reviews and maps.</p>
+      <p className="mb-4 text-sm text-muted">VIP providers are listed first. Distance and date filters arrive with maps.</p>
       <Suspense fallback={<p className="text-muted">Loading…</p>}><Results searchParams={props.searchParams} /></Suspense>
     </PublicShell>
   );

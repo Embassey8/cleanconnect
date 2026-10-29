@@ -749,3 +749,191 @@ do $$ begin
   assert (select sum(amount) from ledger_entries)
        = (select sum(amount) from ledger_entries where kind in ('fund','withdraw','adjustment')), 'money only enters or leaves via the boundary kinds';
 end $$;
+
+-- ---------- Phase 6: trust and media ----------
+-- Job photos: provider only, valid path, active order
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1'::uuid);
+select set_config('t.m1', register_media(:'clean_deep', :'clean_deep' || '/a.jpg', 'before')::text, false);
+select set_config('t.m2', register_media(:'clean_deep', :'clean_deep' || '/b.jpg', 'after')::text, false);
+do $$ begin
+  begin
+    perform register_media(current_setting('t.clean_deep')::uuid, 'elsewhere/a.jpg', 'before');
+    raise exception 'accepted a photo path outside the order folder';
+  exception when others then if sqlerrm not like 'invalid photo path%' then raise; end if; end;
+  begin
+    perform register_media(current_setting('t.dispute_order')::uuid, current_setting('t.dispute_order') || '/a.jpg', 'before');
+    raise exception 'photo on a cancelled order';
+  exception when others then if sqlerrm not like 'you cannot add photos%' then raise; end if; end;
+  begin
+    perform register_media(current_setting('t.laundry_std')::uuid, current_setting('t.laundry_std') || '/a.jpg', 'before');
+    raise exception 'photo on another provider''s order';
+  exception when others then if sqlerrm not like 'you cannot add photos%' then raise; end if; end;
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c2'::uuid);
+do $$ begin
+  begin
+    perform register_media(current_setting('t.clean_deep')::uuid, current_setting('t.clean_deep') || '/c.jpg', 'before');
+    raise exception 'stranger added a photo';
+  exception when others then if sqlerrm not like 'you cannot add photos%' then raise; end if; end;
+end $$;
+
+-- Photos are private until the customer consents
+set role authenticated;
+select count(*) as n_gallery_before from public_gallery \gset
+select count(*) as n_stranger_media from media \gset
+reset role;
+select 1 / (case when :n_gallery_before = 0 then 1 else 0 end) as nothing_public_without_consent;
+select 1 / (case when :n_stranger_media = 0 then 1 else 0 end) as private_photos_hidden_from_strangers;
+do $$ begin
+  begin
+    perform set_media_public(current_setting('t.m1')::uuid, true);
+    raise exception 'stranger shared a photo';
+  exception when others then if sqlerrm not like 'only the customer%' then raise; end if; end;
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1'::uuid);
+do $$ begin
+  begin
+    perform set_media_public(current_setting('t.m1')::uuid, true);
+    raise exception 'provider published their own photo';
+  exception when others then if sqlerrm not like 'only the customer%' then raise; end if; end;
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+select set_media_public(current_setting('t.m1')::uuid, true);
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c2'::uuid);
+set role authenticated;
+select count(*) as n_gallery_after from public_gallery \gset
+select count(*) as n_visible_media from media \gset
+reset role;
+select 1 / (case when :n_gallery_after = 1 then 1 else 0 end) as consented_photo_is_public;
+select 1 / (case when :n_visible_media = 1 then 1 else 0 end) as only_consented_photo_visible;
+do $$ begin
+  assert (select count(*) from public_gallery where service = 'cleaning' and phase = 'before') = 1, 'gallery has phase and service';
+end $$;
+
+-- Moderation hides a photo from everyone but admins
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000d5'::uuid);
+select hide_media(current_setting('t.m1')::uuid, true);
+do $$ begin
+  assert (select count(*) from public_gallery) = 0, 'hidden photo leaves the gallery';
+  perform hide_media(current_setting('t.m1')::uuid, false);
+  assert (select count(*) from public_gallery) = 1, 'unhidden photo returns';
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+do $$ begin
+  begin
+    perform hide_media(current_setting('t.m1')::uuid, true);
+    raise exception 'customer moderated a photo';
+  exception when others then if sqlerrm not like 'not allowed%' then raise; end if; end;
+end $$;
+
+-- Reviews: only completed orders, once each, valid scores
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c2'::uuid);
+do $$ begin
+  begin
+    perform create_review(current_setting('t.clean_deep')::uuid, 5, 5, 5, 5, 5, 'x');
+    raise exception 'stranger reviewed an order';
+  exception when others then if sqlerrm not like 'order not found%' then raise; end if; end;
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+do $$ begin
+  begin
+    perform create_review(current_setting('t.dispute_order')::uuid, 5, 5, 5, 5, 5, 'x');
+    raise exception 'reviewed an order that never completed';
+  exception when others then if sqlerrm not like '%once it is completed%' then raise; end if; end;
+  begin
+    perform create_review(current_setting('t.clean_min')::uuid, 6, 5, 5, 5, 5, 'x');
+    raise exception 'rating of 6 accepted';
+  exception when others then if sqlerrm not like '%between 1 and 5%' then raise; end if; end;
+end $$;
+select create_review(:'clean_deep', 5, 5, 4, 5, 4, 'Spotless, thank you!') as rv1 \gset
+select set_config('t.rv1', :'rv1', false);
+select create_review(:'clean_min', 4, 4, 4, 4, 4, '') as rv2 \gset
+select create_review(:'wash', 5, 5, 5, 5, 5, 'Great wash') as rv3 \gset
+do $$ begin
+  begin
+    perform create_review(current_setting('t.clean_deep')::uuid, 1, 1, 1, 1, 1, 'again');
+    raise exception 'reviewed twice';
+  exception when others then if sqlerrm not like '%already reviewed%' then raise; end if; end;
+end $$;
+
+-- Review photos: customer only, up to 4, public with the review
+select register_media(:'clean_deep', :'clean_deep' || '/r1.jpg', 'general', :'rv1'::uuid);
+select register_media(:'clean_deep', :'clean_deep' || '/r2.jpg', 'general', :'rv1'::uuid);
+select register_media(:'clean_deep', :'clean_deep' || '/r3.jpg', 'general', :'rv1'::uuid);
+select register_media(:'clean_deep', :'clean_deep' || '/r4.jpg', 'general', :'rv1'::uuid);
+do $$ begin
+  begin
+    perform register_media(current_setting('t.clean_deep')::uuid, current_setting('t.clean_deep') || '/r5.jpg', 'general', current_setting('t.rv1')::uuid);
+    raise exception 'fifth review photo accepted';
+  exception when others then if sqlerrm not like 'you cannot add photos%' then raise; end if; end;
+  assert (select count(*) from media where review_id = current_setting('t.rv1')::uuid and is_public) = 4, 'review photos are public';
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1'::uuid);
+do $$ begin
+  begin
+    perform register_media(current_setting('t.clean_deep')::uuid, current_setting('t.clean_deep') || '/r6.jpg', 'general', current_setting('t.rv1')::uuid);
+    raise exception 'provider added a photo to a customer review';
+  exception when others then if sqlerrm not like 'you cannot add photos%' then raise; end if; end;
+  begin
+    perform reply_review(current_setting('t.rv1')::uuid, '');
+    raise exception 'empty reply accepted';
+  exception when others then if sqlerrm not like 'reply required%' then raise; end if; end;
+end $$;
+select reply_review(:'rv1'::uuid, 'Thank you, see you next time!');
+do $$ begin
+  begin
+    perform reply_review(current_setting('t.rv1')::uuid, 'again');
+    raise exception 'replied twice';
+  exception when others then if sqlerrm not like '%already replied%' then raise; end if; end;
+  assert (select reply from reviews where id = current_setting('t.rv1')::uuid) = 'Thank you, see you next time!', 'reply saved';
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+do $$ begin
+  begin
+    perform reply_review(current_setting('t.rv1')::uuid, 'I reply to myself');
+    raise exception 'customer replied as provider';
+  exception when others then if sqlerrm not like 'review not found%' then raise; end if; end;
+end $$;
+
+-- Public stats and RLS on reviews
+do $$ declare s record; begin
+  select * into s from provider_stats where provider_id = (select id from providers where slug = 'shine-cleaners');
+  assert s.rating_count = 2, 'two reviews';
+  assert s.rating_avg = 4.5, 'average rating 4.5';
+  assert s.c5 = 1 and s.c4 = 1, 'distribution';
+  assert s.jobs_completed = 2, 'completed jobs counted';
+  assert not exists (select 1 from provider_stats where provider_id = current_setting('t.partner_id')::uuid), 'car wash partners are not in public stats';
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c2'::uuid);
+set role authenticated;
+select count(*) as n_public_reviews from reviews where order_id = :'clean_deep' \gset
+select count(*) as n_partner_reviews from reviews where order_id = :'wash' \gset
+reset role;
+select 1 / (case when :n_public_reviews = 1 then 1 else 0 end) as public_reviews_readable;
+select 1 / (case when :n_partner_reviews = 0 then 1 else 0 end) as partner_reviews_private;
+
+-- Saved providers and photos
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c2'::uuid);
+select toggle_saved_provider((select id from providers where slug = 'shine-cleaners')) as saved1 \gset
+select toggle_saved_media(current_setting('t.m1')::uuid) as saved_photo \gset
+do $$ begin
+  assert (select count(*) from saved_providers where user_id = '00000000-0000-0000-0000-0000000000c2') = 1, 'provider saved';
+  assert toggle_saved_provider((select id from providers where slug = 'shine-cleaners')) = false, 'toggling again unsaves';
+  begin
+    perform toggle_saved_provider(current_setting('t.partner_id')::uuid);
+    raise exception 'saved an unlisted partner';
+  exception when others then if sqlerrm not like 'provider not found%' then raise; end if; end;
+  begin  -- m2 was never shared
+    perform toggle_saved_media(current_setting('t.m2')::uuid);
+    raise exception 'saved a private photo';
+  exception when others then if sqlerrm not like 'photo not found%' then raise; end if; end;
+end $$;
+
+-- Partner quality feeds the partner score
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000e1'::uuid);
+select register_media(:'wash', :'wash' || '/p1.jpg', 'condition');
+do $$ declare q record; begin
+  select * into q from partner_quality where provider_id = current_setting('t.partner_id')::uuid;
+  assert q.rating_avg = 5.00 and q.rating_count = 1, 'partner rating';
+  assert q.jobs_completed = 1 and q.photo_jobs = 1, 'partner photo compliance';
+end $$;

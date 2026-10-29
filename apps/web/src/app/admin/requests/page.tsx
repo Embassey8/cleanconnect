@@ -15,10 +15,17 @@ async function Requests() {
       .select("id, display_name, areas, partner_scores(offers_total, offers_accepted, jobs_completed, on_time_jobs)")
       .eq("service", "carwash").eq("status", "approved"),
   ]);
+  const { data: quality } = await supabase.from("partner_quality").select("provider_id, rating_avg, jobs_completed, photo_jobs");
+  const qById = new Map((quality ?? []).map((q) => [q.provider_id, q]));
   const ranked = rankPartners((partners ?? []).map((p) => {
     const s = (Array.isArray(p.partner_scores) ? p.partner_scores[0] : p.partner_scores) as
       { offers_total: number; offers_accepted: number; jobs_completed: number; on_time_jobs: number } | null;
-    const stats = { offersTotal: s?.offers_total ?? 0, offersAccepted: s?.offers_accepted ?? 0, jobsCompleted: s?.jobs_completed ?? 0, onTimeJobs: s?.on_time_jobs ?? 0 };
+    const q = qById.get(p.id);
+    const stats = {
+      offersTotal: s?.offers_total ?? 0, offersAccepted: s?.offers_accepted ?? 0, jobsCompleted: s?.jobs_completed ?? 0, onTimeJobs: s?.on_time_jobs ?? 0,
+      rating: q?.rating_avg == null ? null : Number(q.rating_avg),
+      photoCompliance: q && q.jobs_completed > 0 ? q.photo_jobs / q.jobs_completed : null,
+    };
     return { id: p.id, name: p.display_name, areas: p.areas as string[], stats };
   }));
   const options = ranked.map((p) => {
