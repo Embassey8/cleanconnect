@@ -940,7 +940,7 @@ end $$;
 
 -- ---------- Partner availability ----------
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
-select create_carwash_request('exterior', 'saloon', true, '9 Avail Road', 'Yaba', null, null) as wash_avail \gset
+select create_carwash_request('full', 'saloon', true, '9 Avail Road', 'Yaba', null, null) as wash_avail \gset
 select set_config('t.wash_avail', :'wash_avail', false);
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000e1'::uuid);
 do $$ begin
