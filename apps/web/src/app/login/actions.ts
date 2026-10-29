@@ -32,7 +32,7 @@ export async function signUp(_: AuthState, form: FormData): Promise<AuthState> {
     options: { data: { name: String(form.get("name") ?? "") } },
   });
   if (error) return { error: error.message };
-  redirect("/account");
+  redirect(safeNext(form.get("next")) ?? "/account");
 }
 
 export async function signOut() {
