@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { requireRole } from "@/lib/auth/session";
-import type { Role } from "@/lib/auth/roles";
+import type { Role } from "@cleanconnect/shared";
 
 async function Check({ roles, children }: { roles: Role[]; children: React.ReactNode }) {
   await requireRole(roles);

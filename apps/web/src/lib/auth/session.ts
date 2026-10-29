@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { homeFor, type AdminRole, type Role, type SessionUser } from "./roles";
+import { homeFor, type AdminRole, type Role, type SessionUser } from "@cleanconnect/shared";
 
 export async function getSessionUser(): Promise<SessionUser | null> {
   const supabase = await createClient();
