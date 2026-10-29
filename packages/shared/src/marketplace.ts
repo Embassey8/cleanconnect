@@ -86,15 +86,29 @@ export function filtersFromParams(get: (k: string) => string | null, getAll: (k:
 
 /** Query string for the filters (empty values omitted), used to keep the URL shareable. */
 export function filtersToParams(f: MarketplaceFilters, page: number): string {
-  const p = new URLSearchParams();
-  if (f.service) p.set("service", f.service);
-  if (f.laundry) p.set("laundry", f.laundry);
-  if (f.q.trim()) p.set("q", f.q.trim());
-  if (f.min !== null) p.set("min", String(f.min));
-  if (f.max !== null) p.set("max", String(f.max));
-  for (const t of f.types) p.append("type", t);
-  if (f.rating !== null) p.set("rating", String(f.rating));
-  if (f.sort !== "recommended") p.set("sort", f.sort);
-  if (page > 1) p.set("page", String(page));
-  return p.toString();
+  const parts: string[] = [];
+  const add = (k: string, v: string | number) => parts.push(`${k}=${encodeURIComponent(String(v))}`);
+  if (f.service) add("service", f.service);
+  if (f.laundry) add("laundry", f.laundry);
+  if (f.q.trim()) add("q", f.q.trim());
+  if (f.min !== null) add("min", f.min);
+  if (f.max !== null) add("max", f.max);
+  for (const t of f.types) add("type", t);
+  if (f.rating !== null) add("rating", f.rating);
+  if (f.sort !== "recommended") add("sort", f.sort);
+  if (page > 1) add("page", page);
+  return parts.join("&");
+}
+
+/** Minimal query-string reader (no DOM types, so this package stays platform-neutral). */
+export function parseQuery(qs: string): { get: (k: string) => string | null; getAll: (k: string) => string[] } {
+  const pairs = qs.replace(/^\?/, "").split("&").filter(Boolean).map((p) => {
+    const i = p.indexOf("=");
+    const dec = (s: string) => { try { return decodeURIComponent(s.replace(/\+/g, " ")); } catch { return s; } };
+    return i < 0 ? [dec(p), ""] as const : [dec(p.slice(0, i)), dec(p.slice(i + 1))] as const;
+  });
+  return {
+    get: (k) => pairs.find(([key]) => key === k)?.[1] ?? null,
+    getAll: (k) => pairs.filter(([key]) => key === k).map(([, v]) => v),
+  };
 }
