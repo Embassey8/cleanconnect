@@ -20,6 +20,7 @@ export default function CarWashPage() {
       <h1 className="text-3xl font-extrabold">Car wash, handled</h1>
       <p className="mb-6 mt-2 max-w-2xl text-text-2">Tell us what you drive and where. CleanConnect assigns a vetted partner at a fixed price.</p>
       <Suspense fallback={<p className="text-muted">Loading…</p>}><Loader /></Suspense>
+      <p className="mt-8 text-sm text-text-2">Run a car wash? <a href="/apply?kind=partner" className="font-semibold text-primary">Apply to become a partner</a>.</p>
     </PublicShell>
   );
 }

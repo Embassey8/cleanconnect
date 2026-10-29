@@ -10,5 +10,6 @@ export async function advanceOrder(orderId: string, status: OrderStatus): Promis
   if (error) return { error: error.message };
   revalidatePath("/account", "layout");
   revalidatePath("/provider", "layout");
+  revalidatePath("/partner", "layout");
   return {};
 }

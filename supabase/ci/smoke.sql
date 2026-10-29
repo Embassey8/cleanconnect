@@ -468,3 +468,284 @@ end $$;
 reset role;
 select 1 / (case when :n_wallets = 1 then 1 else 0 end) as customer_sees_only_own_wallet;
 select 1 / (case when :n_foreign_ledger = 0 then 1 else 0 end) as ledger_is_private;
+
+-- ---------- Phase 5: operations ----------
+insert into auth.users (id, email, raw_user_meta_data) values
+  ('00000000-0000-0000-0000-0000000000e1', 'e1@x.ng', '{"name":"Sparkle"}'), ('00000000-0000-0000-0000-0000000000c2', 'c2@x.ng', '{"name":"Poor Customer"}'), ('00000000-0000-0000-0000-0000000000d5', 'support@x.ng', '{"name":"Support"}');
+update users set role = 'admin', admin_role = 'support' where id = '00000000-0000-0000-0000-0000000000d5';
+
+-- Partner applications: operations approve, support cannot, approval promotes the applicant
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000e1'::uuid);
+select submit_application('partner', 'Sparkle Wash', '08012345678', 'Yaba', null, null) as app_id \gset
+select set_config('t.app_id', :'app_id', false);
+do $$ begin
+  begin
+    perform submit_application('partner', 'Sparkle Wash', '08012345678', 'Yaba', null, null);
+    raise exception 'duplicate open application';
+  exception when others then if sqlerrm not like '%open application%' then raise; end if; end;
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000d5'::uuid);
+do $$ begin
+  begin
+    perform advance_application(current_setting('t.app_id')::uuid, 'inspection');
+    raise exception 'support admin ran operations';
+  exception when others then if sqlerrm not like 'not allowed%' then raise; end if; end;
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000ad'::uuid);
+select advance_application(:'app_id', 'inspection');
+do $$ begin
+  begin
+    perform advance_application(current_setting('t.app_id')::uuid, 'hired');
+    raise exception 'staff stage on a partner application';
+  exception when others then if sqlerrm not like 'invalid stage%' then raise; end if; end;
+  begin
+    perform advance_application(current_setting('t.app_id')::uuid, 'rejected');
+    raise exception 'rejected without a reason';
+  exception when others then if sqlerrm not like '%reason%' then raise; end if; end;
+end $$;
+select advance_application(:'app_id', 'approved');
+do $$ begin
+  assert (select role from users where id = '00000000-0000-0000-0000-0000000000e1') = 'partner', 'approved applicant becomes a partner';
+  assert (select count(*) from providers where owner_id = '00000000-0000-0000-0000-0000000000e1' and service = 'carwash' and status = 'approved') = 1, 'partner provider created';
+  assert (select count(*) from partner_scores ps join providers p on p.id = ps.provider_id where p.owner_id = '00000000-0000-0000-0000-0000000000e1') = 1, 'score row';
+  begin
+    perform advance_application(current_setting('t.app_id')::uuid, 'rejected', 'late');
+    raise exception 'closed application advanced';
+  exception when others then if sqlerrm not like '%already closed%' then raise; end if; end;
+end $$;
+select id as partner_id from providers where owner_id = '00000000-0000-0000-0000-0000000000e1' \gset
+select set_config('t.partner_id', :'partner_id', false);
+
+-- Staff pipeline
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c2'::uuid);
+select submit_application('staff', null, '08099999999', 'Lekki', 'Support agent', null) as staff_app \gset
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000ad'::uuid);
+select advance_application(:'staff_app', 'interview');
+select advance_application(:'staff_app', 'hired');
+do $$ begin
+  assert (select role from users where id = '00000000-0000-0000-0000-0000000000c2') = 'customer', 'hiring staff does not change account role';
+end $$;
+
+-- Car wash: no charge before assignment
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+do $$ begin
+  begin
+    perform pay_order(current_setting('t.wash')::uuid);
+    raise exception 'charged before a partner was assigned';
+  exception when others then if sqlerrm not like '%once a partner is assigned%' then raise; end if; end;
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000d5'::uuid);
+do $$ begin
+  begin
+    perform assign_carwash(current_setting('t.wash')::uuid, current_setting('t.partner_id')::uuid);
+    raise exception 'support admin assigned a job';
+  exception when others then if sqlerrm not like 'not allowed%' then raise; end if; end;
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000ad'::uuid);
+select assign_carwash(:'wash', :'partner_id');
+do $$ begin
+  assert (select status from orders where id = current_setting('t.wash')::uuid) = 'assigning', 'offered to partner';
+  assert (select partner_payout from carwash_jobs where order_id = current_setting('t.wash')::uuid) = 4000, 'payout snapshot (rate 4000)';
+  assert (select offer_expires_at from carwash_jobs where order_id = current_setting('t.wash')::uuid) > now() + interval '9 minutes', '10 minute window';
+end $$;
+
+-- Partner sees the job but not the customer's address until accepting; customers never see the payout
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000e1'::uuid);
+set role authenticated;
+select count(*) as n_cw_orders from orders where id = :'wash' \gset
+select count(*) as n_cw_addr from order_addresses where order_id = :'wash' \gset
+select count(*) as n_cw_jobs from carwash_jobs \gset
+reset role;
+select 1 / (case when :n_cw_orders = 1 then 1 else 0 end) as partner_sees_offer;
+select 1 / (case when :n_cw_addr = 0 then 1 else 0 end) as partner_address_hidden_until_accept;
+select 1 / (case when :n_cw_jobs = 1 then 1 else 0 end) as partner_sees_own_payout;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+set role authenticated;
+select count(*) as n_cust_jobs from carwash_jobs \gset
+reset role;
+select 1 / (case when :n_cust_jobs = 0 then 1 else 0 end) as customer_cannot_see_payout;
+
+-- Accepting charges the customer from the wallet automatically
+select pg_temp.bal('00000000-0000-0000-0000-0000000000c1'::uuid, 'available') as before_wash \gset
+select set_config('t.before_wash', :'before_wash', false);
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000e1'::uuid);
+select respond_carwash_offer(:'wash', true);
+do $$ begin
+  assert (select status from orders where id = current_setting('t.wash')::uuid) = 'assigned', 'assigned';
+  assert (select escrow_status from orders where id = current_setting('t.wash')::uuid) = 'held', 'charged on acceptance';
+  assert pg_temp.bal('00000000-0000-0000-0000-0000000000c1', 'available') = current_setting('t.before_wash')::integer - 6500, 'wallet charged 6500';
+end $$;
+select count(*) as n_cw_addr2 from order_addresses where order_id = :'wash' \gset
+set role authenticated;
+select count(*) as n_cw_addr3 from order_addresses where order_id = :'wash' \gset
+reset role;
+select 1 / (case when :n_cw_addr3 = 1 then 1 else 0 end) as partner_address_revealed_after_accept;
+
+-- A customer with no money: the partner cannot confirm; expired and declined offers return to the queue
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c2'::uuid);
+select create_carwash_request('full', 'saloon', false, '3 Test', 'Yaba', null, null) as wash3 \gset
+select set_config('t.wash3', :'wash3', false);
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000ad'::uuid);
+select assign_carwash(:'wash3', :'partner_id');
+do $$ begin
+  assert (select partner_payout from carwash_jobs where order_id = current_setting('t.wash3')::uuid) = 4000, 'drop-off has no mobile bonus';
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000e1'::uuid);
+do $$ begin
+  begin
+    perform respond_carwash_offer(current_setting('t.wash3')::uuid, true);
+    raise exception 'accepted a job the customer cannot pay for';
+  exception when others then if sqlerrm not like '%wallet balance is too low%' then raise; end if; end;
+  assert (select status from orders where id = current_setting('t.wash3')::uuid) = 'assigning', 'still offered';
+end $$;
+update carwash_jobs set offer_expires_at = now() - interval '1 minute' where order_id = :'wash3';
+do $$ begin
+  begin
+    perform respond_carwash_offer(current_setting('t.wash3')::uuid, true);
+    raise exception 'accepted an expired offer';
+  exception when others then if sqlerrm not like '%expired%' then raise; end if; end;
+  assert expire_carwash_offers() = 1, 'expired offer returned to the queue';
+  assert (select status from orders where id = current_setting('t.wash3')::uuid) = 'requested', 'back to requested';
+  assert (select provider_id from orders where id = current_setting('t.wash3')::uuid) is null, 'unassigned';
+  assert (select count(*) from carwash_jobs where order_id = current_setting('t.wash3')::uuid) = 0, 'job cleared';
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000ad'::uuid);
+select assign_carwash(:'wash3', :'partner_id');
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000e1'::uuid);
+select respond_carwash_offer(:'wash3', false);
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c2'::uuid);
+select advance_order(:'wash3', 'cancelled');
+do $$ begin
+  assert (select status from orders where id = current_setting('t.wash3')::uuid) = 'cancelled', 'customer cancelled unassigned request';
+end $$;
+
+-- Job steps, sign-off, payout set aside, then weekly settlement
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000e1'::uuid);
+select advance_order(:'wash', 'en_route');
+select advance_order(:'wash', 'arrived');
+select advance_order(:'wash', 'condition_checked');
+select advance_order(:'wash', 'washing');
+select advance_order(:'wash', 'awaiting_signoff');
+select pg_temp.pbal() as pbal_before \gset
+select set_config('t.pbal_before', :'pbal_before', false);
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+select advance_order(:'wash', 'completed');
+do $$ begin
+  assert (select commission_amount from orders where id = current_setting('t.wash')::uuid) = 2500, 'platform margin = 6500 - 4000';
+  assert pg_temp.pbal() = current_setting('t.pbal_before')::integer + 2500, 'platform received its margin';
+  assert pg_temp.bal('00000000-0000-0000-0000-0000000000e1', 'held') = 4000, 'partner payout set aside until Friday';
+  assert pg_temp.bal('00000000-0000-0000-0000-0000000000e1', 'available') = 0, 'nothing withdrawable before settlement';
+  assert (select jobs_completed from partner_scores where provider_id = current_setting('t.partner_id')::uuid) = 1, 'job counted';
+  assert (select on_time_jobs from partner_scores where provider_id = current_setting('t.partner_id')::uuid) = 1, 'unscheduled job counts as on time';
+  assert (select offers_total from partner_scores where provider_id = current_setting('t.partner_id')::uuid) = 3, 'three offers';
+  assert (select offers_accepted from partner_scores where provider_id = current_setting('t.partner_id')::uuid) = 1, 'one accepted';
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000d5'::uuid);
+do $$ begin
+  begin
+    perform admin_settle_partners();
+    raise exception 'support admin settled partner payouts';
+  exception when others then if sqlerrm not like 'not allowed%' then raise; end if; end;
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000ad'::uuid);
+select admin_settle_partners() as settled \gset
+select 1 / (case when :settled = 1 then 1 else 0 end) as one_job_settled;
+do $$ begin
+  assert pg_temp.bal('00000000-0000-0000-0000-0000000000e1', 'held') = 0 and pg_temp.bal('00000000-0000-0000-0000-0000000000e1', 'available') = 4000, 'payout moved to available';
+  assert admin_settle_partners() = 0, 'settlement is idempotent';
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000e1'::uuid);
+select request_withdrawal(2000, 'Test Bank', 'Sparkle Wash', '0123456789');
+do $$ begin
+  assert pg_temp.bal('00000000-0000-0000-0000-0000000000e1', 'available') = 2000, 'partner can withdraw settled earnings';
+end $$;
+
+-- Support tickets
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+select create_ticket('Partner was late', 'He arrived an hour after the slot.', 'order', :'wash') as tkt \gset
+select set_config('t.tkt', :'tkt', false);
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c2'::uuid);
+do $$ begin
+  begin
+    perform create_ticket('Not mine', 'x', 'order', current_setting('t.wash')::uuid);
+    raise exception 'ticket on someone else''s order';
+  exception when others then if sqlerrm not like 'order not found%' then raise; end if; end;
+  begin
+    perform reply_ticket(current_setting('t.tkt')::uuid, 'hello');
+    raise exception 'replied to someone else''s ticket';
+  exception when others then if sqlerrm not like 'ticket not found%' then raise; end if; end;
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000d5'::uuid);
+select reply_ticket(:'tkt', 'Internal: check GPS log', true);
+select reply_ticket(:'tkt', 'Sorry about that, we are looking into it.');
+do $$ begin
+  assert (select status from support_tickets where id = current_setting('t.tkt')::uuid) = 'pending', 'waiting on customer after a public reply';
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+set role authenticated;
+select count(*) as n_visible_msgs from ticket_messages where ticket_id = :'tkt' \gset
+select count(*) as n_visible_tickets from support_tickets \gset
+reset role;
+select 1 / (case when :n_visible_msgs = 2 then 1 else 0 end) as internal_notes_hidden;
+select 1 / (case when :n_visible_tickets = 1 then 1 else 0 end) as tickets_private;
+select reply_ticket(:'tkt', 'Thanks');
+do $$ begin
+  assert (select status from support_tickets where id = current_setting('t.tkt')::uuid) = 'open', 'customer reply reopens';
+  begin
+    perform update_ticket(current_setting('t.tkt')::uuid, 'resolved', null, null);
+    raise exception 'customer resolved own ticket';
+  exception when others then if sqlerrm not like 'not allowed%' then raise; end if; end;
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000d5'::uuid);
+select update_ticket(:'tkt', 'resolved', 'high', '00000000-0000-0000-0000-0000000000d5'::uuid);
+do $$ begin
+  assert (select status || priority from support_tickets where id = current_setting('t.tkt')::uuid) = 'resolvedhigh', 'ticket updated';
+  assert (select assignee_id from support_tickets where id = current_setting('t.tkt')::uuid) = '00000000-0000-0000-0000-0000000000d5'::uuid, 'assigned';
+end $$;
+-- VIP providers get priority support
+update providers set plan = 'vip' where slug = 'shine-cleaners';
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1'::uuid);
+select create_ticket('Payout question', 'When is my payout?', 'payment', null) as vip_tkt \gset
+update providers set plan = 'standard' where slug = 'shine-cleaners';
+do $$ begin
+  assert (select priority from support_tickets where subject = 'Payout question') = 'high', 'VIP ticket is high priority';
+end $$;
+
+-- Finance and overview
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000d5'::uuid);
+do $$ begin
+  begin
+    perform admin_finance(current_date);
+    raise exception 'support admin read finance';
+  exception when others then if sqlerrm not like 'not allowed%' then raise; end if; end;
+  assert (admin_overview() ->> 'partners')::int = 1, 'overview visible to support';
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000ad'::uuid);
+select add_finance_entry('expense', 'salaries', 50000, current_date, 'Staff');
+select add_finance_entry('income', 'advertising', 10000, current_date, 'Banner');
+do $$ declare f jsonb := admin_finance(current_date); begin
+  assert (f ->> 'marketplace_commission')::int = 7749 + 1965 + 1500, 'marketplace commission (cleaning + laundry)';
+  assert (f ->> 'carwash_revenue')::int = 6500, 'car wash revenue';
+  assert (f ->> 'partner_payouts')::int = 4000, 'partner payouts';
+  assert (f ->> 'vip')::int = 40000, 'VIP income (subscribe + renewal)';
+  assert (f ->> 'advertising')::int = 10000, 'advertising income';
+  assert (f -> 'expenses' ->> 'salaries')::int = 50000, 'salaries';
+  assert (admin_run_jobs() ? 'offers_expired'), 'job runner includes offer expiry';
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+do $$ begin
+  begin
+    perform admin_overview();
+    raise exception 'customer read the admin overview';
+  exception when others then if sqlerrm not like 'not allowed%' then raise; end if; end;
+end $$;
+
+-- Ledger integrity still holds after payouts
+do $$ begin
+  assert (select count(*) from (
+            select group_id from ledger_entries
+             where kind in ('hold','release','refund','commission','vip_fee','payout')
+             group by group_id having sum(amount) <> 0) bad) = 0, 'every internal movement nets to zero';
+  assert (select sum(amount) from ledger_entries)
+       = (select sum(amount) from ledger_entries where kind in ('fund','withdraw','adjustment')), 'money only enters or leaves via the boundary kinds';
+end $$;

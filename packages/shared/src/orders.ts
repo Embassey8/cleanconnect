@@ -51,7 +51,15 @@ export const TRANSITIONS: Record<OrderService, Transition[]> = {
     t("delivered", "completed", "customer"), t("delivered", "disputed", "customer"),
     t("requested", "cancelled", "customer"), t("accepted", "cancelled", "customer"), t("pickup_scheduled", "cancelled", "customer"),
   ],
-  carwash: [t("requested", "cancelled", "customer"), t("assigning", "cancelled", "customer")],
+  // requested -> assigning is an admin assignment and assigning -> assigned is the partner's offer
+  // response (it charges the customer), so neither is a plain transition.
+  carwash: [
+    t("requested", "cancelled", "customer"), t("assigning", "cancelled", "customer"), t("assigned", "cancelled", "customer"),
+    t("assigned", "en_route", "provider"), t("en_route", "arrived", "provider"),
+    t("arrived", "condition_checked", "provider"), t("condition_checked", "washing", "provider"),
+    t("washing", "awaiting_signoff", "provider"),
+    t("awaiting_signoff", "completed", "customer"), t("awaiting_signoff", "disputed", "customer"),
+  ],
 };
 
 export const availableActions = (service: OrderService, status: OrderStatus, actor: Actor): OrderStatus[] =>
@@ -70,5 +78,7 @@ export const ACTION_LABEL: Partial<Record<OrderStatus, string>> = {
   pickup_scheduled: "Schedule pickup", received: "Mark received", awaiting_price_approval: "Send new total for approval",
   cleaning: "Start cleaning", ironing: "Move to ironing", ready: "Mark ready",
   out_for_delivery: "Out for delivery", delivered: "Mark delivered",
+  en_route: "I'm on my way", arrived: "I've arrived", condition_checked: "Condition checked",
+  washing: "Start washing", awaiting_signoff: "Ask for sign-off",
   completed: "Confirm completion", disputed: "Report a problem", cancelled: "Cancel order",
 };
