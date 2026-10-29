@@ -1,8 +1,9 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import {
-  CLEANING_AREAS, DEFAULT_LAUNDRY_ITEMS, LAUNDRY_SERVICES, PROPERTY_TYPES, formatNaira,
-} from "@cleanconnect/shared";
+import { DEFAULT_LAUNDRY_SETTINGS, type LaundryPriceList } from "@cleanconnect/shared";
+import { LaundryBooking } from "@/components/booking/LaundryBooking";
+import { CleaningBooking, type CleaningBookingData } from "@/components/booking/CleaningBooking";
+import { startThread } from "@/app/p/actions";
 import { PublicShell } from "@/components/shell/PublicShell";
 import { createClient } from "@/lib/supabase/server";
 
@@ -40,70 +41,46 @@ async function Profile({ params }: { params: PageProps<"/p/[slug]">["params"] })
           ))}
         </ul>
         {p.areas.length > 0 && <p className="mt-3 text-sm text-text-2">Covers: {p.areas.join(", ")}</p>}
+        <form action={startThread.bind(null, p.id, p.slug)} className="mt-4">
+          <button className="min-h-11 rounded-input border border-border bg-surface px-5 text-sm font-bold hover:bg-primary-tint">Message</button>
+        </form>
       </header>
       <section className="mt-6">
-        <h2 className="mb-3 text-xl font-extrabold">Prices</h2>
-        {p.service === "laundry" ? <LaundryPrices providerId={p.id} /> : <CleaningPrices providerId={p.id} />}
+        <h2 className="mb-3 text-xl font-extrabold">{p.service === "laundry" ? "Order laundry" : "Get a price"}</h2>
+        {p.service === "laundry" ? <LaundryPrices providerId={p.id} slug={p.slug} /> : <CleaningPrices providerId={p.id} slug={p.slug} />}
       </section>
     </>
   );
 }
 
-async function LaundryPrices({ providerId }: { providerId: string }) {
+async function LaundryPrices({ providerId, slug }: { providerId: string; slug: string }) {
   const supabase = await createClient();
-  const { data } = await supabase.from("laundry_prices").select("item_id, service, price").eq("provider_id", providerId);
-  const price = (i: string, s: string) => data?.find((r) => r.item_id === i && r.service === s)?.price ?? null;
-  const items = DEFAULT_LAUNDRY_ITEMS.filter((i) => LAUNDRY_SERVICES.some((s) => price(i.id, s.id) != null));
-  if (items.length === 0) return <p className="text-muted">This provider hasn&apos;t published prices yet.</p>;
-  return (
-    <div className="overflow-x-auto rounded-card border border-border bg-surface">
-      <table className="w-full text-sm">
-        <thead><tr className="border-b border-border text-left text-muted">
-          <th className="p-3">Item</th>{LAUNDRY_SERVICES.map((s) => <th key={s.id} className="p-3 text-right">{s.label}</th>)}
-        </tr></thead>
-        <tbody>
-          {items.map((i) => (
-            <tr key={i.id} className="border-b border-bg-admin last:border-0">
-              <th scope="row" className="p-3 text-left font-semibold">{i.name}</th>
-              {LAUNDRY_SERVICES.map((s) => {
-                const v = price(i.id, s.id);
-                return <td key={s.id} className="p-3 text-right">{v == null ? "—" : formatNaira(v)}</td>;
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+  const [{ data }, { data: st }] = await Promise.all([
+    supabase.from("laundry_prices").select("item_id, service, price").eq("provider_id", providerId),
+    supabase.from("laundry_settings").select("express_pct, delivery_fee, free_delivery_over").eq("provider_id", providerId).maybeSingle(),
+  ]);
+  const prices: LaundryPriceList = {};
+  for (const r of data ?? []) (prices[r.item_id] ??= {})[r.service as "dry" | "wash" | "iron"] = r.price;
+  const settings = st
+    ? { expressPct: st.express_pct, deliveryFee: st.delivery_fee, freeDeliveryOver: st.free_delivery_over }
+    : DEFAULT_LAUNDRY_SETTINGS;
+  return <LaundryBooking providerId={providerId} slug={slug} prices={prices} settings={settings} />;
 }
 
-async function CleaningPrices({ providerId }: { providerId: string }) {
+async function CleaningPrices({ providerId, slug }: { providerId: string; slug: string }) {
   const supabase = await createClient();
-  const [{ data }, { data: s }] = await Promise.all([
-    supabase.from("cleaning_prices").select("property_type, area_id, price, offered").eq("provider_id", providerId).eq("offered", true),
-    supabase.from("cleaning_settings").select("property_types, min_order").eq("provider_id", providerId).maybeSingle(),
+  const [{ data }, { data: st }] = await Promise.all([
+    supabase.from("cleaning_prices").select("property_type, area_id, price").eq("provider_id", providerId).eq("offered", true),
+    supabase.from("cleaning_settings").select("property_types, mult_regular, mult_deep, mult_move, mult_post, min_order").eq("provider_id", providerId).maybeSingle(),
   ]);
-  const types = PROPERTY_TYPES.filter((t) => s?.property_types?.includes(t.id));
-  if (!data?.length || types.length === 0) return <p className="text-muted">This provider hasn&apos;t published prices yet.</p>;
+  if (!st || !data?.length) return <p className="text-muted">This provider hasn&apos;t published prices yet.</p>;
+  const prices: CleaningBookingData["prices"] = {};
+  for (const r of data) if (r.price != null) (prices[r.property_type] ??= {})[r.area_id] = r.price;
   return (
-    <div className="space-y-4">
-      {types.map((t) => {
-        const rows = CLEANING_AREAS[t.id].filter((a) => data.some((r) => r.property_type === t.id && r.area_id === a.id));
-        if (rows.length === 0) return null;
-        return (
-          <div key={t.id} className="rounded-card border border-border bg-surface p-4">
-            <h3 className="font-extrabold">{t.label}</h3>
-            <ul className="mt-2 divide-y divide-bg-admin text-sm">
-              {rows.map((a) => {
-                const r = data.find((x) => x.property_type === t.id && x.area_id === a.id)!;
-                return <li key={a.id} className="flex justify-between py-2"><span>{a.name} <span className="text-muted">{a.unit}</span></span><span className="font-semibold">{formatNaira(r.price ?? 0)}</span></li>;
-              })}
-            </ul>
-          </div>
-        );
-      })}
-      {s?.min_order != null && <p className="text-sm text-muted">Minimum order {formatNaira(s.min_order)}.</p>}
-    </div>
+    <CleaningBooking providerId={providerId} slug={slug} data={{
+      prices, propertyTypes: st.property_types, minOrder: st.min_order,
+      multipliers: { regular: Number(st.mult_regular), deep: Number(st.mult_deep), move: Number(st.mult_move), post: Number(st.mult_post) },
+    }} />
   );
 }
 
