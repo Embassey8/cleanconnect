@@ -2,7 +2,7 @@ import { Guard } from "@/components/auth/Guard";
 import { DashboardShell } from "@/components/shell/DashboardShell";
 
 const NAV = [
-  ["overview", "Overview"], ["approvals", "Provider approvals"], ["registrations", "Registrations & logins"],
+  ["overview", "Overview"], ["approvals", "Provider approvals"], ["payouts", "Payouts & disputes"], ["registrations", "Registrations & logins"],
   ["applications", "Job applications"], ["staff", "Staff & locations"], ["requests", "User requests"],
   ["vip", "VIP calls"], ["income", "Income & profit"], ["support", "Support & help"], ["chat", "Chat"],
 ].map(([s, label]) => ({ href: `/admin/${s}`, label }));

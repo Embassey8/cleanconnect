@@ -35,7 +35,7 @@ export default function Account() {
         <form action={signOut}><button className="min-h-11 px-3 text-sm font-semibold text-muted">Sign out</button></form>
       </div>
       <div className="mt-3 flex gap-3 text-sm font-semibold text-primary">
-        <Link href="/marketplace">Find a provider</Link><Link href="/car-wash">Request a car wash</Link><Link href="/messages">Messages</Link>
+        <Link href="/marketplace">Find a provider</Link><Link href="/car-wash">Request a car wash</Link><Link href="/messages">Messages</Link><Link href="/account/wallet">Wallet</Link>
       </div>
       <Suspense fallback={<p className="mt-6 text-muted">Loading…</p>}><Orders /></Suspense>
     </main>

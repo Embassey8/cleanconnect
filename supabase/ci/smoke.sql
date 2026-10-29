@@ -2,15 +2,16 @@
 insert into auth.users (email, raw_user_meta_data) values ('a@b.c', '{"name":"Ada"}');
 do $$ begin
   assert (select role from users) = 'customer', 'new users must be customers';
-  assert (select count(*) from wallets) = 1, 'wallet not created';
+  assert (select count(*) from wallets where kind = 'user') = 1, 'wallet not created';
+  assert (select count(*) from wallets where kind = 'platform') = 1, 'platform wallet missing';
 end $$;
 insert into ledger_entries (wallet_id, group_id, bucket, amount, kind)
-  select id, gen_random_uuid(), 'available', 5000, 'fund' from wallets;
+  select id, gen_random_uuid(), 'available', 5000, 'fund' from wallets where kind = 'user';
 do $$ begin
-  assert (select available from wallet_balances) = 5000, 'balance wrong';
+  assert (select available from wallet_balances where wallet_id = (select id from wallets where kind = 'user')) = 5000, 'balance wrong';
   begin
     insert into ledger_entries (wallet_id, group_id, bucket, amount, kind)
-      select id, gen_random_uuid(), 'available', -9000, 'withdraw' from wallets;
+      select id, gen_random_uuid(), 'available', -9000, 'withdraw' from wallets where kind = 'user';
     raise exception 'overdraft was allowed';
   exception when others then
     if sqlerrm not like 'insufficient%' then raise; end if;
@@ -158,6 +159,40 @@ do $$ begin
   exception when others then if sqlerrm not like 'cannot move%' then raise; end if; end;
 end $$;
 
+-- Phase 4: provider cannot accept until the customer has paid
+create function pg_temp.as_user(u uuid) returns void language sql as $$ select set_config('request.jwt.sub', u::text, false) $$;
+create function pg_temp.bal(u uuid, b text) returns integer language sql as $$
+  select coalesce(sum(le.amount), 0)::integer from ledger_entries le join wallets w on w.id = le.wallet_id
+  where w.user_id = u and le.bucket = b $$;
+create function pg_temp.pbal() returns integer language sql as $$
+  select coalesce(sum(le.amount), 0)::integer from ledger_entries le join wallets w on w.id = le.wallet_id
+  where w.kind = 'platform' $$;
+select set_config('request.jwt.sub', '00000000-0000-0000-0000-0000000000a1', false);
+do $$ begin
+  begin
+    perform advance_order(current_setting('t.clean_deep')::uuid, 'accepted');
+    raise exception 'provider accepted an unpaid order';
+  exception when others then if sqlerrm not like 'waiting for the customer%' then raise; end if; end;
+end $$;
+select set_config('request.jwt.sub', '00000000-0000-0000-0000-0000000000c1', false);
+do $$ begin
+  begin
+    perform pay_order(current_setting('t.clean_deep')::uuid);
+    raise exception 'paid with an empty wallet';
+  exception when others then if sqlerrm not like 'insufficient%' then raise; end if; end;
+end $$;
+select mock_fund_wallet(100000);
+select pay_order(:'clean_deep');
+do $$ begin
+  assert (select escrow_status from orders where id = current_setting('t.clean_deep')::uuid) = 'held', 'escrow held';
+  assert pg_temp.bal('00000000-0000-0000-0000-0000000000c1', 'available') = 100000 - 51660, 'available reduced by order total';
+  assert pg_temp.bal('00000000-0000-0000-0000-0000000000c1', 'held') = 51660, 'held equals order total';
+  begin
+    perform pay_order(current_setting('t.clean_deep')::uuid);
+    raise exception 'paid twice';
+  exception when others then if sqlerrm not like '%already paid%' then raise; end if; end;
+end $$;
+
 -- Row-level security as real users
 select set_config('request.jwt.sub', '00000000-0000-0000-0000-0000000000a1', false);
 set role authenticated;
@@ -197,6 +232,7 @@ do $$ begin
   assert (select total from orders where id = current_setting('t.quote_order')::uuid) = 45000, 'quote order total';
   assert (select status from orders where id = current_setting('t.quote_order')::uuid) = 'accepted', 'quote order accepted';
   assert (select quote_status from messages where id = current_setting('t.qid')::bigint) = 'accepted', 'quote marked accepted';
+  assert (select escrow_status from orders where id = current_setting('t.quote_order')::uuid) = 'held', 'quote is paid on acceptance';
   begin
     perform accept_quote(current_setting('t.qid')::bigint, 'again', null, null);
     raise exception 'quote accepted twice';
@@ -222,3 +258,213 @@ do $$ begin
   assert (select total from orders where id = current_setting('t.wash')::uuid) = 6500, 'car wash total = price + fee';
   assert (select provider_id from orders where id = current_setting('t.wash')::uuid) is null, 'unassigned';
 end $$;
+
+-- ---------- Phase 4: settlement ----------
+-- Cleaning: provider works, customer confirms, escrow releases less 15% (7749 of 51660)
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1'::uuid);
+select advance_order(:'clean_deep', 'in_progress');
+select advance_order(:'clean_deep', 'awaiting_confirmation');
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+select advance_order(:'clean_deep', 'completed');
+do $$ begin
+  assert (select commission_amount from orders where id = current_setting('t.clean_deep')::uuid) = 7749, 'cleaning commission (TS: 7749)';
+  assert (select escrow_status from orders where id = current_setting('t.clean_deep')::uuid) = 'released', 'released';
+  assert pg_temp.bal('00000000-0000-0000-0000-0000000000c1', 'held') = 45000, 'only the quote order is still held';
+  assert pg_temp.bal('00000000-0000-0000-0000-0000000000a1', 'available') = 51660 - 7749, 'provider credited net of commission';
+  assert pg_temp.pbal() = 7749, 'platform earned commission';
+end $$;
+
+-- Cancelling a paid order refunds the wallet in full
+select advance_order(:'quote_order', 'cancelled');
+do $$ begin
+  assert (select escrow_status from orders where id = current_setting('t.quote_order')::uuid) = 'refunded', 'refunded';
+  assert pg_temp.bal('00000000-0000-0000-0000-0000000000c1', 'held') = 0, 'nothing held';
+  assert pg_temp.bal('00000000-0000-0000-0000-0000000000c1', 'available') = 100000 - 51660, 'refund restored balance';
+end $$;
+
+-- Laundry: commission only on items, never on delivery (1965 of 14600)
+select pay_order(:'laundry_std');
+select pg_temp.as_user((select owner_id from providers where slug = 'wash-co'));
+select advance_order(:'laundry_std', 'accepted');
+select advance_order(:'laundry_std', 'pickup_scheduled');
+select advance_order(:'laundry_std', 'received');
+select advance_order(:'laundry_std', 'cleaning');
+select advance_order(:'laundry_std', 'ready');
+select advance_order(:'laundry_std', 'out_for_delivery');
+select advance_order(:'laundry_std', 'delivered');
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+select advance_order(:'laundry_std', 'completed');
+do $$ declare w uuid := (select owner_id from providers where slug = 'wash-co'); begin
+  assert (select commission_amount from orders where id = current_setting('t.laundry_std')::uuid) = 1965, 'laundry commission (TS: 1965)';
+  assert pg_temp.bal(w, 'available') = 14600 - 1965, 'laundry provider earns net of commission, delivery included';
+  assert pg_temp.pbal() = 7749 + 1965, 'platform commission total';
+end $$;
+
+-- Provider declines a paid order: refunded
+select pay_order(:'laundry_exp');
+select pg_temp.as_user((select owner_id from providers where slug = 'wash-co'));
+select advance_order(:'laundry_exp', 'declined');
+do $$ begin
+  assert (select escrow_status from orders where id = current_setting('t.laundry_exp')::uuid) = 'refunded', 'declined order refunded';
+  assert pg_temp.bal('00000000-0000-0000-0000-0000000000c1', 'available') = 100000 - 51660 - 14600, 'balance after laundry';
+end $$;
+
+-- Auto-confirm releases escrow when the customer stays silent
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+select pay_order(:'clean_min');
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1'::uuid);
+select advance_order(:'clean_min', 'accepted');
+select advance_order(:'clean_min', 'in_progress');
+select advance_order(:'clean_min', 'awaiting_confirmation');
+do $$ begin
+  assert auto_confirm_orders() = 0, 'too early to auto-confirm';
+end $$;
+update order_events set created_at = now() - interval '3 days'
+ where order_id = :'clean_min' and status = 'awaiting_confirmation';
+do $$ begin
+  assert auto_confirm_orders() = 1, 'auto-confirmed after the window';
+  assert (select status from orders where id = current_setting('t.clean_min')::uuid) = 'completed', 'completed';
+  assert (select commission_amount from orders where id = current_setting('t.clean_min')::uuid) = 1500, 'commission on minimum order';
+  assert auto_confirm_orders() = 0, 'idempotent';
+  assert pg_temp.bal('00000000-0000-0000-0000-0000000000a1', 'available') = 51660 - 7749 + 10000 - 1500, 'provider total after auto-confirm';
+end $$;
+
+-- Disputes: money stays held until an admin decides
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+select mock_fund_wallet(50000);
+select create_cleaning_order((select id from providers where slug = 'shine-cleaners'), 'home', 'regular', 'once',
+  '[{"area":"bath","qty":1}]', '{}', '5 Test Road', 'Lekki', null) as dispute_order \gset
+select set_config('t.dispute_order', :'dispute_order', false);
+select pay_order(:'dispute_order');
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1'::uuid);
+select advance_order(:'dispute_order', 'accepted');
+select advance_order(:'dispute_order', 'in_progress');
+select advance_order(:'dispute_order', 'awaiting_confirmation');
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+select advance_order(:'dispute_order', 'disputed');
+do $$ begin
+  assert (select escrow_status from orders where id = current_setting('t.dispute_order')::uuid) = 'held', 'held while disputed';
+  begin
+    perform resolve_dispute(current_setting('t.dispute_order')::uuid, 'refund');
+    raise exception 'customer resolved a dispute';
+  exception when others then if sqlerrm not like 'admin only%' then raise; end if; end;
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000ad'::uuid);
+select resolve_dispute(:'dispute_order', 'refund');
+do $$ begin
+  assert (select escrow_status from orders where id = current_setting('t.dispute_order')::uuid) = 'refunded', 'dispute refunded';
+  assert pg_temp.bal('00000000-0000-0000-0000-0000000000c1', 'held') = 0, 'nothing held after dispute';
+end $$;
+
+-- Withdrawals (mock payouts)
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1'::uuid);
+do $$ begin
+  begin
+    perform request_withdrawal(500, 'Test Bank', 'Shine Ltd', '0123456789');
+    raise exception 'withdrew below minimum';
+  exception when others then if sqlerrm not like 'minimum withdrawal%' then raise; end if; end;
+  begin
+    perform request_withdrawal(10000000, 'Test Bank', 'Shine Ltd', '0123456789');
+    raise exception 'withdrew more than available';
+  exception when others then if sqlerrm not like 'insufficient%' then raise; end if; end;
+  begin
+    perform request_withdrawal(5000, 'Test Bank', 'Shine Ltd', '12345');
+    raise exception 'bad account number accepted';
+  exception when others then if sqlerrm not like 'account number%' then raise; end if; end;
+end $$;
+select request_withdrawal(5000, 'Test Bank', 'Shine Ltd', '0123456789') as payout1 \gset
+select set_config('t.payout1', :'payout1', false);
+do $$ begin
+  assert (select account_last4 from payouts where id = current_setting('t.payout1')::uuid) = '6789', 'only last 4 digits stored';
+  assert (select eta_hours from payouts where id = current_setting('t.payout1')::uuid) = 72, 'standard payout eta';
+  assert pg_temp.bal('00000000-0000-0000-0000-0000000000a1', 'available') = 51660 - 7749 + 10000 - 1500 - 5000, 'balance reduced by withdrawal';
+  begin
+    perform mark_payout(current_setting('t.payout1')::uuid, 'paid');
+    raise exception 'provider settled own payout';
+  exception when others then if sqlerrm not like 'admin only%' then raise; end if; end;
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000ad'::uuid);
+select mark_payout(:'payout1', 'failed');
+do $$ begin
+  assert (select status from payouts where id = current_setting('t.payout1')::uuid) = 'failed', 'payout failed';
+  assert pg_temp.bal('00000000-0000-0000-0000-0000000000a1', 'available') = 51660 - 7749 + 10000 - 1500, 'failed payout returns the money';
+  begin
+    perform mark_payout(current_setting('t.payout1')::uuid, 'paid');
+    raise exception 'settled a payout twice';
+  exception when others then if sqlerrm not like '%not pending%' then raise; end if; end;
+end $$;
+
+-- VIP subscription: paid from the wallet, renews, cancels, lapses
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1'::uuid);
+select subscribe_vip((select id from providers where slug = 'shine-cleaners'));
+do $$ begin
+  assert (select plan from providers where slug = 'shine-cleaners') = 'vip', 'VIP after payment';
+  assert pg_temp.bal('00000000-0000-0000-0000-0000000000a1', 'available') = 51660 - 7749 + 10000 - 1500 - 20000, 'VIP fee charged';
+  assert pg_temp.pbal() = 7749 + 1965 + 1500 + 20000, 'platform received VIP fee';
+  begin
+    perform subscribe_vip((select id from providers where slug = 'shine-cleaners'));
+    raise exception 'subscribed twice';
+  exception when others then if sqlerrm not like 'already a VIP%' then raise; end if; end;
+end $$;
+select request_withdrawal(1000, 'Test Bank', 'Shine Ltd', '0123456789') as payout2 \gset
+select set_config('t.payout2', :'payout2', false);
+do $$ begin
+  assert (select eta_hours from payouts where id = current_setting('t.payout2')::uuid) = 24, 'VIP gets faster payouts';
+end $$;
+update vip_subscriptions set current_period_end = now() - interval '1 hour';
+do $$ begin
+  assert renew_vip_subscriptions() = 1, 'renewed';
+  assert (select plan from providers where slug = 'shine-cleaners') = 'vip', 'still VIP after renewal';
+  assert pg_temp.bal('00000000-0000-0000-0000-0000000000a1', 'available') = 51660 - 7749 + 10000 - 1500 - 20000 - 1000 - 20000, 'renewal charged';
+end $$;
+select cancel_vip((select id from providers where slug = 'shine-cleaners'));
+update vip_subscriptions set current_period_end = now() - interval '1 hour';
+do $$ begin
+  assert renew_vip_subscriptions() = 0, 'cancelled subscription does not renew';
+  assert (select plan from providers where slug = 'shine-cleaners') = 'standard', 'back to standard when VIP lapses';
+end $$;
+
+-- Mock payments can be switched off
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+update money_settings set payments_mode = 'live';
+do $$ begin
+  begin
+    perform mock_fund_wallet(1000);
+    raise exception 'mock funding worked in live mode';
+  exception when others then if sqlerrm not like '%disabled%' then raise; end if; end;
+end $$;
+update money_settings set payments_mode = 'mock';
+
+-- Ledger integrity: internal movements net to zero; only fund/withdraw/adjustment change the total
+do $$ begin
+  assert (select count(*) from (
+            select group_id from ledger_entries
+             where kind in ('hold','release','refund','commission','vip_fee')
+             group by group_id having sum(amount) <> 0) bad) = 0, 'every internal movement nets to zero';
+  assert (select sum(amount) from ledger_entries)
+       = (select sum(amount) from ledger_entries where kind in ('fund','withdraw','adjustment')), 'money only enters or leaves via the boundary kinds';
+end $$;
+
+-- Clients cannot write money or reach internal functions
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+set role authenticated;
+select count(*) as n_wallets from wallets \gset
+select count(*) as n_foreign_ledger from ledger_entries le join wallets w on w.id = le.wallet_id where w.user_id <> '00000000-0000-0000-0000-0000000000c1' \gset
+do $$ begin
+  begin
+    insert into ledger_entries (wallet_id, group_id, bucket, amount, kind)
+      select id, gen_random_uuid(), 'available', 99999, 'fund' from wallets limit 1;
+    raise exception 'client wrote the ledger';
+  exception when others then if sqlerrm like 'client wrote%' then raise; end if; end;
+  begin
+    perform escrow_release(current_setting('t.clean_deep')::uuid);
+    raise exception 'client called an internal function';
+  exception when others then if sqlerrm like 'client called%' then raise; end if; end;
+  begin
+    update orders set escrow_status = 'held' where id = current_setting('t.clean_min')::uuid;
+    if found then raise exception 'client edited escrow status'; end if;
+  exception when others then if sqlerrm like 'client edited%' then raise; end if; end;
+end $$;
+reset role;
+select 1 / (case when :n_wallets = 1 then 1 else 0 end) as customer_sees_only_own_wallet;
+select 1 / (case when :n_foreign_ledger = 0 then 1 else 0 end) as ledger_is_private;

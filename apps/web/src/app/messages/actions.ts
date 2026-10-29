@@ -1,5 +1,6 @@
 "use server";
 
+import { friendlyMoneyError } from "@/lib/money";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -33,7 +34,7 @@ export async function acceptQuote(messageId: number, _: MsgState, form: FormData
     p_message: messageId, p_address: String(form.get("address") ?? ""),
     p_area: String(form.get("area") ?? "") || null, p_scheduled: lagosToIso(String(form.get("when") ?? "")),
   });
-  if (error) return { error: error.message };
+  if (error) return { error: friendlyMoneyError(error.message) };
   redirect(`/account/orders/${data}`);
 }
 
