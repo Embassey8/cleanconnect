@@ -13,9 +13,9 @@ export function Composer({ threadId, canQuote }: { threadId: string; canQuote: b
   const [qState, qAction, qPending] = useActionState<MsgState, FormData>(sendQuote.bind(null, threadId), {});
   return (
     <div className="space-y-3">
-      <form ref={formRef} action={mAction} className="flex gap-2">
-        <input name="body" required maxLength={2000} autoComplete="off" aria-label="Message" placeholder="Write a message" className={`${inp} flex-1`} />
-        <button disabled={mPending} className="min-h-11 rounded-input bg-primary px-5 text-sm font-bold text-white disabled:opacity-60">Send</button>
+      <form ref={formRef} action={mAction} className="flex gap-2.5">
+        <input name="body" required maxLength={2000} autoComplete="off" aria-label="Message" placeholder="Write a message…" className={`${inp} flex-1 text-[15px]`} />
+        <button disabled={mPending} className="min-h-11 rounded-input bg-primary px-5 text-[15px] font-semibold text-white disabled:opacity-60">Send</button>
       </form>
       {mState.error && <p role="alert" className="text-sm text-danger">{mState.error}</p>}
       {canQuote && (
