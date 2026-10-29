@@ -103,17 +103,19 @@ select set_config('request.jwt.sub', '00000000-0000-0000-0000-0000000000c1', fal
 select create_laundry_order((select id from providers where slug = 'wash-co'),
   '[{"item":"shirt","service":"dry","qty":3},{"item":"native","service":"dry","qty":2},{"item":"trousers","service":"iron","qty":4}]',
   false, '12 Test Street', 'Yaba', now() + interval '1 day') as laundry_std \gset
+select set_config('t.laundry_std', :'laundry_std', false);
 select create_laundry_order((select id from providers where slug = 'wash-co'),
   '[{"item":"shirt","service":"dry","qty":3},{"item":"native","service":"dry","qty":2},{"item":"trousers","service":"iron","qty":4}]',
   true, '12 Test Street', 'Yaba', null) as laundry_exp \gset
+select set_config('t.laundry_exp', :'laundry_exp', false);
 
 do $$ begin
-  assert (select total from orders where id = :'laundry_std') = 14600, 'laundry standard total (TS: 14600)';
-  assert (select delivery_fee from orders where id = :'laundry_std') = 1500, 'delivery fee';
-  assert (select total from orders where id = :'laundry_exp') = 21150, 'laundry express total (TS: 19650 + 1500)';
-  assert (select surcharge from orders where id = :'laundry_exp') = 6550, 'express fee';
-  assert (select status from orders where id = :'laundry_std') = 'requested', 'starts requested';
-  assert (select count(*) from order_events where order_id = :'laundry_std') = 1, 'event recorded';
+  assert (select total from orders where id = current_setting('t.laundry_std')::uuid) = 14600, 'laundry standard total (TS: 14600)';
+  assert (select delivery_fee from orders where id = current_setting('t.laundry_std')::uuid) = 1500, 'delivery fee';
+  assert (select total from orders where id = current_setting('t.laundry_exp')::uuid) = 21150, 'laundry express total (TS: 19650 + 1500)';
+  assert (select surcharge from orders where id = current_setting('t.laundry_exp')::uuid) = 6550, 'express fee';
+  assert (select status from orders where id = current_setting('t.laundry_std')::uuid) = 'requested', 'starts requested';
+  assert (select count(*) from order_events where order_id = current_setting('t.laundry_std')::uuid) = 1, 'event recorded';
 end $$;
 
 -- A service the provider does not offer must be refused
@@ -136,20 +138,22 @@ select set_config('request.jwt.sub', '00000000-0000-0000-0000-0000000000c1', fal
 select create_cleaning_order((select id from providers where slug = 'shine-cleaners'), 'home', 'deep', 'week',
   '[{"area":"bed","qty":3},{"area":"sit","qty":1},{"area":"kit","qty":1},{"area":"bath","qty":2}]',
   array['fridge'], '5 Test Road', 'Lekki', null) as clean_deep \gset
+select set_config('t.clean_deep', :'clean_deep', false);
 select create_cleaning_order((select id from providers where slug = 'shine-cleaners'), 'home', 'regular', 'once',
   '[{"area":"bath","qty":1}]', '{}', '5 Test Road', 'Lekki', null) as clean_min \gset
+select set_config('t.clean_min', :'clean_min', false);
 do $$ begin
-  assert (select total from orders where id = :'clean_deep') = 51660, 'cleaning deep+extra+weekly (TS: 51660)';
-  assert (select discount from orders where id = :'clean_deep') = 5740, 'discount';
-  assert (select surcharge from orders where id = :'clean_deep') = 20400, 'deep uplift';
-  assert (select total from orders where id = :'clean_min') = 10000, 'minimum order applies';
-  assert (select min_applied from orders where id = :'clean_min'), 'min_applied flag';
+  assert (select total from orders where id = current_setting('t.clean_deep')::uuid) = 51660, 'cleaning deep+extra+weekly (TS: 51660)';
+  assert (select discount from orders where id = current_setting('t.clean_deep')::uuid) = 5740, 'discount';
+  assert (select surcharge from orders where id = current_setting('t.clean_deep')::uuid) = 20400, 'deep uplift';
+  assert (select total from orders where id = current_setting('t.clean_min')::uuid) = 10000, 'minimum order applies';
+  assert (select min_applied from orders where id = current_setting('t.clean_min')::uuid), 'min_applied flag';
 end $$;
 
 -- Status rules
 do $$ begin
   begin  -- customer cannot accept
-    perform advance_order(:'clean_deep', 'accepted');
+    perform advance_order(current_setting('t.clean_deep')::uuid, 'accepted');
     raise exception 'customer accepted own order';
   exception when others then if sqlerrm not like 'cannot move%' then raise; end if; end;
 end $$;
@@ -180,22 +184,25 @@ select 1 / (case when :n_foreign = 0 then 1 else 0 end) as orders_are_private;
 -- Messaging + quote flow
 select set_config('request.jwt.sub', '00000000-0000-0000-0000-0000000000c1', false);
 select start_thread((select id from providers where slug = 'shine-cleaners')) as tid \gset
+select set_config('t.tid', :'tid', false);
 select send_message(:'tid', 'Hello, can you do a 4-bedroom flat?');
 select set_config('request.jwt.sub', '00000000-0000-0000-0000-0000000000a1', false);
 select send_quote(:'tid', 45000, '4-bed deep clean');
 select id as qid from messages where kind = 'quote' \gset
+select set_config('t.qid', :'qid', false);
 select set_config('request.jwt.sub', '00000000-0000-0000-0000-0000000000c1', false);
 select accept_quote(:qid, '9 Quote Close', 'Lekki', null) as quote_order \gset
+select set_config('t.quote_order', :'quote_order', false);
 do $$ begin
-  assert (select total from orders where id = :'quote_order') = 45000, 'quote order total';
-  assert (select status from orders where id = :'quote_order') = 'accepted', 'quote order accepted';
-  assert (select quote_status from messages where id = :qid) = 'accepted', 'quote marked accepted';
+  assert (select total from orders where id = current_setting('t.quote_order')::uuid) = 45000, 'quote order total';
+  assert (select status from orders where id = current_setting('t.quote_order')::uuid) = 'accepted', 'quote order accepted';
+  assert (select quote_status from messages where id = current_setting('t.qid')::bigint) = 'accepted', 'quote marked accepted';
   begin
-    perform accept_quote(:qid, 'again', null, null);
+    perform accept_quote(current_setting('t.qid')::bigint, 'again', null, null);
     raise exception 'quote accepted twice';
   exception when others then if sqlerrm not like '%no longer open%' then raise; end if; end;
   begin  -- customers cannot send quotes
-    perform send_quote(:'tid', 1000, 'x');
+    perform send_quote(current_setting('t.tid')::uuid, 1000, 'x');
     raise exception 'customer sent a quote';
   exception when others then if sqlerrm not like 'only the provider%' then raise; end if; end;
 end $$;
@@ -210,7 +217,8 @@ end $$;
 insert into carwash_rates values ('full', 'saloon', 6000, 4000);
 update carwash_settings set service_fee = 500;
 select create_carwash_request('full', 'saloon', true, '1 Test', 'Yaba', null, 'gate code 1234') as wash \gset
+select set_config('t.wash', :'wash', false);
 do $$ begin
-  assert (select total from orders where id = :'wash') = 6500, 'car wash total = price + fee';
-  assert (select provider_id from orders where id = :'wash') is null, 'unassigned';
+  assert (select total from orders where id = current_setting('t.wash')::uuid) = 6500, 'car wash total = price + fee';
+  assert (select provider_id from orders where id = current_setting('t.wash')::uuid) is null, 'unassigned';
 end $$;
