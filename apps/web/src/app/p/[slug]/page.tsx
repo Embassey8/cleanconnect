@@ -5,11 +5,11 @@ import { LaundryBooking } from "@/components/booking/LaundryBooking";
 import { CleaningBooking, type CleaningBookingData } from "@/components/booking/CleaningBooking";
 import { startThread } from "@/app/p/actions";
 import { PublicShell } from "@/components/shell/PublicShell";
-import { starsText } from "@cleanconnect/shared";
+import { formatNaira, starsText } from "@cleanconnect/shared";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth/session";
 import Link from "next/link";
-import { Gallery, Policies, ProfileStats, Reviews, Team, loadStats } from "@/components/reviews/ProfileTrust";
+import { Gallery, Policies, Reviews, Team, loadStats } from "@/components/reviews/ProfileTrust";
 import { SaveProviderButton } from "@/components/media/PhotoButtons";
 
 const BADGE: Record<string, string> = { cac: "CAC verified", nin: "NIN verified", bvn: "BVN verified" };
@@ -33,61 +33,25 @@ async function Profile({ params, searchParams }: { params: PageProps<"/p/[slug]"
     ? await supabase.from("saved_providers").select("provider_id").eq("user_id", user.id).eq("provider_id", p.id).maybeSingle()
     : { data: null };
 
-  if (p.service === "cleaning") {
-    const stats = await loadStats(p.id);
-    return <CleaningProfile p={p} verified={verified.map((b) => BADGE[b.kind])} stats={stats} saved={!!savedRow} withPhotos={withPhotos} />;
-  }
-
-  return (
-    <>
-      <header className="rounded-panel border border-border bg-surface p-6">
-        <div className="flex flex-wrap items-center gap-2">
-          <h1 className="text-3xl font-extrabold">{p.display_name}</h1>
-          {p.plan === "vip" && (
-            <span className="rounded-full border border-vip-border bg-vip-bg px-3 py-1 text-xs font-bold text-vip">VIP</span>
-          )}
-        </div>
-        <p className="mt-1 text-muted">
-          {p.type === "business" ? "Business" : "Individual"} · {p.service === "laundry" ? "Laundry" : "House & commercial cleaning"}
-        </p>
-        <Suspense fallback={null}><ProfileStats providerId={p.id} /></Suspense>
-        <ul className="mt-3 flex flex-wrap gap-2">
-          {verified.map((b) => (
-            <li key={b.kind} className="rounded-full bg-primary-tint px-3 py-1 text-xs font-bold text-primary">✓ {BADGE[b.kind]}</li>
-          ))}
-        </ul>
-        {p.areas.length > 0 && <p className="mt-3 text-sm text-text-2">Covers: {p.areas.join(", ")}</p>}
-        <div className="mt-4 flex flex-wrap gap-3">
-          <form action={startThread.bind(null, p.id, p.slug)}>
-            <button className="min-h-11 rounded-input border border-border bg-surface px-5 text-sm font-bold hover:bg-primary-tint">Message</button>
-          </form>
-          <SaveProviderButton providerId={p.id} slug={p.slug} saved={!!savedRow} />
-        </div>
-      </header>
-      <section className="mt-6">
-        <h2 className="mb-3 text-xl font-extrabold">{p.service === "laundry" ? "Order laundry" : "Get a price"}</h2>
-        {p.service === "laundry" ? <LaundryPrices providerId={p.id} slug={p.slug} /> : <CleaningPrices providerId={p.id} slug={p.slug} />}
-      </section>
-      <Suspense fallback={null}><Gallery providerId={p.id} slug={p.slug} /></Suspense>
-      <Suspense fallback={null}><Reviews providerId={p.id} slug={p.slug} withPhotos={withPhotos} /></Suspense>
-    </>
-  );
+  const stats = await loadStats(p.id);
+  return <ProfileView p={p} verified={verified.map((b) => BADGE[b.kind])} stats={stats} saved={!!savedRow} withPhotos={withPhotos} />;
 }
 
-type ProviderRow = { id: string; slug: string; display_name: string; type: string; plan: string; areas: string[] };
+type ProviderRow = { service: string; id: string; slug: string; display_name: string; type: string; plan: string; areas: string[] };
 
-function CleaningProfile({ p, verified, stats, saved, withPhotos }: {
+function ProfileView({ p, verified, stats, saved, withPhotos }: {
   p: ProviderRow; verified: string[]; stats: Awaited<ReturnType<typeof loadStats>>; saved: boolean; withPhotos: boolean;
 }) {
   const chip = "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[13px] font-bold";
+  const laundry = p.service === "laundry";
   const avg = stats?.rating_avg == null ? null : Number(stats.rating_avg);
   return (
     <div className="space-y-5">
       <nav aria-label="Breadcrumb" className="text-sm text-muted">
-        <Link href="/marketplace" className="text-primary">Marketplace</Link> › <Link href="/marketplace?service=cleaning" className="text-primary">House &amp; commercial cleaning</Link> › {p.display_name}
+        <Link href="/marketplace" className="text-primary">Marketplace</Link> › <Link href={`/marketplace?service=${p.service}`} className="text-primary">{laundry ? "Laundry" : "House & commercial cleaning"}</Link> › {p.display_name}
       </nav>
       <section aria-label="Provider summary" className="flex flex-wrap items-center gap-5 rounded-panel border border-border bg-surface p-5 sm:p-6">
-        <span className="grid size-20 shrink-0 place-items-center rounded-3xl bg-primary-tint text-2xl font-extrabold text-primary sm:size-24 sm:text-3xl">
+        <span className={`grid size-20 shrink-0 place-items-center rounded-3xl text-2xl font-extrabold ${laundry ? "bg-laundry-bg text-laundry" : "bg-primary-tint text-primary"} sm:size-24 sm:text-3xl`}>
           {p.display_name.slice(0, 1).toUpperCase()}
         </span>
         <div className="flex min-w-0 flex-1 basis-72 flex-col gap-2.5">
@@ -114,20 +78,44 @@ function CleaningProfile({ p, verified, stats, saved, withPhotos }: {
       </section>
       <div className="flex flex-wrap items-start gap-6">
         <div className="flex min-w-0 flex-[999_1_34rem] flex-col gap-5">
+          {laundry && <Suspense fallback={null}><LaundryAbout providerId={p.id} /></Suspense>}
           <Suspense fallback={null}><Gallery providerId={p.id} slug={p.slug} /></Suspense>
-          <Suspense fallback={null}><Team providerId={p.id} /></Suspense>
+          {!laundry && <Suspense fallback={null}><Team providerId={p.id} /></Suspense>}
           <Suspense fallback={null}><Reviews providerId={p.id} slug={p.slug} withPhotos={withPhotos} /></Suspense>
-          <Policies />
+          <Policies laundry={laundry} />
         </div>
         <div className="w-full min-w-0 flex-[1_1_24rem] lg:max-w-[28.75rem]">
-          <Suspense fallback={<p className="text-muted">Loading prices…</p>}><CleaningPrices providerId={p.id} slug={p.slug} name={p.display_name} /></Suspense>
+          <Suspense fallback={<p className="text-muted">Loading prices…</p>}>
+            {laundry ? <LaundryPrices providerId={p.id} slug={p.slug} name={p.display_name} /> : <CleaningPrices providerId={p.id} slug={p.slug} name={p.display_name} />}
+          </Suspense>
         </div>
       </div>
     </div>
   );
 }
 
-async function LaundryPrices({ providerId, slug }: { providerId: string; slug: string }) {
+async function LaundryAbout({ providerId }: { providerId: string }) {
+  const supabase = await createClient();
+  const { data: st } = await supabase.from("laundry_settings").select("express_pct, delivery_fee, free_delivery_over, opening_hours").eq("provider_id", providerId).maybeSingle();
+  const s = st ? { expressPct: st.express_pct, deliveryFee: st.delivery_fee, freeDeliveryOver: st.free_delivery_over } : DEFAULT_LAUNDRY_SETTINGS;
+  const facts: [string, string][] = [
+    ["Express", `Same day · +${s.expressPct}%`],
+    ["Pickup & delivery", `${formatNaira(s.deliveryFee)}${s.freeDeliveryOver ? ` · free over ${formatNaira(s.freeDeliveryOver)}` : ""}`],
+  ];
+  if (st?.opening_hours) facts.push(["Shop hours", st.opening_hours]);
+  return (
+    <section aria-labelledby="about-h" className="rounded-card border border-border bg-surface p-5 sm:p-6">
+      <h2 id="about-h" className="mb-3 text-xl font-extrabold">About this shop</h2>
+      <dl className="grid gap-3 sm:grid-cols-2">
+        {facts.map(([k, v]) => (
+          <div key={k} className="rounded-xl bg-bg p-3.5"><dt className="text-xs text-muted">{k}</dt><dd className="text-sm font-bold">{v}</dd></div>
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+async function LaundryPrices({ providerId, slug, name }: { providerId: string; slug: string; name: string }) {
   const supabase = await createClient();
   const [{ data }, { data: st }] = await Promise.all([
     supabase.from("laundry_prices").select("item_id, service, price").eq("provider_id", providerId),
@@ -138,7 +126,7 @@ async function LaundryPrices({ providerId, slug }: { providerId: string; slug: s
   const settings = st
     ? { expressPct: st.express_pct, deliveryFee: st.delivery_fee, freeDeliveryOver: st.free_delivery_over }
     : DEFAULT_LAUNDRY_SETTINGS;
-  return <LaundryBooking providerId={providerId} slug={slug} prices={prices} settings={settings} />;
+  return <LaundryBooking providerId={providerId} slug={slug} providerName={name} prices={prices} settings={settings} />;
 }
 
 async function CleaningPrices({ providerId, slug, name }: { providerId: string; slug: string; name?: string }) {
