@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireRole } from "./session";
@@ -8,7 +9,7 @@ export interface OwnPartner {
 }
 
 /** The signed-in car wash partner's own profile and score counters. */
-export async function requireOwnPartner(): Promise<OwnPartner> {
+export const requireOwnPartner = cache(async (): Promise<OwnPartner> => {
   const user = await requireRole(["partner"]);
   const supabase = await createClient();
   const { data } = await supabase
@@ -25,4 +26,4 @@ export async function requireOwnPartner(): Promise<OwnPartner> {
       rating: q?.rating_avg == null ? null : Number(q.rating_avg),
       photoCompliance: q && q.jobs_completed > 0 ? q.photo_jobs / q.jobs_completed : null },
   };
-}
+});
