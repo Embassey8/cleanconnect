@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "@/app/login/actions";
 
-const NAV = [
+const CLEANING_NAV = [
   { href: "/provider", label: "Overview & orders", match: (p: string) => p === "/provider" || p.startsWith("/provider/orders") },
   { href: "/provider/prices", label: "Packages & prices" },
   { href: "/provider/areas", label: "Availability & areas" },
@@ -18,7 +18,21 @@ const NAV = [
   { href: "/support", label: "Support" },
 ];
 
-function Nav({ path, subtitle, onNavigate }: { path: string; subtitle: string; onNavigate?: () => void }) {
+const LAUNDRY_NAV = [
+  { href: "/provider", label: "Orders board", match: (p: string) => p === "/provider" || p.startsWith("/provider/orders") },
+  { href: "/provider/prices", label: "Price list" },
+  { href: "/provider/delivery", label: "Pickup & delivery" },
+  { href: "/provider/hours", label: "Opening hours & capacity" },
+  { href: "/provider/wallet", label: "Earnings & payouts" },
+  { href: "/messages", label: "Messages" },
+  { href: "/provider/reviews", label: "Reviews" },
+  { href: "/provider/profile", label: "Profile & verification" },
+  { href: "/provider/vip", label: "VIP", vip: true },
+  { href: "/support", label: "Support" },
+];
+
+function Nav({ path, subtitle, service, onNavigate }: { path: string; subtitle: string; service: "cleaning" | "laundry"; onNavigate?: () => void }) {
+  const NAV = service === "laundry" ? LAUNDRY_NAV : CLEANING_NAV;
   return (
     <>
       <Link href="/" className="flex items-center gap-2.5 px-2">
@@ -41,7 +55,7 @@ function Nav({ path, subtitle, onNavigate }: { path: string; subtitle: string; o
   );
 }
 
-function Shell({ subtitle, children }: { subtitle: string; children: React.ReactNode }) {
+function Shell({ subtitle, service, children }: { subtitle: string; service: "cleaning" | "laundry"; children: React.ReactNode }) {
   const path = usePathname();
   const [openOn, setOpenOn] = useState<string | null>(null);
   const open = openOn === path;
@@ -54,10 +68,10 @@ function Shell({ subtitle, children }: { subtitle: string; children: React.React
           onClick={() => setOpenOn(open ? null : path)} className="flex size-11 items-center justify-center rounded-input border border-border">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">{open ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}</svg>
         </button>
-        {open && <div id={id} className="absolute inset-x-0 top-full z-40 flex max-h-[80dvh] flex-col gap-4 overflow-y-auto border-b border-border bg-surface p-4 shadow-lg"><Nav path={path} subtitle={subtitle} onNavigate={() => setOpenOn(null)} /></div>}
+        {open && <div id={id} className="absolute inset-x-0 top-full z-40 flex max-h-[80dvh] flex-col gap-4 overflow-y-auto border-b border-border bg-surface p-4 shadow-lg"><Nav path={path} subtitle={subtitle} service={service} onNavigate={() => setOpenOn(null)} /></div>}
       </header>
       <aside aria-label="Provider navigation" className="hidden w-[250px] shrink-0 flex-col gap-[18px] overflow-y-auto border-r border-border bg-surface px-3 py-5 md:sticky md:top-0 md:flex md:h-screen">
-        <Nav path={path} subtitle={subtitle} />
+        <Nav path={path} subtitle={subtitle} service={service} />
       </aside>
       <main className="flex min-w-0 flex-1 flex-col gap-[22px] p-4 md:p-7">{children}</main>
     </div>
@@ -65,6 +79,6 @@ function Shell({ subtitle, children }: { subtitle: string; children: React.React
 }
 
 /** Provider console frame from the design: white sidebar with green accents. */
-export function ProviderShell({ subtitle, children }: { subtitle: string; children: React.ReactNode }) {
-  return <Suspense fallback={<main className="p-4 md:p-7">{children}</main>}><Shell subtitle={subtitle}>{children}</Shell></Suspense>;
+export function ProviderShell({ subtitle, service = "cleaning", children }: { subtitle: string; service?: "cleaning" | "laundry"; children: React.ReactNode }) {
+  return <Suspense fallback={<main className="p-4 md:p-7">{children}</main>}><Shell subtitle={subtitle} service={service}>{children}</Shell></Suspense>;
 }

@@ -58,3 +58,44 @@ export function RemoveMemberButton({ id, name }: { id: string; name: string }) {
     </span>
   );
 }
+
+import { saveDelivery, saveHours, type LaundryState } from "@/app/provider/laundry/actions";
+
+function LFeedback({ s }: { s: LaundryState }) {
+  if (s.error) return <p role="alert" className="text-sm text-danger">{s.error}</p>;
+  if (s.ok) return <p role="status" className="text-sm font-semibold text-primary">{s.ok}</p>;
+  return null;
+}
+
+export function DeliveryForm({ expressPct, deliveryFee, freeOver, turnaroundHours }: { expressPct: number; deliveryFee: number; freeOver: number; turnaroundHours: number }) {
+  const [state, action, pending] = useActionState<LaundryState, FormData>(saveDelivery, {});
+  const f = (name: string, label: string, value: number, hint?: string) => (
+    <label className="block text-sm font-semibold">{label}{hint && <span className="ml-1 font-normal text-muted">{hint}</span>}
+      <input name={name} inputMode="numeric" defaultValue={value} className={`${input} mt-1`} required />
+    </label>
+  );
+  return (
+    <form action={action} className="space-y-3">
+      {f("expressPct", "Express surcharge (%)", expressPct, "same-day orders")}
+      {f("deliveryFee", "Pickup & delivery fee (₦)", deliveryFee)}
+      {f("freeDeliveryOver", "Free pickup & delivery over (₦)", freeOver)}
+      {f("turnaroundHours", "Standard turnaround (hours)", turnaroundHours, "express orders are due the same day")}
+      <LFeedback s={state} />
+      <button disabled={pending} className={btn}>{pending ? "Saving…" : "Save"}</button>
+    </form>
+  );
+}
+
+export function HoursForm({ capacity, hours }: { capacity: number; hours: string }) {
+  const [state, action, pending] = useActionState<LaundryState, FormData>(saveHours, {});
+  return (
+    <form action={action} className="space-y-3">
+      <label className="block text-sm font-semibold" htmlFor="oh">Opening hours <span className="font-normal text-muted">(shown to you and your team)</span></label>
+      <input id="oh" name="openingHours" defaultValue={hours} placeholder="Mon–Sat 8:00 am – 6:00 pm" className={input} />
+      <label className="block text-sm font-semibold" htmlFor="cap">Daily capacity (items)</label>
+      <input id="cap" name="capacityItems" inputMode="numeric" defaultValue={capacity} className={input} required />
+      <LFeedback s={state} />
+      <button disabled={pending} className={btn}>{pending ? "Saving…" : "Save"}</button>
+    </form>
+  );
+}

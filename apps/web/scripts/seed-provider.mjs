@@ -18,7 +18,7 @@ const cleaner = await as("cleaning@demo.test");
 const prov = ok(await customer.from("providers").select("id").eq("slug", "shine-cleaners").single(), "provider").id;
 ok(await customer.rpc("mock_fund_wallet", { p_amount: 80000 }), "top up");
 const when = (days) => new Date(Date.now() + days * 86400000).toISOString();
-const book = async (ctype, areas, extras, days, notes) => {
+const book = async (ctype, areas, extras, days) => {
   const id = ok(await customer.rpc("create_cleaning_order", {
     p_provider: prov, p_property: "home", p_ctype: ctype, p_frequency: "once", p_areas: areas, p_extras: extras,
     p_address: "22 Admiralty Way", p_area: "Lekki Phase 1", p_scheduled: when(days),

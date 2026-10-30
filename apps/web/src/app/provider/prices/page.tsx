@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { DEFAULT_CLEANING_MULTIPLIERS, DEFAULT_LAUNDRY_SETTINGS, DEFAULT_MIN_ORDER, type LaundryPriceList, type PropertyType } from "@cleanconnect/shared";
 import { createClient } from "@/lib/supabase/server";
 import { requireOwnProvider } from "@/lib/auth/provider";
-import { LaundryEditor } from "@/components/provider/LaundryEditor";
+import { InlineLaundryPrices } from "@/components/provider/InlineLaundryPrices";
 import { CleaningEditor, type CleaningData } from "@/components/provider/CleaningEditor";
 
 async function Editor() {
@@ -17,9 +17,11 @@ async function Editor() {
     const prices: LaundryPriceList = {};
     for (const r of rows ?? []) (prices[r.item_id] ??= {})[r.service as "dry" | "wash" | "iron"] = r.price;
     return (
-      <LaundryEditor prices={prices} settings={s ? {
-        expressPct: s.express_pct, deliveryFee: s.delivery_fee, freeDeliveryOver: s.free_delivery_over,
-      } : DEFAULT_LAUNDRY_SETTINGS} />
+      <div className="max-w-xl rounded-2xl border-[1.5px] border-primary bg-surface p-5">
+        <InlineLaundryPrices prices={prices} settings={s ? {
+          expressPct: s.express_pct, deliveryFee: s.delivery_fee, freeDeliveryOver: s.free_delivery_over,
+        } : DEFAULT_LAUNDRY_SETTINGS} />
+      </div>
     );
   }
 
@@ -41,7 +43,7 @@ async function Editor() {
 export default function ProviderPrices() {
   return (
     <>
-      <h1 className="mb-1 text-[26px] font-extrabold">Packages &amp; prices</h1>
+      <h1 className="mb-1 text-[26px] font-extrabold">Prices</h1>
       <Suspense fallback={<p className="text-muted">Loading…</p>}><Editor /></Suspense>
     </>
   );

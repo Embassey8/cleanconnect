@@ -10,9 +10,10 @@ describe("order transitions", () => {
     expect(availableActions("cleaning", "awaiting_confirmation", "customer")).toContain("completed");
     expect(availableActions("cleaning", "awaiting_confirmation", "provider")).toEqual([]);
   });
-  it("laundry intake can branch to price approval", () => {
-    expect(availableActions("laundry", "received", "provider")).toEqual(["cleaning", "awaiting_price_approval"]);
-    expect(availableActions("laundry", "awaiting_price_approval", "customer")).toEqual(["cleaning"]);
+  it("laundry price changes go through intake and approval, not plain status changes", () => {
+    expect(availableActions("laundry", "received", "provider")).toEqual([]);
+    expect(availableActions("laundry", "awaiting_price_approval", "customer")).toEqual(["cancelled"]);
+    expect(availableActions("laundry", "awaiting_price_approval", "provider")).toEqual([]);
   });
   it("has no actions from terminal states", () => {
     for (const s of ["completed", "cancelled", "declined", "expired"] as const)
@@ -23,7 +24,9 @@ describe("order transitions", () => {
     for (const svc of ["cleaning", "laundry"] as const) {
       const steps = PROGRESS[svc];
       for (let i = 0; i < steps.length - 1; i++) {
-        const ok = TRANSITIONS[svc].some((x) => x.from === steps[i] && x.to === steps[i + 1]);
+        // Laundry's intake step (received -> cleaning) is done by submit_intake, not a plain status change.
+        const viaFunction = svc === "laundry" && steps[i] === "received" && steps[i + 1] === "cleaning";
+        const ok = viaFunction || TRANSITIONS[svc].some((x) => x.from === steps[i] && x.to === steps[i + 1]);
         expect(ok, `${svc}: ${steps[i]} -> ${steps[i + 1]}`).toBe(true);
       }
     }

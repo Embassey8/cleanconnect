@@ -5,7 +5,7 @@ import { requireOwnProvider } from "@/lib/auth/provider";
 
 async function Frame({ children }: { children: React.ReactNode }) {
   const p = await requireOwnProvider();
-  return <ProviderShell subtitle={`Provider · ${p.service === "laundry" ? "Laundry" : "House cleaning"}`}>{children}</ProviderShell>;
+  return <ProviderShell service={p.service === "laundry" ? "laundry" : "cleaning"} subtitle={`Provider · ${p.service === "laundry" ? "Laundry" : "House cleaning"}`}>{children}</ProviderShell>;
 }
 
 export default function ProviderLayout({ children }: LayoutProps<"/provider">) {
