@@ -139,15 +139,15 @@ export async function Team({ providerId }: { providerId: string }) {
   );
 }
 
-export function Policies() {
+export function Policies({ laundry = false }: { laundry?: boolean }) {
   const box = "rounded-xl bg-bg p-3.5 text-sm leading-normal";
   return (
     <section aria-labelledby="pol-h" className="rounded-card border border-border bg-surface p-5 sm:p-6">
       <h2 id="pol-h" className="mb-3 text-xl font-extrabold">Policies</h2>
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="rounded-xl bg-primary-tint p-3.5 text-sm leading-normal"><strong>Payment held safely</strong><br /><span className="text-text-2">Released only after you confirm the job is done.</span></div>
-        <div className={box}><strong>Size check on arrival</strong><br /><span className="text-text-2">If rooms differ from your booking, the new price is sent to you for approval first.</span></div>
-        <div className={box}><strong>Cancellation</strong><br /><span className="text-text-2">You can cancel before the provider accepts. Money held for the order goes back to your wallet.</span></div>
+        <div className={box}>{laundry ? <><strong>Item count on pickup</strong><br /><span className="text-text-2">The shop counts your items and confirms the price in the app before cleaning.</span></> : <><strong>Size check on arrival</strong><br /><span className="text-text-2">If rooms differ from your booking, the new price is sent to you for approval first.</span></>}</div>
+        <div className={box}><strong>Cancellation</strong><br /><span className="text-text-2">{laundry ? "Cancel any time before the shop starts cleaning. Money held for the order goes back to your wallet." : "You can cancel before the provider accepts. Money held for the order goes back to your wallet."}</span></div>
         <div className={box}><strong>Problems</strong><br /><span className="text-text-2">Raise a ticket from your order and our team will step in.</span></div>
       </div>
       <Link href="/support" className="mt-3 inline-block py-1.5 text-[13px] text-muted">Report this profile</Link>

@@ -9,8 +9,8 @@ import { bookLaundry, type BookState } from "@/app/p/actions";
 import { DeliveryFields, Stepper } from "./Fields";
 
 export function LaundryBooking({
-  providerId, slug, prices, settings,
-}: { providerId: string; slug: string; prices: LaundryPriceList; settings: LaundrySettings }) {
+  providerId, slug, providerName, prices, settings,
+}: { providerId: string; slug: string; providerName: string; prices: LaundryPriceList; settings: LaundrySettings }) {
   const [state, action, pending] = useActionState<BookState, FormData>(bookLaundry, {});
   const [svc, setSvc] = useState<LaundryService>("dry");
   const [qty, setQty] = useState<Record<string, number>>({});
@@ -28,58 +28,80 @@ export function LaundryBooking({
   const active = services.some((s) => s.id === svc) ? svc : services[0].id;
 
   return (
-    <form action={action} className="grid gap-6 lg:grid-cols-[1fr_340px]">
+    <form action={action} aria-labelledby="calc-h" className="space-y-4 rounded-panel border-[1.5px] border-primary bg-surface p-5 lg:sticky lg:top-4">
       <input type="hidden" name="providerId" value={providerId} />
       <input type="hidden" name="slug" value={slug} />
       <input type="hidden" name="lines" value={JSON.stringify(lines)} />
-      <div className="min-w-0">
-        <div role="tablist" className="mb-3 flex gap-2 overflow-x-auto">
-          {services.map((s) => (
-            <button key={s.id} type="button" role="tab" aria-selected={active === s.id} onClick={() => setSvc(s.id)}
-              className={`min-h-11 whitespace-nowrap rounded-full border px-4 text-sm font-bold ${active === s.id ? "border-primary bg-primary-tint text-primary" : "border-border bg-surface"}`}>
-              {s.label} <span className="font-normal text-muted">· {count(s.id) ? `${count(s.id)} added` : "none yet"}</span>
-            </button>
-          ))}
-        </div>
-        <ul className="divide-y divide-bg-admin rounded-card border border-border bg-surface">
-          {offered(active).map((i) => {
-            const k = qtyKey(active, i.id);
-            const unit = prices[i.id]![active]!;
-            const q = qty[k] ?? 0;
-            return (
-              <li key={i.id} className="flex items-center justify-between gap-3 p-3">
-                <div><p className="font-semibold">{i.name}</p><p className="text-sm text-muted">{formatNaira(unit)} each</p></div>
-                <div className="flex items-center gap-4">
-                  <span className="w-20 text-right text-sm">{q ? formatNaira(q * unit) : "—"}</span>
-                  <Stepper label={i.name} value={q} onChange={(n) => setQty((p) => ({ ...p, [k]: n }))} />
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+      <div>
+        <h2 id="calc-h" className="text-xl font-extrabold">Build your order</h2>
+        <p className="text-sm text-muted">Prices set by {providerName}. Pick a service, then add your clothes.</p>
       </div>
-      <aside className="space-y-4 rounded-card border border-border bg-surface p-4 lg:sticky lg:top-4 lg:self-start">
-        <h3 className="font-extrabold">Your order</h3>
-        {t.itemCount === 0 ? <p className="text-sm text-muted">Add items to see your total.</p> : (
-          <dl className="space-y-1 text-sm">
-            <div className="flex justify-between"><dt>Items ({t.itemCount})</dt><dd>{formatNaira(t.subtotal)}</dd></div>
-            {express && <div className="flex justify-between"><dt>Express (+{settings.expressPct}%)</dt><dd>{formatNaira(t.express)}</dd></div>}
-            <div className="flex justify-between"><dt>Pickup &amp; delivery</dt><dd>{t.delivery === 0 ? "Free" : formatNaira(t.delivery)}</dd></div>
-            <div className="flex justify-between border-t border-border pt-2 text-base font-extrabold"><dt>Total</dt><dd>{formatNaira(t.total)}</dd></div>
-            {t.freeDeliveryGap > 0 && <p className="pt-1 text-xs text-primary">Add {formatNaira(t.freeDeliveryGap)} more for free pickup &amp; delivery</p>}
-          </dl>
+      <div role="tablist" aria-label="Service" className="flex gap-1 rounded-xl bg-bg p-1">
+        {services.map((s) => {
+          const on = active === s.id;
+          const n = count(s.id);
+          return (
+            <button key={s.id} type="button" role="tab" aria-selected={on} onClick={() => setSvc(s.id)}
+              className={`flex min-h-11 flex-1 flex-col items-center justify-center rounded-lg text-[13px] ${on ? "bg-primary font-bold text-white" : "font-semibold text-text-2"}`}>
+              {s.label}
+              <span className={`text-[10px] font-medium ${on ? "text-[#cdebe1]" : "text-muted"}`}>{n ? `${n} added` : "none yet"}</span>
+            </button>
+          );
+        })}
+      </div>
+      <ul>
+        {offered(active).map((i) => {
+          const k = qtyKey(active, i.id);
+          const unit = prices[i.id]![active]!;
+          const q = qty[k] ?? 0;
+          return (
+            <li key={i.id} className="flex items-center gap-2 border-b border-bg-admin py-2">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold">{i.name}</p>
+                <p className="text-xs text-muted">{formatNaira(unit)} each</p>
+              </div>
+              <Stepper label={i.name} value={q} onChange={(n) => setQty((p) => ({ ...p, [k]: n }))} />
+              <span className="w-16 text-right text-sm font-bold">{q ? formatNaira(q * unit) : "—"}</span>
+            </li>
+          );
+        })}
+      </ul>
+      <label className="flex min-h-14 cursor-pointer items-center gap-3 rounded-xl border border-border px-3.5">
+        <span className="flex-1"><span className="block text-sm font-bold">Express service</span><span className="block text-xs text-muted">+{settings.expressPct}% on cleaning</span></span>
+        <input type="checkbox" name="express" checked={express} onChange={(e) => setExpress(e.target.checked)} className="size-5 accent-primary" />
+      </label>
+      <div className="space-y-2 rounded-2xl bg-bg p-4 text-[13px]">
+        <div className="flex items-center justify-between">
+          <strong className="text-sm">Your basket · {t.itemCount} items</strong>
+          {t.itemCount > 0 && <button type="button" onClick={() => { setQty({}); setExpress(false); }} className="min-h-8 text-[13px] font-semibold text-danger">Clear</button>}
+        </div>
+        {t.itemCount === 0 ? <p className="text-muted">Add clothes above to see your price.</p> : (
+          <>
+            {LAUNDRY_SERVICES.flatMap((s) => DEFAULT_LAUNDRY_ITEMS.map((i) => ({ s, i, q: qty[qtyKey(s.id, i.id)] ?? 0 }))).filter((x) => x.q > 0).map(({ s, i, q }) => (
+              <div key={`${s.id}:${i.id}`} className="flex justify-between">
+                <span className="text-text-2">{q} × {i.name} <span className="text-muted">· {s.label}</span></span>
+                <span className="font-semibold">{formatNaira(q * (prices[i.id]?.[s.id] ?? 0))}</span>
+              </div>
+            ))}
+            <div className="space-y-1 border-t border-border pt-2">
+              <div className="flex justify-between"><span className="text-muted">Subtotal</span><span className="font-semibold">{formatNaira(t.subtotal)}</span></div>
+              {express && <div className="flex justify-between"><span className="text-muted">Express (+{settings.expressPct}%)</span><span className="font-semibold">+{formatNaira(t.express)}</span></div>}
+              <div className="flex justify-between"><span className="text-muted">Pickup &amp; delivery</span><span className="font-semibold">{t.delivery === 0 ? "Free" : formatNaira(t.delivery)}</span></div>
+              {t.freeDeliveryGap > 0 && <p className="text-xs text-primary">Add {formatNaira(t.freeDeliveryGap)} more for free pickup &amp; delivery</p>}
+            </div>
+          </>
         )}
-        <label className="flex min-h-11 items-center gap-3 text-sm font-semibold">
-          <input type="checkbox" name="express" checked={express} onChange={(e) => setExpress(e.target.checked)} className="size-5 accent-primary" />
-          Express service
-        </label>
-        <DeliveryFields />
-        {state.error && <p role="alert" className="rounded-input bg-danger-bg px-3 py-2 text-sm text-danger">{state.error}</p>}
-        <button disabled={pending || t.itemCount === 0} className="min-h-11 w-full rounded-input bg-primary font-bold text-white hover:bg-primary-hover disabled:opacity-50">
-          {pending ? "Sending…" : "Send request"}
-        </button>
-        <p className="text-xs text-muted">You&apos;re not charged yet. Payment is held securely once the provider accepts (coming soon).</p>
-      </aside>
+        <div className="flex items-baseline justify-between border-t border-border pt-2.5">
+          <span className="text-base font-extrabold">Estimated total</span>
+          <span className="text-2xl font-extrabold">{formatNaira(t.itemCount === 0 ? 0 : t.total)}</span>
+        </div>
+      </div>
+      <DeliveryFields />
+      {state.error && <p role="alert" className="rounded-input bg-danger-bg px-3 py-2 text-sm text-danger">{state.error}</p>}
+      <button disabled={pending || t.itemCount === 0} className="min-h-14 w-full rounded-2xl bg-primary text-base font-bold text-white hover:bg-primary-hover disabled:opacity-50">
+        {pending ? "Sending…" : `Book pickup · ${formatNaira(t.itemCount === 0 ? 0 : t.total)}`}
+      </button>
+      <p className="text-center text-xs leading-normal text-muted">The shop counts your clothes at pickup and confirms the final price in the app before cleaning. You&apos;re not charged until the shop accepts.</p>
     </form>
   );
 }
