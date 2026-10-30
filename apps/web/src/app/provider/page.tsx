@@ -8,6 +8,7 @@ import { isoInDays, lagosDayRange, lagosWeekStart } from "@/lib/time";
 import { AvailabilityToggle } from "@/components/partner/PartnerControls";
 import { TabOrders } from "@/components/provider/OrderCards";
 import { PricesCard, TeamCard, VipCard, WithdrawCard } from "@/components/provider/SideCards";
+import { LaundryOverview } from "@/components/provider/LaundryOverview";
 
 const BANNER = {
   pending: ["bg-warning-bg text-warning", "Your verification is being reviewed. You'll be visible to customers once approved."],
@@ -22,7 +23,8 @@ const wait = <div className="h-32 animate-pulse rounded-2xl bg-border/60" />;
 async function Overview({ searchParams }: { searchParams: PageProps<"/provider">["searchParams"] }) {
   await connection(); // today/week/30-day windows read the clock
   const p = await requireOwnProvider();
-  const service = p.service === "laundry" ? "laundry" : "cleaning";
+  if (p.service === "laundry") return <LaundryOverview p={p} searchParams={searchParams} />;
+  const service = "cleaning" as const;
   const tabs = PROVIDER_TABS[service];
   const raw = (await searchParams).tab;
   const tabId = tabs.some((t) => t.id === raw) ? (raw as string) : tabs[0].id;

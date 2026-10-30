@@ -118,3 +118,32 @@ export function intakeDiff(booked: LaundryTotals, counted: LaundryTotals) {
   const diff = counted.total - booked.total;
   return { diff, needsApproval: diff !== 0 };
 }
+
+export interface IntakeLine { unitPrice: number; counted: number }
+
+/**
+ * Recalculates an order after the shop counts the items. Mirrors `submit_intake` in the database:
+ * the express percentage is the one the customer was quoted, and delivery is free over the threshold.
+ */
+export function recomputeIntake(
+  lines: IntakeLine[],
+  opts: { expressPct: number; deliveryFee: number; freeDeliveryOver: number },
+) {
+  const items = lines.reduce((a, l) => a + l.counted, 0);
+  const sub = lines.reduce((a, l) => a + l.counted * l.unitPrice, 0);
+  const express = roundNaira((sub * opts.expressPct) / 100);
+  const cleaning = sub + express;
+  const delivery = items === 0 || cleaning >= opts.freeDeliveryOver ? 0 : opts.deliveryFee;
+  return { items, sub, express, cleaning, delivery, total: cleaning + delivery };
+}
+
+/** The pricing a customer was quoted, recovered from the stored order (percent of subtotal that was express). */
+export const quotedExpressPct = (subtotal: number, surcharge: number): number =>
+  subtotal > 0 && surcharge > 0 ? Math.round((surcharge * 100) / subtotal) : 0;
+
+export const EXPRESS_TURNAROUND_HOURS = 8;
+
+/** When an order is due back to the customer, from the moment the shop received it. */
+export function laundryDueAt(receivedAt: Date, express: boolean, standardHours: number = 48): Date {
+  return new Date(receivedAt.getTime() + (express ? EXPRESS_TURNAROUND_HOURS : standardHours) * 3_600_000);
+}

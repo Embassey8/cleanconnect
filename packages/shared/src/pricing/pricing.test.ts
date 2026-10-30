@@ -6,6 +6,9 @@ import {
   formatNaira,
   intakeDiff,
   quoteCarWash,
+  recomputeIntake,
+  quotedExpressPct,
+  laundryDueAt,
   type LaundryPriceList,
 } from "./index";
 
@@ -111,5 +114,30 @@ describe("quoteCarWash", () => {
       price: 6000, serviceFee: 500, total: 6500, partnerPayout: 5000,
     });
     expect(quoteCarWash(rates, "exterior", "suv", 500, false)).toBeNull();
+  });
+});
+
+describe("laundry intake recalculation", () => {
+  const opts = { expressPct: 0, deliveryFee: 1500, freeDeliveryOver: 20000 };
+  const booked = [{ unitPrice: 1500, counted: 3 }, { unitPrice: 3500, counted: 2 }, { unitPrice: 400, counted: 4 }];
+  it("matches the booked total when the counts match (13,100 + 1,500 delivery)", () => {
+    expect(recomputeIntake(booked, opts)).toMatchObject({ sub: 13100, total: 14600, delivery: 1500 });
+  });
+  it("matches the database: one extra shirt makes 16,100", () => {
+    const counted = [{ unitPrice: 1500, counted: 4 }, booked[1], booked[2]];
+    expect(recomputeIntake(counted, opts).total).toBe(16100);
+  });
+  it("keeps the quoted express percentage and waives delivery over the threshold", () => {
+    expect(quotedExpressPct(13100, 6550)).toBe(50);
+    expect(quotedExpressPct(13100, 0)).toBe(0);
+    const r = recomputeIntake(booked, { ...opts, expressPct: 50 });
+    expect(r).toMatchObject({ express: 6550, cleaning: 19650, delivery: 1500, total: 21150 });
+    expect(recomputeIntake([{ unitPrice: 3000, counted: 5 }], opts).delivery).toBe(1500); // 15,000 is under the 20,000 line
+    expect(recomputeIntake([{ unitPrice: 5000, counted: 5 }], opts).delivery).toBe(0); // 25,000 is over it
+  });
+  it("computes the due time", () => {
+    const at = new Date("2026-10-30T10:00:00Z");
+    expect(laundryDueAt(at, true).toISOString()).toBe("2026-10-30T18:00:00.000Z");
+    expect(laundryDueAt(at, false).toISOString()).toBe("2026-11-01T10:00:00.000Z");
   });
 });

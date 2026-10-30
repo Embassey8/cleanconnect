@@ -44,8 +44,8 @@ export const TRANSITIONS: Record<OrderService, Transition[]> = {
   laundry: [
     t("requested", "accepted", "provider"), t("requested", "declined", "provider"),
     t("accepted", "pickup_scheduled", "provider"), t("pickup_scheduled", "received", "provider"),
-    t("received", "cleaning", "provider"), t("received", "awaiting_price_approval", "provider"),
-    t("awaiting_price_approval", "cleaning", "customer"),
+    // Leaving "received" and approving a changed total go through the intake and price-approval functions.
+    t("awaiting_price_approval", "cancelled", "customer"),
     t("cleaning", "ironing", "provider"), t("cleaning", "ready", "provider"), t("ironing", "ready", "provider"),
     t("ready", "out_for_delivery", "provider"), t("out_for_delivery", "delivered", "provider"),
     t("delivered", "completed", "customer"), t("delivered", "disputed", "customer"),

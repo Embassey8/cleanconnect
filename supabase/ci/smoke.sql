@@ -288,7 +288,7 @@ select pg_temp.as_user((select owner_id from providers where slug = 'wash-co'));
 select advance_order(:'laundry_std', 'accepted');
 select advance_order(:'laundry_std', 'pickup_scheduled');
 select advance_order(:'laundry_std', 'received');
-select advance_order(:'laundry_std', 'cleaning');
+select submit_intake(:'laundry_std', '{}');
 select advance_order(:'laundry_std', 'ready');
 select advance_order(:'laundry_std', 'out_for_delivery');
 select advance_order(:'laundry_std', 'delivered');
@@ -989,3 +989,113 @@ select set_availability(true);
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
 select create_cleaning_order((select id from providers where slug = 'shine-cleaners'), 'home', 'regular', 'once',
   '[{"area":"bath","qty":1}]', '{}', '5 Test Road', 'Lekki', null) as back_online \gset
+
+-- ---------- Laundry intake ----------
+-- Booked: 3 shirts dry (1500), 2 native dry (3500), 4 trousers iron (400) = 13100 + 1500 delivery = 14600 (standard)
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+select mock_fund_wallet(100000);
+select create_laundry_order((select id from providers where slug = 'wash-co'),
+  '[{"item":"shirt","service":"dry","qty":3},{"item":"native","service":"dry","qty":2},{"item":"trousers","service":"iron","qty":4}]',
+  false, '12 Intake St', 'Yaba', now() + interval '1 day') as li1 \gset
+select set_config('t.li1', :'li1', false);
+select pay_order(:'li1');
+select pg_temp.as_user((select owner_id from providers where slug = 'wash-co')::uuid);
+select advance_order(:'li1', 'accepted');
+select advance_order(:'li1', 'pickup_scheduled');
+select advance_order(:'li1', 'received');
+do $$ begin
+  begin  -- the old shortcuts are gone: a plain status change cannot skip the intake
+    perform advance_order(current_setting('t.li1')::uuid, 'awaiting_price_approval');
+    raise exception 'provider skipped intake';
+  exception when others then if sqlerrm not like 'cannot move%' then raise; end if; end;
+  begin
+    perform advance_order(current_setting('t.li1')::uuid, 'cleaning');
+    raise exception 'provider skipped intake straight to cleaning';
+  exception when others then if sqlerrm not like 'cannot move%' then raise; end if; end;
+  perform set_config('t.tag0', my_next_tag((select id from providers where slug = 'wash-co'))::text, false);
+  assert current_setting('t.tag0')::int >= 412, 'tags start at 0412 or later (an earlier order already used some)';
+end $$;
+-- Same counts as booked: straight to cleaning, tags assigned in order
+select submit_intake(:'li1', '{}') as r1 \gset
+do $$ begin
+  assert (select status from orders where id = current_setting('t.li1')::uuid) = 'cleaning', 'same total goes to cleaning';
+  assert (select count(*) from order_lines where order_id = current_setting('t.li1')::uuid and tag is not null) = 3, 'tags assigned';
+  assert (select tag from order_lines where order_id = current_setting('t.li1')::uuid and item_id = 'shirt') = lpad(current_setting('t.tag0'), 4, '0') || '–' || lpad((current_setting('t.tag0')::int + 2)::text, 4, '0'), 'first tags start at the next number';
+  assert (select tag from order_lines where order_id = current_setting('t.li1')::uuid and item_id = 'native') = lpad((current_setting('t.tag0')::int + 3)::text, 4, '0') || '–' || lpad((current_setting('t.tag0')::int + 4)::text, 4, '0'), 'tags continue';
+  assert (select tag from order_lines where order_id = current_setting('t.li1')::uuid and item_id = 'trousers') = lpad((current_setting('t.tag0')::int + 5)::text, 4, '0') || '–' || lpad((current_setting('t.tag0')::int + 8)::text, 4, '0'), 'tags continue';
+  assert my_next_tag((select id from providers where slug = 'wash-co')) = current_setting('t.tag0')::int + 9, 'counter moves past the tags handed out';
+end $$;
+
+-- A second order where the shop counts one extra shirt: +1500 -> needs approval, customer pays the difference
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+select create_laundry_order((select id from providers where slug = 'wash-co'),
+  '[{"item":"shirt","service":"dry","qty":3},{"item":"native","service":"dry","qty":2},{"item":"trousers","service":"iron","qty":4}]',
+  false, '12 Intake St', 'Yaba', null) as li2 \gset
+select set_config('t.li2', :'li2', false);
+select pay_order(:'li2');
+select pg_temp.bal('00000000-0000-0000-0000-0000000000c1'::uuid, 'available') as bal_before \gset
+select set_config('t.bal_before', :'bal_before', false);
+select pg_temp.as_user((select owner_id from providers where slug = 'wash-co')::uuid);
+select advance_order(:'li2', 'accepted');
+select advance_order(:'li2', 'pickup_scheduled');
+select advance_order(:'li2', 'received');
+select id as shirt_line from order_lines where order_id = :'li2' and item_id = 'shirt' \gset
+select set_config('t.shirt_line', :'shirt_line', false);
+select submit_intake(:'li2', jsonb_build_object(:'shirt_line', 4)) as r2 \gset
+do $$ begin
+  assert (select status from orders where id = current_setting('t.li2')::uuid) = 'awaiting_price_approval', 'changed total waits for the customer';
+  assert (select proposed_total from orders where id = current_setting('t.li2')::uuid) = 16100, 'proposed total = 14600 + 1500 (TS parity)';
+  assert (select total from orders where id = current_setting('t.li2')::uuid) = 14600, 'booked total unchanged until approved';
+  begin
+    perform submit_intake(current_setting('t.li2')::uuid, '{}');
+    raise exception 'intake recorded twice';
+  exception when others then if sqlerrm not like '%received order%' then raise; end if; end;
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c2'::uuid);
+do $$ begin
+  begin
+    perform respond_price_change(current_setting('t.li2')::uuid, true);
+    raise exception 'stranger answered a price change';
+  exception when others then if sqlerrm not like 'not allowed%' then raise; end if; end;
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+select respond_price_change(:'li2', true);
+do $$ begin
+  assert (select status from orders where id = current_setting('t.li2')::uuid) = 'cleaning', 'approved -> cleaning';
+  assert (select total from orders where id = current_setting('t.li2')::uuid) = 16100, 'order total updated';
+  assert pg_temp.bal('00000000-0000-0000-0000-0000000000c1', 'available') = current_setting('t.bal_before')::integer - 1500, 'customer paid the 1500 difference';
+  assert (select proposed_total from orders where id = current_setting('t.li2')::uuid) is null, 'proposal cleared';
+end $$;
+-- Finish it: commission follows the counted items (14600 * 15% = 2190), not delivery
+select pg_temp.as_user((select owner_id from providers where slug = 'wash-co')::uuid);
+select advance_order(:'li2', 'ready');
+select advance_order(:'li2', 'out_for_delivery');
+select advance_order(:'li2', 'delivered');
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+select advance_order(:'li2', 'completed');
+do $$ begin
+  assert (select commission_amount from orders where id = current_setting('t.li2')::uuid) = 2190, 'commission on the counted items only (15% of 14600)';
+end $$;
+
+-- A third order: fewer items counted (-1500 -> refund the difference); a fourth: customer declines -> full refund
+select create_laundry_order((select id from providers where slug = 'wash-co'),
+  '[{"item":"shirt","service":"dry","qty":3},{"item":"native","service":"dry","qty":2},{"item":"trousers","service":"iron","qty":4}]',
+  false, '12 Intake St', 'Yaba', null) as li3 \gset
+select set_config('t.li3', :'li3', false);
+select pay_order(:'li3');
+select pg_temp.bal('00000000-0000-0000-0000-0000000000c1'::uuid, 'available') as bal3 \gset
+select set_config('t.bal3', :'bal3', false);
+select pg_temp.as_user((select owner_id from providers where slug = 'wash-co')::uuid);
+select advance_order(:'li3', 'accepted');
+select advance_order(:'li3', 'pickup_scheduled');
+select advance_order(:'li3', 'received');
+select id as shirt3 from order_lines where order_id = :'li3' and item_id = 'shirt' \gset
+select set_config('t.shirt3', :'shirt3', false);
+select submit_intake(:'li3', jsonb_build_object(:'shirt3', 2)) as r3 \gset
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+select respond_price_change(:'li3', false);
+do $$ begin
+  assert (select status from orders where id = current_setting('t.li3')::uuid) = 'cancelled', 'declined -> cancelled';
+  assert (select escrow_status from orders where id = current_setting('t.li3')::uuid) = 'refunded', 'declined -> refunded';
+  assert pg_temp.bal('00000000-0000-0000-0000-0000000000c1', 'available') = current_setting('t.bal3')::integer + 14600, 'full refund after decline';
+end $$;

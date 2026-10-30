@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatWhen } from "@/lib/time";
 import { ActionButtons } from "./ActionButtons";
 import { PayCard } from "./PayCard";
+import { PriceApproval } from "./PriceApproval";
 import { OrderMedia } from "@/components/media/OrderMedia";
 import { OrderReview } from "@/components/reviews/OrderReview";
 
@@ -16,12 +17,12 @@ export async function OrderView({ id, viewer }: { id: string; viewer: "customer"
   const supabase = await createClient();
   const { data: o } = await supabase
     .from("orders")
-    .select("id, service, status, total, subtotal, surcharge, extras_total, discount, delivery_fee, scheduled_at, is_express, notes, created_at, accept_by, escrow_status, commission_amount, providers(display_name, slug)")
+    .select("id, service, status, total, subtotal, surcharge, extras_total, discount, delivery_fee, scheduled_at, is_express, notes, created_at, accept_by, escrow_status, commission_amount, proposed_total, providers(display_name, slug)")
     .eq("id", id)
     .maybeSingle();
   if (!o) notFound();
   const [{ data: lines }, { data: events }, { data: addr }] = await Promise.all([
-    supabase.from("order_lines").select("id, label, qty, unit_price, kind").eq("order_id", id).order("id"),
+    supabase.from("order_lines").select("id, label, qty, counted_qty, unit_price, kind, tag").eq("order_id", id).order("id"),
     supabase.from("order_events").select("id, status, created_at").eq("order_id", id).order("id"),
     supabase.from("order_addresses").select("address, area").eq("order_id", id).maybeSingle(),
   ]);
@@ -37,9 +38,10 @@ export async function OrderView({ id, viewer }: { id: string; viewer: "customer"
     (a) => !(viewer === "provider" && a === "accepted" && !canProviderAccept(service, escrow)),
   );
   // Car wash is only charged once a partner is assigned.
+  const needsApproval = viewer === "customer" && status === "awaiting_price_approval" && o.proposed_total != null;
   const canPay = viewer === "customer" && unpaid && (service === "carwash" ? status === "assigning" : ["requested", "accepted"].includes(status));
   let available = 0;
-  if (canPay) {
+  if (canPay || needsApproval) {
     const { data: bal } = await supabase.from("wallet_balances").select("available");
     available = (bal ?? []).reduce((sum, r) => sum + (r.available as number), 0);
   }
@@ -62,6 +64,7 @@ export async function OrderView({ id, viewer }: { id: string; viewer: "customer"
         </div>
       )}
 
+      {needsApproval && <PriceApproval orderId={o.id} current={o.total} proposed={o.proposed_total!} available={available} />}
       {canPay && <PayCard orderId={o.id} total={o.total} available={available} />}
       <ActionButtons orderId={o.id} actions={actions} />
       {viewer === "customer" && service === "carwash" && status === "requested" && (
@@ -89,7 +92,7 @@ export async function OrderView({ id, viewer }: { id: string; viewer: "customer"
         <ul className="divide-y divide-bg-admin text-sm">
           {(lines ?? []).map((l) => (
             <li key={l.id} className="flex justify-between py-2">
-              <span>{l.qty} × {l.label}</span><span>{formatNaira(l.qty * l.unit_price)}</span>
+              <span>{l.counted_qty ?? l.qty} × {l.label}{l.counted_qty != null && l.counted_qty !== l.qty ? <span className="ml-1 text-xs text-warning">(booked {l.qty})</span> : null}{l.tag ? <span className="ml-1 text-xs text-muted">· tag {l.tag}</span> : null}</span><span>{formatNaira((l.counted_qty ?? l.qty) * l.unit_price)}</span>
             </li>
           ))}
         </ul>
