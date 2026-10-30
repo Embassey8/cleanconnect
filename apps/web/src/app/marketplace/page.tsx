@@ -16,7 +16,7 @@ async function Loader({ searchParams }: { searchParams: PageProps<"/marketplace"
 
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from("provider_listing").select("id, slug, display_name, type, service, plan, areas, min_price").neq("service", "carwash").limit(500);
+    .from("provider_listing").select("id, slug, display_name, type, service, plan, areas, min_price, accepting_jobs").neq("service", "carwash").limit(500);
   if (error) return <p role="alert" className="text-danger">Could not load providers: {error.message}</p>;
   const base = data ?? [];
   const ids = base.map((r) => r.id);
@@ -34,6 +34,7 @@ async function Loader({ searchParams }: { searchParams: PageProps<"/marketplace"
     rating: st.get(r.id)?.rating_avg == null ? null : Number(st.get(r.id)!.rating_avg), reviews: st.get(r.id)?.rating_count ?? 0,
     checks: [...new Set((badges ?? []).filter((b) => b.provider_id === r.id && b.verified).map((b) => BADGE[b.kind]).filter(Boolean))],
     laundry: [...new Set((lp ?? []).filter((x) => x.provider_id === r.id).map((x) => x.service))],
+    online: r.accepting_jobs !== false,
   }));
   return <MarketplaceBrowser rows={rows} initialQuery={initial.toString()} />;
 }

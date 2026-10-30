@@ -969,5 +969,23 @@ do $$ begin
   begin
     perform set_availability(false);
     raise exception 'a customer changed partner availability';
-  exception when others then if sqlerrm not like 'only car wash partners%' then raise; end if; end;
+  exception when others then if sqlerrm not like 'only providers%' then raise; end if; end;
 end $$;
+
+-- Offline cleaning/laundry providers cannot receive new requests
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1'::uuid);
+select set_availability(false);
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+do $$ begin
+  begin
+    perform create_cleaning_order((select id from providers where slug = 'shine-cleaners'), 'home', 'regular', 'once',
+      '[{"area":"bath","qty":1}]', '{}', '5 Test Road', 'Lekki', null);
+    raise exception 'order placed with an offline provider';
+  exception when others then if sqlerrm not like '%not taking new orders%' then raise; end if; end;
+  assert (select accepting_jobs from provider_listing where slug = 'shine-cleaners') = false, 'listing shows offline';
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1'::uuid);
+select set_availability(true);
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+select create_cleaning_order((select id from providers where slug = 'shine-cleaners'), 'home', 'regular', 'once',
+  '[{"area":"bath","qty":1}]', '{}', '5 Test Road', 'Lekki', null) as back_online \gset

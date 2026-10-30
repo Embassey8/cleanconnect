@@ -3,7 +3,7 @@ import { EMPTY_FILTERS, filterListings, filtersFromParams, filtersToParams, pagi
 
 const row = (o: Partial<ListingRow>): ListingRow => ({
   id: "x", slug: "x", display_name: "X", type: "business", service: "cleaning", plan: "standard",
-  areas: [], min_price: 5000, rating: null, reviews: 0, checks: [], laundry: [], ...o,
+  areas: [], min_price: 5000, rating: null, reviews: 0, checks: [], laundry: [], online: true, ...o,
 });
 const rows = [
   row({ id: "a", display_name: "Shine Cleaners", areas: ["Lekki"], min_price: 2500, rating: 4.8, plan: "vip" }),

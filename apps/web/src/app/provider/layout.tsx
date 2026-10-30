@@ -1,10 +1,17 @@
+import { Suspense } from "react";
 import { Guard } from "@/components/auth/Guard";
-import { DashboardShell } from "@/components/shell/DashboardShell";
+import { ProviderShell } from "@/components/provider/ProviderShell";
+import { requireOwnProvider } from "@/lib/auth/provider";
+
+async function Frame({ children }: { children: React.ReactNode }) {
+  const p = await requireOwnProvider();
+  return <ProviderShell subtitle={`Provider · ${p.service === "laundry" ? "Laundry" : "House cleaning"}`}>{children}</ProviderShell>;
+}
 
 export default function ProviderLayout({ children }: LayoutProps<"/provider">) {
   return (
-    <DashboardShell title="Provider" nav={[{ href: "/provider", label: "Dashboard" }, { href: "/provider/orders", label: "Orders" }, { href: "/messages", label: "Messages" }, { href: "/provider/prices", label: "Prices" }, { href: "/provider/wallet", label: "Earnings" }, { href: "/provider/vip", label: "VIP" }, { href: "/support", label: "Support" }]}>
-      <Guard roles={["provider"]}>{children}</Guard>
-    </DashboardShell>
+    <Guard roles={["provider"]}>
+      <Suspense fallback={<main className="p-8 text-muted">Loading…</main>}><Frame>{children}</Frame></Suspense>
+    </Guard>
   );
 }
