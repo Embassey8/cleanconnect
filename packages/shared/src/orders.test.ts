@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { PROGRESS, TRANSITIONS, availableActions, orderRef, orderTab, progressFraction, summaryStep, type OrderService } from "./orders";
+import { PROGRESS, PROVIDER_TABS, TRANSITIONS, availableActions, orderRef, orderTab, progressFraction, summaryStep, type OrderService } from "./orders";
 
 describe("order transitions", () => {
   it("lets providers accept or decline a request, and customers only cancel", () => {
@@ -61,5 +61,16 @@ describe("order summary", () => {
     expect(orderTab("disputed")).toBe("ongoing");
     expect(orderTab("completed")).toBe("completed");
     expect(orderTab("declined")).toBe("cancelled");
+  });
+});
+
+describe("provider order tabs", () => {
+  it("covers every status of the happy path and the end states exactly once", () => {
+    for (const svc of ["cleaning", "laundry"] as const) {
+      const all = PROVIDER_TABS[svc].flatMap((t) => t.statuses);
+      expect(new Set(all).size, `${svc} has a status in two tabs`).toBe(all.length);
+      for (const st of PROGRESS[svc]) expect(all, `${svc}:${st}`).toContain(st);
+      for (const end of ["cancelled", "declined", "expired", "disputed"] as const) expect(all).toContain(end);
+    }
   });
 });

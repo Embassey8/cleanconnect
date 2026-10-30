@@ -41,7 +41,7 @@ async function Editor() {
 export default function ProviderPrices() {
   return (
     <>
-      <h1 className="mb-6 text-2xl font-extrabold">Your prices</h1>
+      <h1 className="mb-1 text-[26px] font-extrabold">Packages &amp; prices</h1>
       <Suspense fallback={<p className="text-muted">Loading…</p>}><Editor /></Suspense>
     </>
   );

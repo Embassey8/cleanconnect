@@ -14,6 +14,8 @@ export interface ListingRow {
   checks: string[];
   /** Laundry services with a price: dry, wash, iron. */
   laundry: string[];
+  /** False while the provider has paused new orders. */
+  online: boolean;
 }
 
 export type MarketplaceSort = "recommended" | "price_asc" | "price_desc" | "rating";

@@ -128,3 +128,25 @@ export function orderTab(status: OrderStatus): OrderTab {
   if (status === "cancelled" || status === "declined" || status === "expired") return "cancelled";
   return "ongoing"; // includes disputed: still unresolved
 }
+
+export interface ProviderTab { id: string; label: string; statuses: OrderStatus[] }
+
+/** The order tabs on a provider's Overview page (BUILD_BRIEF §7 statuses). Cleaning also has a "Quote requests" tab built from chats. */
+export const PROVIDER_TABS: Record<"cleaning" | "laundry", ProviderTab[]> = {
+  cleaning: [
+    { id: "new", label: "New requests", statuses: ["requested"] },
+    { id: "upcoming", label: "Upcoming", statuses: ["accepted", "upcoming"] },
+    { id: "progress", label: "In progress", statuses: ["in_progress"] },
+    { id: "confirm", label: "Awaiting confirmation", statuses: ["awaiting_confirmation"] },
+    { id: "done", label: "Completed", statuses: ["completed"] },
+    { id: "closed", label: "Cancelled / disputed", statuses: ["cancelled", "declined", "expired", "disputed"] },
+  ],
+  laundry: [
+    { id: "new", label: "New requests", statuses: ["requested"] },
+    { id: "upcoming", label: "Upcoming", statuses: ["accepted", "pickup_scheduled"] },
+    { id: "progress", label: "In progress", statuses: ["received", "awaiting_price_approval", "cleaning", "ironing", "ready"] },
+    { id: "confirm", label: "Delivery & confirmation", statuses: ["out_for_delivery", "delivered"] },
+    { id: "done", label: "Completed", statuses: ["completed"] },
+    { id: "closed", label: "Cancelled / disputed", statuses: ["cancelled", "declined", "expired", "disputed"] },
+  ],
+};

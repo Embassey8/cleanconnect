@@ -132,6 +132,7 @@ export function MarketplaceBrowser({ rows, initialQuery }: { rows: ListingRow[];
                     <p className="flex flex-wrap gap-2 text-xs font-semibold text-text-2">
                       <span className="rounded-full bg-bg px-2.5 py-1">{r.service === "laundry" ? "Laundry" : "House cleaning"}</span>
                       {r.laundry.map((o) => <span key={o} className="rounded-full bg-bg px-2.5 py-1">{LAUNDRY_LABEL[o]}</span>)}
+                      {!r.online && <span className="rounded-full bg-warning-bg px-2.5 py-1 text-warning">Not taking new orders right now</span>}
                     </p>
                   </div>
                   <div className="flex flex-col items-start gap-2 sm:items-end">
@@ -139,7 +140,7 @@ export function MarketplaceBrowser({ rows, initialQuery }: { rows: ListingRow[];
                     <span className="text-xl font-extrabold">{r.min_price != null ? formatNaira(r.min_price) : "Soon"}</span>
                     <div className="flex gap-2">
                       <form action={startThread.bind(null, r.id, r.slug)}><button className="min-h-11 rounded-input border border-border bg-surface px-4 text-sm font-bold hover:bg-primary-tint">Message</button></form>
-                      <Link href={`/p/${r.slug}`} className="inline-flex min-h-11 items-center rounded-input bg-primary px-4 text-sm font-bold text-white hover:bg-primary-hover">Book</Link>
+                      <Link href={`/p/${r.slug}`} className={`inline-flex min-h-11 items-center rounded-input px-4 text-sm font-bold ${r.online ? "bg-primary text-white hover:bg-primary-hover" : "border border-border bg-surface text-text-2"}`}>{r.online ? "Book" : "View"}</Link>
                     </div>
                   </div>
                 </li>
