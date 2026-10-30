@@ -7,10 +7,10 @@ import { signOut } from "@/app/login/actions";
 
 const NAV = [
   { href: "/partner", label: "Assigned jobs", match: (p: string) => p === "/partner" || p.startsWith("/partner/orders") },
-  { href: "/partner#schedule", label: "Today's schedule" },
-  { href: "/partner#rates", label: "Payout rates" },
-  { href: "/partner/wallet", label: "Payouts", match: (p: string) => p.startsWith("/partner/wallet") },
-  { href: "/partner#score", label: "Partner score" },
+  { href: "/partner/schedule", label: "Today's schedule" },
+  { href: "/partner/rates", label: "Payout rates" },
+  { href: "/partner/wallet", label: "Payouts" },
+  { href: "/partner/score", label: "Partner score" },
   { href: "/support", label: "Support" },
 ];
 
@@ -25,7 +25,7 @@ function Nav({ path, onNavigate }: { path: string; onNavigate?: () => void }) {
       </Link>
       <nav aria-label="Partner navigation" className="flex flex-col gap-0.5">
         {NAV.map((n) => {
-          const active = n.match?.(path) ?? false;
+          const active = n.match ? n.match(path) : path === n.href || path.startsWith(`${n.href}/`);
           return (
             <Link key={n.href} href={n.href} onClick={onNavigate} aria-current={active ? "page" : undefined}
               className={`flex min-h-[42px] items-center rounded-lg px-3 text-sm ${active ? "bg-carwash-bg font-bold text-carwash" : "text-text-2 hover:bg-bg"}`}>{n.label}</Link>

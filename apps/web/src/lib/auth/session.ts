@@ -1,8 +1,10 @@
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { homeFor, type AdminRole, type Role, type SessionUser } from "@cleanconnect/shared";
 
-export async function getSessionUser(): Promise<SessionUser | null> {
+/** Cached per request, so the layout, page and components share one set of lookups. */
+export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
   const supabase = await createClient();
   const { data: claims } = await supabase.auth.getClaims();
   const id = claims?.claims?.sub;
@@ -26,7 +28,7 @@ export async function getSessionUser(): Promise<SessionUser | null> {
     adminRole: (row.admin_role as AdminRole | null) ?? undefined,
     providerService: provider?.service ?? undefined,
   };
-}
+});
 
 /** Server-side authorization. Redirects signed-out users to /login and others to their home. */
 export async function requireRole(roles: Role[]): Promise<SessionUser> {

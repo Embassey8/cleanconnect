@@ -8,7 +8,7 @@ const PAYOUT_STYLE: Record<string, string> = {
   pending: "bg-warning-bg text-warning", paid: "bg-primary-tint text-primary", failed: "bg-danger-bg text-danger",
 };
 
-export async function WalletView() {
+export async function WalletView({ heldLabel = "On hold for orders" }: { heldLabel?: string } = {}) {
   const user = await getSessionUser();
   const supabase = await createClient();
   const { data: wallet } = await supabase.from("wallets").select("id").eq("user_id", user!.id).maybeSingle();
@@ -31,7 +31,7 @@ export async function WalletView() {
           <p className="text-2xl font-extrabold">{formatNaira(available)}</p>
         </div>
         <div className="rounded-card border border-border bg-surface p-4">
-          <p className="text-sm text-muted">On hold for orders</p>
+          <p className="text-sm text-muted">{heldLabel}</p>
           <p className="text-2xl font-extrabold">{formatNaira(held)}</p>
         </div>
       </section>
