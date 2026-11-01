@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { checkFunding, checkWithdrawal, parseNaira } from "@cleanconnect/shared";
 import { createClient } from "@/lib/supabase/server";
+import { getSessionUser } from "@/lib/auth/session";
 import { friendlyMoneyError } from "@/lib/money";
 
 export interface MoneyState { error?: string; ok?: string }
@@ -15,6 +16,8 @@ function refresh() {
 
 /** Mock payment provider: credits the wallet instantly. Swap for a Paystack/Flutterwave checkout later. */
 export async function fundWallet(_: MoneyState, form: FormData): Promise<MoneyState> {
+  const user = await getSessionUser();
+  if (user?.role === "provider" || user?.role === "partner") return { error: "Providers can't add money to their wallet." };
   const amount = parseNaira(String(form.get("amount") ?? ""));
   if (amount == null) return { error: "Enter a valid amount." };
   const check = checkFunding(amount);

@@ -22,6 +22,8 @@ export async function WalletView({ heldLabel = "On hold for orders" }: { heldLab
   ]);
   const available = bal?.available ?? 0;
   const held = bal?.held ?? 0;
+  // Providers and partners earn and withdraw; they never deposit.
+  const canFund = user!.role !== "provider" && user!.role !== "partner";
 
   return (
     <div className="space-y-8">
@@ -36,11 +38,13 @@ export async function WalletView({ heldLabel = "On hold for orders" }: { heldLab
         </div>
       </section>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <section id="fund" className="scroll-mt-4 rounded-card border border-border bg-surface p-4">
-          <h2 className="mb-3 font-extrabold">Add money</h2>
-          <FundForm />
-        </section>
+      <div className={`grid gap-6 ${canFund ? "md:grid-cols-2" : ""}`}>
+        {canFund && (
+          <section id="fund" className="scroll-mt-4 rounded-card border border-border bg-surface p-4">
+            <h2 className="mb-3 font-extrabold">Add money</h2>
+            <FundForm />
+          </section>
+        )}
         <section id="withdraw" className="scroll-mt-4 rounded-card border border-border bg-surface p-4">
           <h2 className="mb-3 font-extrabold">Withdraw to bank</h2>
           <WithdrawForm />
