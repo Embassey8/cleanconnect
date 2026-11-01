@@ -298,6 +298,10 @@ do $$ declare w uuid := (select owner_id from providers where slug = 'wash-co');
   assert (select commission_amount from orders where id = current_setting('t.laundry_std')::uuid) = 1965, 'laundry commission (TS: 1965)';
   assert pg_temp.bal(w, 'available') = 14600 - 1965, 'laundry provider earns net of commission, delivery included';
   assert pg_temp.pbal() = 7749 + 1965, 'platform commission total';
+  -- The provider's statement shows the whole amount in, the service fee out, and the fee lands on the platform wallet.
+  assert (select coalesce(sum(amount), 0) from ledger_entries where order_id = current_setting('t.laundry_std')::uuid and wallet_id = (select id from wallets where user_id = w) and kind = 'release') = 14600, 'provider credited the gross';
+  assert (select coalesce(sum(amount), 0) from ledger_entries where order_id = current_setting('t.laundry_std')::uuid and wallet_id = (select id from wallets where user_id = w) and kind = 'commission') = -1965, 'service fee deducted from the provider';
+  assert (select coalesce(sum(amount), 0) from ledger_entries where order_id = current_setting('t.laundry_std')::uuid and wallet_id = (select id from wallets where kind = 'platform') and kind = 'commission') = 1965, 'service fee added to the platform';
 end $$;
 
 -- Provider declines a paid order: refunded
@@ -1098,4 +1102,26 @@ do $$ begin
   assert (select status from orders where id = current_setting('t.li3')::uuid) = 'cancelled', 'declined -> cancelled';
   assert (select escrow_status from orders where id = current_setting('t.li3')::uuid) = 'refunded', 'declined -> refunded';
   assert pg_temp.bal('00000000-0000-0000-0000-0000000000c1', 'available') = current_setting('t.bal3')::integer + 14600, 'full refund after decline';
+end $$;
+
+-- Providers cannot deposit
+select pg_temp.as_user((select owner_id from providers where slug = 'wash-co')::uuid);
+do $$ begin
+  begin
+    perform mock_fund_wallet(5000);
+    raise exception 'provider deposited';
+  exception when others then if sqlerrm not like '%cannot add money%' then raise; end if; end;
+end $$;
+
+-- Admin money overview: per-provider gross, fee and net add up to the platform commission
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000ad'::uuid);
+select admin_money(current_date) as am \gset
+select set_config('t.am', :'am', false);
+do $$ declare am jsonb := current_setting('t.am')::jsonb; v_fee int; v_net int; v_gross int; begin
+  select coalesce(sum((r ->> 'fee')::int), 0), coalesce(sum((r ->> 'net')::int), 0), coalesce(sum((r ->> 'gross')::int), 0)
+    into v_fee, v_net, v_gross from jsonb_array_elements(am -> 'providers') r;
+  assert v_fee = (am -> 'totals' ->> 'commission')::int, 'provider fees add up to the platform commission';
+  assert v_net = (am -> 'totals' ->> 'provider_net')::int, 'provider net adds up';
+  assert v_gross = v_fee + v_net, 'gross = fee + net';
+  assert v_fee >= 1965, 'commission includes the laundry order';
 end $$;

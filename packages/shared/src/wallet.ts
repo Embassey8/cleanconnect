@@ -75,7 +75,7 @@ export const LEDGER_KIND_LABEL: Record<LedgerKind, string> = {
   hold: "Held for order",
   release: "Order payment",
   refund: "Refund",
-  commission: "CleanConnect commission",
+  commission: "Service fee",
   payout: "Payout",
   vip_fee: "VIP subscription",
   adjustment: "Adjustment",

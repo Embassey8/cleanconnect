@@ -122,6 +122,64 @@ export async function FinanceSection({ month }: { month: string }) {
   );
 }
 
+/* ---------- Money overview: who earned what, the fees taken, net profit ---------- */
+interface MoneyRow { id: string; name: string; [k: string]: string | number }
+const th = "px-3 py-2 text-left text-xs font-semibold text-muted";
+const td = "px-3 py-2.5";
+const num = `${td} text-right tabular-nums`;
+
+function MoneyTable({ title, note, head, rows, empty }: { title: string; note: string; head: string[]; rows: React.ReactNode[][]; empty: string }) {
+  return (
+    <section className={card}>
+      <div><h2 className={h2}>{title}</h2><p className={sub}>{note}</p></div>
+      {rows.length === 0 ? <p className="text-sm text-muted">{empty}</p> : (
+        <div className="-mx-2 overflow-x-auto">
+          <table className="w-full min-w-[560px] text-sm">
+            <thead><tr>{head.map((h, i) => <th key={h} className={`${th} ${i > 0 ? "text-right" : ""}`}>{h}</th>)}</tr></thead>
+            <tbody className="divide-y divide-bg-admin">
+              {rows.map((r, i) => <tr key={i}>{r.map((c, j) => <td key={j} className={j === 0 ? `${td} font-semibold` : num}>{c}</td>)}</tr>)}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
+}
+
+export async function MoneySection({ month }: { month: string }) {
+  const supabase = await createClient();
+  const [{ data, error }, fin] = await Promise.all([supabase.rpc("admin_money", { p_month: monthDate(month) }), finance(month)]);
+  if (error || !data || !fin) return null;
+  const d = data as unknown as { providers: MoneyRow[]; partners: MoneyRow[]; customers: MoneyRow[]; totals: Record<string, number> };
+  const n = (r: MoneyRow, k: string) => Number(r[k] ?? 0);
+  const t = d.totals;
+  const tile = "flex flex-col gap-1 rounded-[14px] border border-border bg-surface p-[18px]";
+  const cut = d.providers.reduce((a, r) => a + n(r, "gross"), 0);
+  return (
+    <>
+      <section aria-label="Where the money went" className="grid grid-cols-2 gap-3.5 lg:grid-cols-4">
+        <div className={tile}><span className="text-[13px] text-muted">Providers billed</span><span className="text-2xl font-extrabold">{money(cut)}</span>
+          <span className="text-xs text-muted">{money(t.provider_net)} kept after fees</span></div>
+        <div className={tile}><span className="text-[13px] text-muted">Service fees earned</span><span className="text-2xl font-extrabold">{money(t.commission)}</span>
+          <span className="text-xs text-muted">Taken from laundry and cleaning orders</span></div>
+        <div className={tile}><span className="text-[13px] text-muted">Car wash margin</span><span className="text-2xl font-extrabold">{money(t.carwash_margin)}</span>
+          <span className="text-xs text-muted">Customer price less partner payouts</span></div>
+        <div className="flex flex-col gap-1 rounded-[14px] bg-primary p-[18px] text-white"><span className="text-[13px] text-[#cdebe1]">Net profit</span>
+          <span className="text-2xl font-extrabold">{money(fin.calc.profit)}</span><span className="text-xs text-[#cdebe1]">{fin.calc.margin}% margin after costs</span></div>
+      </section>
+      <MoneyTable title="Service providers" note="Settled this month. Gross is what customers paid; the service fee goes to CleanConnect."
+        head={["Provider", "Orders", "Gross", "Service fee", "Kept", "VIP paid", "Wallet"]} empty="No approved shops or individuals yet."
+        rows={d.providers.map((r) => [r.name, n(r, "orders"), money(n(r, "gross")), `−${money(n(r, "fee"))}`, money(n(r, "net")), money(n(r, "vip_paid")), money(n(r, "available") + n(r, "held"))])} />
+      <MoneyTable title="Car wash" note="Managed jobs this month. Partners get a fixed payout; the rest is CleanConnect revenue."
+        head={["Partner", "Jobs", "Customers paid", "Partner payout", "Our margin", "Wallet"]} empty="No car wash partners yet."
+        rows={d.partners.map((r) => [r.name, n(r, "jobs"), money(n(r, "revenue")), `−${money(n(r, "payouts"))}`, money(n(r, "margin")), money(n(r, "available") + n(r, "held"))])} />
+      <MoneyTable title="Customer wallets" note={`Held in escrow across all open orders: ${money(t.held_in_escrow)}. Customer wallets hold ${money(t.customer_wallets)}.`}
+        head={["Customer", "Deposited", "Spent (finished)", "Wallet", "On hold"]} empty="No customers yet."
+        rows={d.customers.map((r) => [r.name, money(n(r, "deposited")), money(n(r, "spent")), money(n(r, "available")), money(n(r, "held"))])} />
+    </>
+  );
+}
+
 /* ---------- Provider approvals ---------- */
 const V_KIND: Record<string, string> = { cac: "CAC", nin: "NIN", bvn: "BVN", selfie: "Face match" };
 const V_STYLE: Record<string, { text: string; cls: string }> = {

@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
-import { FinanceSection, Kpis } from "@/components/admin/sections";
+import { FinanceSection, Kpis, MoneySection } from "@/components/admin/sections";
 import { formatNaira } from "@cleanconnect/shared";
 import { createClient } from "@/lib/supabase/server";
 import { FinanceForm } from "@/components/ops/Forms";
@@ -33,6 +33,7 @@ async function Income({ searchParams }: { searchParams: PageProps<"/admin/income
     <>
       <Suspense fallback={wait}><Kpis month={month} /></Suspense>
       <Suspense fallback={wait}><FinanceSection month={month} /></Suspense>
+      <Suspense fallback={wait}><MoneySection month={month} /></Suspense>
       <div className="flex flex-wrap items-start gap-5">
         <section className={`${card} flex-[1_1_380px]`}>
           <h2 className="text-lg font-bold">Add income or expense</h2>
