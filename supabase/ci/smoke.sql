@@ -1156,3 +1156,12 @@ begin
   assert (select available from wallet_balances where wallet_id = w) = mid + 2000, 'failed payout refunded once';
 end $$;
 update money_settings set payments_mode = 'mock';
+
+-- Smile ID: live KYC mode leaves checks pending until the server records a verdict
+update money_settings set kyc_mode = 'live';
+do $$ begin assert mock_verify('nin', '12345678901') = 'pending', 'live mode never auto-verifies'; end $$;
+update money_settings set kyc_mode = 'mock';
+do $$ declare pid uuid := (select id from providers limit 1); begin
+  perform record_verification(pid, 'selfie', 'verified', '{"source":"smile_id"}');
+  assert (select status from verifications where provider_id = pid and kind = 'selfie') = 'verified', 'verdict recorded';
+exception when others then if sqlerrm not like '%selfie%' then raise; end if; end $$;

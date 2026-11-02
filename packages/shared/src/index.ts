@@ -9,3 +9,4 @@ export * from "./ops";
 export * from "./media";
 export * from "./reviews";
 export * from "./marketplace";
+export * from "./kyc";
