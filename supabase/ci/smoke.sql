@@ -1125,3 +1125,34 @@ do $$ declare am jsonb := current_setting('t.am')::jsonb; v_fee int; v_net int; 
   assert v_gross = v_fee + v_net, 'gross = fee + net';
   assert v_fee >= 1965, 'commission includes the laundry order';
 end $$;
+
+-- Paystack: live funding credits once, refuses a wrong amount, and a failed transfer returns the money
+update money_settings set payments_mode = 'live';
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c1'::uuid);
+select create_payment_intent(25000) as pref \gset
+select set_config('t.pref', :'pref', false);
+do $$ declare
+  w uuid := (select id from wallets where user_id = '00000000-0000-0000-0000-0000000000c1');
+  before_bal int; ref text := current_setting('t.pref');
+begin
+  select available into before_bal from wallet_balances where wallet_id = w;
+  begin perform credit_payment(ref, 24000); raise exception 'wrong amount accepted';
+  exception when others then if sqlerrm not like 'amount mismatch%' then raise; end if; end;
+  assert credit_payment(ref, 25000), 'first confirmation credits';
+  assert not credit_payment(ref, 25000), 'second confirmation is a no-op';
+  assert (select available from wallet_balances where wallet_id = w) = before_bal + 25000, 'credited exactly once';
+  begin perform mock_fund_wallet(1000); raise exception 'mock funding allowed in live mode';
+  exception when others then if sqlerrm not like '%mock payments are disabled%' then raise; end if; end;
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1'::uuid);
+select request_withdrawal(2000, 'Test Bank', 'Prov', '0123456789') as pid \gset
+select set_config('t.pid', :'pid', false);
+do $$ declare
+  w uuid := (select wallet_of('00000000-0000-0000-0000-0000000000a1'::uuid)); mid int; pid uuid := current_setting('t.pid')::uuid;
+begin
+  select available into mid from wallet_balances where wallet_id = w;
+  assert settle_payout(pid, 'failed', null, 'bank down'), 'failed transfer settles';
+  assert not settle_payout(pid, 'failed'), 'settling twice is a no-op';
+  assert (select available from wallet_balances where wallet_id = w) = mid + 2000, 'failed payout refunded once';
+end $$;
+update money_settings set payments_mode = 'mock';
