@@ -2,7 +2,8 @@ import { LEDGER_KIND_LABEL, formatNaira, type LedgerKind } from "@cleanconnect/s
 import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth/session";
 import { formatWhen } from "@/lib/time";
-import { FundForm, WithdrawForm } from "./WalletForms";
+import { listBanks, paystackConfigured } from "@/lib/paystack";
+import { FundForm, PaymentNotice, WithdrawForm, type BankOption } from "./WalletForms";
 
 const PAYOUT_STYLE: Record<string, string> = {
   pending: "bg-warning-bg text-warning", paid: "bg-primary-tint text-primary", failed: "bg-danger-bg text-danger",
@@ -20,6 +21,10 @@ export async function WalletView({ heldLabel = "On hold for orders" }: { heldLab
     supabase.from("payouts").select("id, amount, bank_name, account_last4, status, eta_hours, created_at")
       .eq("user_id", user!.id).order("created_at", { ascending: false }).limit(10),
   ]);
+  const { data: settings } = await supabase.from("money_settings").select("payments_mode").single();
+  const live = settings?.payments_mode === "live" && paystackConfigured();
+  let banks: BankOption[] = [];
+  if (live) banks = await listBanks().catch(() => []);
   const available = bal?.available ?? 0;
   const held = bal?.held ?? 0;
   // Providers and partners earn and withdraw; they never deposit.
@@ -27,6 +32,7 @@ export async function WalletView({ heldLabel = "On hold for orders" }: { heldLab
 
   return (
     <div className="space-y-8">
+      <PaymentNotice />
       <section className="grid grid-cols-2 gap-3">
         <div className="rounded-card border border-border bg-surface p-4">
           <p className="text-sm text-muted">Available</p>
@@ -42,12 +48,12 @@ export async function WalletView({ heldLabel = "On hold for orders" }: { heldLab
         {canFund && (
           <section id="fund" className="scroll-mt-4 rounded-card border border-border bg-surface p-4">
             <h2 className="mb-3 font-extrabold">Add money</h2>
-            <FundForm />
+            <FundForm live={live} />
           </section>
         )}
         <section id="withdraw" className="scroll-mt-4 rounded-card border border-border bg-surface p-4">
           <h2 className="mb-3 font-extrabold">Withdraw to bank</h2>
-          <WithdrawForm />
+          <WithdrawForm banks={banks} />
         </section>
       </div>
 
