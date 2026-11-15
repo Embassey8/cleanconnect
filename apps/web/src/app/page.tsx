@@ -87,10 +87,13 @@ export default function Home() {
             </label>
             <label className={`${field} flex-[1_1_180px]`}>
               <span className={label}>Service</span>
-              <select name="service" className={control}>
-                <option value="">All services</option><option value="carwash">Car wash</option><option value="cleaning">House cleaning</option>
-                <option value="laundry">Laundry (dry clean, wash, ironing)</option>
-              </select>
+              <span className="relative block">
+                <select name="service" className={`${control} w-full cursor-pointer appearance-none pr-6`}>
+                  <option value="">All services</option><option value="carwash">Car wash</option><option value="cleaning">House cleaning</option>
+                  <option value="laundry">Laundry (dry clean, wash, ironing)</option>
+                </select>
+                <svg className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 text-muted" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+              </span>
             </label>
             <label className={`${field} flex-[1_1_180px]`}>
               <span className={label}>Location</span>
