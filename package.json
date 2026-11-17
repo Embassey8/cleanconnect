@@ -4,6 +4,7 @@
   "packageManager": "pnpm@10.28.2",
   "scripts": {
     "dev": "pnpm --filter web dev",
+    "test-env": "bash apps/web/scripts/test-env.sh",
     "build": "pnpm --filter web build",
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",

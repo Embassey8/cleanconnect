@@ -2,6 +2,21 @@
 
 Local only. Nothing here touches a hosted Supabase project.
 
+## Quick start: test environment
+With Docker running:
+```bash
+pnpm test-env          # starts Supabase in Docker, writes apps/web/.env.local, seeds the test accounts
+pnpm dev               # http://localhost:3000
+pnpm test-env reset    # wipe and re-seed      |  pnpm test-env stop
+```
+| Role | Email | Password |
+|---|---|---|
+| Test user (customer, wallet ₦100,000) | `testuser@cleanconnect.test` | `Demo-Pass-1234` |
+| Test service (approved cleaning provider) | `testservice@cleanconnect.test` | `Demo-Pass-1234` |
+| Test admin | `testadmin@cleanconnect.test` | `Demo-Pass-1234` |
+
+The longer manual steps below do the same thing.
+
 ## Start
 1. Open Docker Desktop and wait until it says it is running.
 2. From the repo root:
@@ -44,3 +59,9 @@ database. Re-runnable.
 - The in-app camera needs a camera and a secure context; `http://localhost` counts. Photos are stored in the
   private `job-media` bucket and shown through short-lived signed URLs.
 - Local email lands in Mailpit at http://127.0.0.1:54324 (no real email is sent).
+
+## Test accounts on a hosted Supabase project
+`supabase/test/seed_test_accounts.sql` creates the same three test accounts (and funds the test user) in a hosted
+project; run it in the SQL editor. `supabase/test/cleanup_test_accounts.sql` removes them again.
+Point `apps/web/.env.local` at the project: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+(Project Settings, API) and `SUPABASE_SERVICE_ROLE_KEY`.
