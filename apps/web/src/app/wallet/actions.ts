@@ -2,10 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { checkFunding, checkWithdrawal, parseNaira } from "@cleanconnect/shared";
+import {
+  checkFunding, checkWithdrawal, cleanIdNumber, mapIdentityResult, parseNaira, splitName,
+  type CustomerIdKind, type KycStatus,
+} from "@cleanconnect/shared";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth/session";
 import { friendlyMoneyError } from "@/lib/money";
+import { smileConfigured, verifyPerson } from "@/lib/smile";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   createRecipient, initializeCharge, initiateTransfer, listBanks, paystackConfigured, resolveAccount, siteUrl,
@@ -36,7 +40,7 @@ export async function fundWallet(_: MoneyState, form: FormData): Promise<MoneySt
   if (await isLive(supabase)) {
     if (!paystackConfigured()) return { error: "Payments are not set up yet. Please try again later." };
     const { data: ref, error: refError } = await supabase.rpc("create_payment_intent", { p_amount: amount });
-    if (refError) return { error: refError.message };
+    if (refError) return { error: friendlyMoneyError(refError.message) };
     const { data: auth } = await supabase.auth.getUser();
     let url: string;
     try {
@@ -52,9 +56,41 @@ export async function fundWallet(_: MoneyState, form: FormData): Promise<MoneySt
     redirect(url);
   }
   const { error } = await supabase.rpc("mock_fund_wallet", { p_amount: amount });
-  if (error) return { error: error.message };
+  if (error) return { error: friendlyMoneyError(error.message) };
   refresh();
   return { ok: "Wallet topped up (test mode: no real money moved)." };
+}
+
+/** Customers verify their identity (NIN or BVN) before they can add or withdraw money. Mock mode decides in the
+ *  database; live mode asks Smile ID and records the verdict. Raw numbers are never stored. */
+export async function verifyIdentity(_: MoneyState, form: FormData): Promise<MoneyState> {
+  const user = await getSessionUser();
+  if (!user) return { error: "Sign in first." };
+  const kind = String(form.get("kind")) as CustomerIdKind;
+  if (kind !== "nin" && kind !== "bvn") return { error: "Choose NIN or BVN." };
+  const number = cleanIdNumber(String(form.get("idNumber") ?? ""));
+  if (!number) return { error: `Enter your 11-digit ${kind.toUpperCase()}.` };
+
+  const supabase = await createClient();
+  const { data: submitted, error } = await supabase.rpc("submit_identity", { p_kind: kind, p_number: number });
+  if (error) return { error: error.message.replace(/^.*?: /, "") };
+  let status = submitted as KycStatus;
+
+  if (status === "pending" && smileConfigured()) {
+    const admin = createAdminClient();
+    const { first, last } = splitName(user.name ?? "");
+    try {
+      status = mapIdentityResult(await verifyPerson({
+        idType: kind === "nin" ? "NIN_V2" : "BVN", idNumber: number, firstName: first, lastName: last,
+        userId: user.id, jobId: `${user.id}-${kind}-${Date.now()}`,
+      }));
+    } catch { /* stays pending; the person can try again */ }
+    if (status !== "pending") await admin.rpc("record_user_verification", { p_user: user.id, p_status: status, p_result: { source: "smile_id" } });
+  }
+  refresh();
+  if (status === "verified") return { ok: "Identity verified. You can now add and withdraw money." };
+  if (status === "pending") return { error: "We couldn't complete the check right now. Please try again in a few minutes." };
+  return { error: "We couldn't match that number to the name on your account. Check the number and that your account name is your full legal name." };
 }
 
 export async function payOrder(orderId: string): Promise<{ error?: string }> {

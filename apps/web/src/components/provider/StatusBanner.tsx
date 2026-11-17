@@ -1,5 +1,5 @@
 const BANNER = {
-  pending: ["bg-warning-bg text-warning", "Your verification is being reviewed. You'll be visible to customers once approved."],
+  pending: ["bg-warning-bg text-warning", "Your identity checks are being reviewed. You'll be visible to customers once they pass and you're approved."],
   approved: null,
   rejected: ["bg-danger-bg text-danger", "Your application was not approved."],
   suspended: ["bg-danger-bg text-danger", "Your profile is suspended. Contact support."],

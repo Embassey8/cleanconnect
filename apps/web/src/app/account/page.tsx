@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth/session";
 import { signOut } from "@/app/login/actions";
 import { formatWhen } from "@/lib/time";
+import { IdentityCard } from "@/components/wallet/IdentityCard";
 
 const SERVICE_STYLE: Record<OrderService, { bg: string; stroke: string; icon: React.ReactNode }> = {
   cleaning: { bg: "bg-primary-tint", stroke: "#0B6B57", icon: <><path d="M3 11l9-7 9 7" /><path d="M5 10v10h14V10" /></> },
@@ -43,7 +44,7 @@ async function Account({ searchParams }: { searchParams: PageProps<"/account">["
   const sp = await searchParams;
   const tab: OrderTab = sp.tab === "completed" || sp.tab === "cancelled" ? sp.tab : "ongoing";
 
-  const [{ data: profile }, { data: orders }, { data: wallet }, { count: savedP }, { count: savedM }] = await Promise.all([
+  const [{ data: profile }, { data: orders }, { data: wallet }, { count: savedP }, { count: savedM }, { data: idCheck }] = await Promise.all([
     supabase.from("users").select("name, email, phone").eq("id", user.id).single(),
     supabase.from("orders")
       .select("id, service, status, total, escrow_status, created_at, scheduled_at, cleaning_type, carwash_package, provider_id, providers(display_name, slug)")
@@ -51,6 +52,9 @@ async function Account({ searchParams }: { searchParams: PageProps<"/account">["
     supabase.from("wallets").select("id").eq("user_id", user.id).maybeSingle(),
     supabase.from("saved_providers").select("*", { count: "exact", head: true }).eq("user_id", user.id),
     supabase.from("saved_media").select("*", { count: "exact", head: true }).eq("user_id", user.id),
+    user.role === "customer"
+      ? supabase.from("user_verifications").select("status").eq("user_id", user.id).maybeSingle()
+      : Promise.resolve({ data: null }),
   ]);
   const rows = (orders ?? []) as unknown as OrderRow[];
   const ids = rows.map((o) => o.id);
@@ -99,6 +103,8 @@ async function Account({ searchParams }: { searchParams: PageProps<"/account">["
           <Link href="/account/profile" className="flex min-h-11 items-center justify-center rounded-input border border-border text-sm font-semibold">Edit profile</Link>
           <form action={signOut}><button className="min-h-11 w-full rounded-input text-sm font-semibold text-muted hover:text-ink">Sign out</button></form>
         </section>
+
+        {user.role === "customer" && <IdentityCard status={(idCheck?.status as "verified" | "pending" | "mismatch" | "failed" | undefined) ?? null} />}
 
         <section aria-labelledby="wallet-h" className="flex flex-col gap-4 rounded-[18px] bg-ink p-6 text-white">
           <div className="flex items-center justify-between">

@@ -40,3 +40,11 @@ export function splitName(full: string): { first: string; last: string } {
   if (parts.length === 0) return { first: "", last: "" };
   return { first: parts[0], last: parts.length > 1 ? parts[parts.length - 1] : parts[0] };
 }
+
+export type CustomerIdKind = "nin" | "bvn";
+
+/** NIN and BVN are both exactly 11 digits. Spaces and dashes are ignored; returns the digits or null. */
+export function cleanIdNumber(input: string): string | null {
+  const digits = input.replace(/[\s-]/g, "");
+  return /^[0-9]{11}$/.test(digits) ? digits : null;
+}

@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth/session";
 import { formatWhen } from "@/lib/time";
 import { listBanks, paystackConfigured } from "@/lib/paystack";
-import { FundForm, PaymentNotice, WithdrawForm, type BankOption } from "./WalletForms";
+import { FundForm, PaymentNotice, VerifyIdentityForm, WithdrawForm, type BankOption } from "./WalletForms";
 
 const PAYOUT_STYLE: Record<string, string> = {
   pending: "bg-warning-bg text-warning", paid: "bg-primary-tint text-primary", failed: "bg-danger-bg text-danger",
@@ -29,6 +29,12 @@ export async function WalletView({ heldLabel = "On hold for orders" }: { heldLab
   const held = bal?.held ?? 0;
   // Providers and partners earn and withdraw; they never deposit.
   const canFund = user!.role !== "provider" && user!.role !== "partner";
+  // Customers must verify their identity before they can add or withdraw money (enforced in the database too).
+  const needsIdentity = user!.role === "customer";
+  const { data: idCheck } = needsIdentity
+    ? await supabase.from("user_verifications").select("status").eq("user_id", user!.id).maybeSingle()
+    : { data: null };
+  const identityOk = !needsIdentity || idCheck?.status === "verified";
 
   return (
     <div className="space-y-8">
@@ -44,7 +50,17 @@ export async function WalletView({ heldLabel = "On hold for orders" }: { heldLab
         </div>
       </section>
 
-      <div className={`grid gap-6 ${canFund ? "md:grid-cols-2" : ""}`}>
+      {!identityOk && (
+        <section id="verify" className="scroll-mt-4 rounded-card border border-border bg-surface p-4">
+          <h2 className="font-extrabold">Verify your identity</h2>
+          <p className="mb-3 mt-1 text-sm text-text-2">
+            To keep everyone&apos;s money safe, we need to confirm who you are before you can add money or withdraw. It takes a minute.
+          </p>
+          <VerifyIdentityForm previous={idCheck?.status as "mismatch" | "failed" | "pending" | undefined} />
+        </section>
+      )}
+
+      {identityOk && <div className={`grid gap-6 ${canFund ? "md:grid-cols-2" : ""}`}>
         {canFund && (
           <section id="fund" className="scroll-mt-4 rounded-card border border-border bg-surface p-4">
             <h2 className="mb-3 font-extrabold">Add money</h2>
@@ -55,7 +71,7 @@ export async function WalletView({ heldLabel = "On hold for orders" }: { heldLab
           <h2 className="mb-3 font-extrabold">Withdraw to bank</h2>
           <WithdrawForm banks={banks} />
         </section>
-      </div>
+      </div>}
 
       {(payouts ?? []).length > 0 && (
         <section>

@@ -32,10 +32,21 @@ for (const a of ACCOUNTS) {
   must(await db.from("users").update({ role: a.role, name: a.name }).eq("id", u.id), `role ${a.email}`);
 }
 
+// Providers must pass their identity checks before they can be approved (the database enforces it), so the
+// seed records verified checks first and approves afterwards. Car wash partners are exempt.
 async function provider(email, row) {
-  const found = must(await db.from("providers").select("id").eq("slug", row.slug).maybeSingle(), "find provider");
-  if (found) return found.id;
-  return must(await db.from("providers").insert({ owner_id: ids[email], status: "approved", approved_at: new Date().toISOString(), ...row }).select("id").single(), `provider ${row.slug}`).id;
+  let found = must(await db.from("providers").select("id, status").eq("slug", row.slug).maybeSingle(), "find provider");
+  if (!found) found = must(await db.from("providers").insert({ owner_id: ids[email], status: "pending", ...row }).select("id, status").single(), `provider ${row.slug}`);
+  if (row.service !== "carwash") {
+    const kinds = row.type === "business" ? ["cac"] : row.service === "laundry" ? ["nin", "bvn"] : ["nin"];
+    for (const kind of kinds) {
+      must(await db.from("verifications").upsert({ provider_id: found.id, kind, status: "verified", provider_ref: "0001" }, { onConflict: "provider_id,kind" }), `verify ${kind}`);
+    }
+  }
+  if (found.status !== "approved") {
+    must(await db.from("providers").update({ status: "approved", approved_at: new Date().toISOString() }).eq("id", found.id), `approve ${row.slug}`);
+  }
+  return found.id;
 }
 
 const laundryId = await provider("laundry@demo.test", { type: "business", service: "laundry", slug: "sparkle-laundry", display_name: "Sparkle Laundry", areas: ["Lekki", "Yaba"] });
@@ -61,6 +72,11 @@ for (const pid of [cleaningId, testServiceId]) {
   must(await db.from("cleaning_prices").delete().eq("provider_id", pid), "clear cleaning prices");
   must(await db.from("cleaning_prices").insert(Object.entries(C).map(([area, price]) => ({ provider_id: pid, property_type: "home", area_id: area, price, offered: true }))), "cleaning prices");
   must(await db.from("cleaning_settings").upsert({ provider_id: pid }), "cleaning settings");
+}
+
+// Customers must verify their identity before they can add or withdraw money
+for (const email of ["customer@demo.test", "testuser@cleanconnect.test"]) {
+  must(await db.from("user_verifications").upsert({ user_id: ids[email], kind: "nin", status: "verified", provider_ref: "0001", verified_at: new Date().toISOString() }, { onConflict: "user_id" }), `verify ${email}`);
 }
 
 // Fund the customer's wallet once

@@ -14,8 +14,18 @@ pnpm test-env reset    # wipe and re-seed      |  pnpm test-env stop
 | Test user (customer, wallet ₦100,000) | `testuser@cleanconnect.test` | `Demo-Pass-1234` |
 | Test service (approved cleaning provider) | `testservice@cleanconnect.test` | `Demo-Pass-1234` |
 | Test admin | `testadmin@cleanconnect.test` | `Demo-Pass-1234` |
+| New test user (customer, **not** ID-verified: use it to try the verification page) | `testnewuser@cleanconnect.test` | `Demo-Pass-1234` |
 
 The longer manual steps below do the same thing.
+
+## Identity verification rules
+- **Customers** must verify their identity (NIN or BVN) on their wallet page before they can add money or withdraw.
+  Enforced in the database (`identity_gate`), not just the UI.
+- **Providers** must pass their identity checks (CAC for businesses; NIN for individuals, plus BVN for laundry) before
+  they can be approved. If a check later stops passing they drop back to "pending" and disappear from the marketplace.
+  Car wash partners are onboarded by an admin and are exempt.
+- In `kyc_mode = 'mock'` a number ending in `0` is a mismatch and anything else verifies. In `live` mode the server
+  asks Smile ID. The demo seeds already mark the demo customers and providers as verified.
 
 ## Start
 1. Open Docker Desktop and wait until it says it is running.
