@@ -66,7 +66,7 @@ async function FeaturedProviders() {
   );
 }
 
-const field = "flex flex-col gap-1 rounded-[10px] bg-bg px-3 py-2";
+const field = "flex flex-col gap-1 rounded-[10px] bg-bg px-3 py-2 focus-within:ring-2 focus-within:ring-primary";
 const label = "text-xs font-semibold text-muted";
 const control = "border-0 bg-transparent py-0.5 text-base text-ink outline-none";
 
