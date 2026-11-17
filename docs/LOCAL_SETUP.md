@@ -2,6 +2,21 @@
 
 Local only. Nothing here touches a hosted Supabase project.
 
+## Quick start: test environment
+With Docker running:
+```bash
+pnpm test-env          # starts Supabase in Docker, writes apps/web/.env.local, seeds the test accounts
+pnpm dev               # http://localhost:3000
+pnpm test-env reset    # wipe and re-seed      |  pnpm test-env stop
+```
+| Role | Email | Password |
+|---|---|---|
+| Test user (customer, wallet ₦100,000) | `testuser@cleanconnect.test` | `Demo-Pass-1234` |
+| Test service (approved cleaning provider) | `testservice@cleanconnect.test` | `Demo-Pass-1234` |
+| Test admin | `testadmin@cleanconnect.test` | `Demo-Pass-1234` |
+
+The longer manual steps below do the same thing.
+
 ## Start
 1. Open Docker Desktop and wait until it says it is running.
 2. From the repo root:

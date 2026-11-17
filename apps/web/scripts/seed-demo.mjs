@@ -17,6 +17,10 @@ const ACCOUNTS = [
   { email: "laundry@demo.test", name: "Sparkle Laundry", role: "provider" },
   { email: "cleaning@demo.test", name: "Shine Cleaners", role: "provider" },
   { email: "partner@demo.test", name: "Speedy Wash", role: "partner" },
+  // Short, memorable accounts for the Docker test environment (pnpm test-env).
+  { email: "testuser@cleanconnect.test", name: "Test User", role: "customer" },
+  { email: "testservice@cleanconnect.test", name: "Test Service", role: "provider" },
+  { email: "testadmin@cleanconnect.test", name: "Test Admin", role: "admin" },
 ];
 
 const ids = {};
@@ -36,6 +40,7 @@ async function provider(email, row) {
 
 const laundryId = await provider("laundry@demo.test", { type: "business", service: "laundry", slug: "sparkle-laundry", display_name: "Sparkle Laundry", areas: ["Lekki", "Yaba"] });
 const cleaningId = await provider("cleaning@demo.test", { type: "business", service: "cleaning", slug: "shine-cleaners", display_name: "Shine Cleaners", areas: ["Lekki", "Ikeja"] });
+const testServiceId = await provider("testservice@cleanconnect.test", { type: "business", service: "cleaning", slug: "test-service", display_name: "Test Service", areas: ["Lekki", "Ikeja"] });
 const partnerId = await provider("partner@demo.test", { type: "business", service: "carwash", slug: "cw-speedy-wash", display_name: "Speedy Wash", areas: ["Lekki"] });
 must(await db.from("partner_scores").upsert({ provider_id: partnerId }), "partner score");
 
@@ -51,16 +56,20 @@ must(await db.from("laundry_prices").insert(laundryRows), "laundry prices");
 must(await db.from("laundry_settings").upsert({ provider_id: laundryId }), "laundry settings");
 
 // Cleaning prices and settings
-must(await db.from("cleaning_prices").delete().eq("provider_id", cleaningId), "clear cleaning prices");
 const C = { bed: 5000, sit: 6000, kit: 6000, bath: 3500, din: 4000, bal: 2500, stair: 3000 };
-must(await db.from("cleaning_prices").insert(Object.entries(C).map(([area, price]) => ({ provider_id: cleaningId, property_type: "home", area_id: area, price, offered: true }))), "cleaning prices");
-must(await db.from("cleaning_settings").upsert({ provider_id: cleaningId }), "cleaning settings");
+for (const pid of [cleaningId, testServiceId]) {
+  must(await db.from("cleaning_prices").delete().eq("provider_id", pid), "clear cleaning prices");
+  must(await db.from("cleaning_prices").insert(Object.entries(C).map(([area, price]) => ({ provider_id: pid, property_type: "home", area_id: area, price, offered: true }))), "cleaning prices");
+  must(await db.from("cleaning_settings").upsert({ provider_id: pid }), "cleaning settings");
+}
 
 // Fund the customer's wallet once
-const wallet = must(await db.from("wallets").select("id").eq("user_id", ids["customer@demo.test"]).single(), "wallet");
-const funded = must(await db.from("ledger_entries").select("id").eq("reference", "demo-seed-funding").maybeSingle(), "funding check");
-if (!funded) {
-  must(await db.from("ledger_entries").insert({ wallet_id: wallet.id, group_id: crypto.randomUUID(), bucket: "available", amount: 100000, kind: "fund", reference: "demo-seed-funding" }), "fund wallet");
+for (const [email, reference] of [["customer@demo.test", "demo-seed-funding"], ["testuser@cleanconnect.test", "test-user-seed-funding"]]) {
+  const wallet = must(await db.from("wallets").select("id").eq("user_id", ids[email]).single(), "wallet");
+  const funded = must(await db.from("ledger_entries").select("id").eq("reference", reference).maybeSingle(), "funding check");
+  if (!funded) {
+    must(await db.from("ledger_entries").insert({ wallet_id: wallet.id, group_id: crypto.randomUUID(), bucket: "available", amount: 100000, kind: "fund", reference }), "fund wallet");
+  }
 }
 
 console.log("Demo data ready. Accounts (password in apps/web/scripts/seed-demo.mjs):");
