@@ -29,13 +29,22 @@ begin
   select id into uid from auth.users where email = 'testservice@cleanconnect.test';
   select id into pid from public.providers where slug = 'test-service';
   if pid is null then
-    insert into public.providers (owner_id,type,service,status,approved_at,slug,display_name,areas)
-    values (uid,'business','cleaning','approved',now(),'test-service','Test Service','{Lekki,Ikeja}') returning id into pid;
+    insert into public.providers (owner_id,type,service,status,slug,display_name,areas)
+    values (uid,'business','cleaning','pending','test-service','Test Service','{Lekki,Ikeja}') returning id into pid;
   end if;
+  -- approval requires verified identity checks
+  insert into public.verifications (provider_id,kind,status,provider_ref) values (pid,'cac','verified','0001')
+  on conflict (provider_id,kind) do update set status = 'verified';
+  update public.providers set status = 'approved', approved_at = coalesce(approved_at, now()) where id = pid;
   delete from public.cleaning_prices where provider_id = pid;
   insert into public.cleaning_prices (provider_id,property_type,area_id,price,offered)
   select pid,'home',a,p,true from (values ('bed',5000),('sit',6000),('kit',6000),('bath',3500),('din',4000),('bal',2500),('stair',3000)) t(a,p);
   insert into public.cleaning_settings (provider_id) values (pid) on conflict do nothing;
+
+  -- The test user has verified their identity (needed to add or withdraw money)
+  insert into public.user_verifications (user_id,kind,status,provider_ref,verified_at)
+  select id,'nin','verified','0001',now() from auth.users where email = 'testuser@cleanconnect.test'
+  on conflict (user_id) do update set status = 'verified', verified_at = now();
 
   -- Fund the test user's wallet once (N100,000)
   select w.id into wid from public.wallets w join auth.users u on u.id = w.user_id where u.email = 'testuser@cleanconnect.test';

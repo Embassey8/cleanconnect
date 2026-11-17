@@ -47,7 +47,7 @@ begin
   assert (select status from providers where id = p1) = 'pending', 'must start pending';
   assert (select plan from providers where id = p2) = 'standard', 'VIP must not be granted at sign-up';
   assert (select status from verifications where provider_id = p1 and kind = 'cac') = 'verified', 'cac';
-  assert (select status from verifications where provider_id = p2 and kind = 'bvn') = 'pending', 'bvn pending';
+  assert (select status from verifications where provider_id = p2 and kind = 'bvn') = 'verified', 'bvn verified in mock mode';
   assert (select provider_ref from verifications where provider_id = p1 and kind = 'cac') = '4567', 'only last 4 stored';
   assert exists (select 1 from cleaning_settings where provider_id = p1), 'cleaning settings';
   assert exists (select 1 from laundry_settings where provider_id = p2), 'laundry settings';
@@ -88,6 +88,10 @@ end $$;
 insert into auth.users (id, email, raw_user_meta_data) values
   ('00000000-0000-0000-0000-0000000000c1', 'cust@x.ng', '{"name":"Cust"}'),
   ('00000000-0000-0000-0000-0000000000a3', 'p3@x.ng', '{"name":"Wash"}');
+
+-- Customers must have verified their identity before they can add or withdraw money
+insert into user_verifications (user_id, kind, status, provider_ref, verified_at)
+values ('00000000-0000-0000-0000-0000000000c1', 'nin', 'verified', '1234', now());
 
 select set_config('request.jwt.sub', '00000000-0000-0000-0000-0000000000a3', false);
 select register_provider('individual', 'laundry', 'Wash Co', array['Yaba'], 'standard', null, '12345678901', '10987654321');
@@ -1165,3 +1169,73 @@ do $$ declare pid uuid := (select id from providers limit 1); begin
   perform record_verification(pid, 'selfie', 'verified', '{"source":"smile_id"}');
   assert (select status from verifications where provider_id = pid and kind = 'selfie') = 'verified', 'verdict recorded';
 exception when others then if sqlerrm not like '%selfie%' then raise; end if; end $$;
+
+-- ===== Identity gates =====
+-- Customers must verify before adding or withdrawing money.
+insert into auth.users (id, email, raw_user_meta_data) values
+  ('00000000-0000-0000-0000-0000000000d1', 'kyc@x.ng', '{"name":"Kyc Customer"}'),
+  ('00000000-0000-0000-0000-0000000000d2', 'kyc2@x.ng', '{"name":"Kyc Two"}'),
+  ('00000000-0000-0000-0000-0000000000f1', 'pv1@x.ng', '{"name":"Verified Pro"}'),
+  ('00000000-0000-0000-0000-0000000000f2', 'pv2@x.ng', '{"name":"Unverified Pro"}');
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000d1'::uuid);
+do $$ begin
+  begin perform mock_fund_wallet(5000); raise exception 'unverified customer funded a wallet';
+  exception when others then if sqlerrm not like '%identity verification required%' then raise; end if; end;
+  begin perform request_withdrawal(2000, 'Test Bank', 'Kyc', '0123456789'); raise exception 'unverified customer withdrew';
+  exception when others then if sqlerrm not like '%identity verification required%' then raise; end if; end;
+  -- bad numbers are rejected without storing anything
+  begin perform submit_identity('nin', '123'); raise exception 'short number accepted';
+  exception when others then if sqlerrm not like '%11-digit%' then raise; end if; end;
+  begin perform submit_identity('cac', '12345678901'); raise exception 'cac accepted for a customer';
+  exception when others then if sqlerrm not like '%NIN or BVN%' then raise; end if; end;
+  assert not exists (select 1 from user_verifications where user_id = '00000000-0000-0000-0000-0000000000d1'), 'nothing stored for rejected submissions';
+  -- a mismatch keeps the gate closed; only the last 4 digits are kept
+  assert submit_identity('nin', '12345678910') = 'mismatch', 'number ending in 0 is a mismatch in mock mode';
+  assert (select provider_ref from user_verifications where user_id = '00000000-0000-0000-0000-0000000000d1') = '8910', 'only last 4 stored';
+  begin perform mock_fund_wallet(5000); raise exception 'mismatch customer funded a wallet';
+  exception when others then if sqlerrm not like '%identity verification required%' then raise; end if; end;
+  -- a matching number opens the gate
+  assert submit_identity('bvn', '12345678901') = 'verified', 'verified in mock mode';
+  perform mock_fund_wallet(5000);
+  assert pg_temp.bal('00000000-0000-0000-0000-0000000000d1', 'available') = 5000, 'verified customer can fund';
+  perform request_withdrawal(2000, 'Test Bank', 'Kyc', '0123456789');
+  begin perform submit_identity('nin', '12345678901'); raise exception 'verified customer re-submitted';
+  exception when others then if sqlerrm not like '%already verified%' then raise; end if; end;
+end $$;
+
+-- Live mode: submission stays pending (so the gate stays shut) until the server records Smile ID's verdict.
+update money_settings set payments_mode = 'live', kyc_mode = 'live';
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000d2'::uuid);
+do $$ begin
+  assert submit_identity('nin', '12345678901') = 'pending', 'live mode leaves it pending';
+  begin perform create_payment_intent(5000); raise exception 'pending customer started a payment';
+  exception when others then if sqlerrm not like '%identity verification required%' then raise; end if; end;
+  perform record_user_verification('00000000-0000-0000-0000-0000000000d2', 'verified', '{"source":"smile_id"}');
+  assert create_payment_intent(5000) is not null, 'verified customer can start a payment';
+end $$;
+update money_settings set payments_mode = 'mock', kyc_mode = 'mock';
+
+-- Providers: approval needs passing checks; a failing check hides an approved provider.
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000f1'::uuid);
+select register_provider('business', 'cleaning', 'Verified Biz', array['Lekki'], 'standard', 'RC7654321');
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000f2'::uuid);
+select register_provider('business', 'cleaning', 'Mismatch Biz', array['Lekki'], 'standard', 'RC7654320');
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000ad'::uuid);
+do $$ declare ok uuid := (select id from providers where slug = 'verified-biz'); bad uuid := (select id from providers where slug = 'mismatch-biz');
+begin
+  assert (select status from verifications where provider_id = bad and kind = 'cac') = 'mismatch', 'mismatching CAC';
+  begin perform review_provider(bad, true); raise exception 'unverified provider approved';
+  exception when others then if sqlerrm not like '%identity verification must pass%' then raise; end if; end;
+  assert (select status from providers where id = bad) = 'pending', 'stays pending';
+  perform review_provider(ok, true);
+  assert (select status from providers where id = ok) = 'approved', 'verified provider approved';
+  -- the check later fails: back to pending, off the marketplace
+  perform record_verification(ok, 'cac', 'mismatch', '{}');
+  assert (select status from providers where id = ok) = 'pending', 'provider hidden when a check stops passing';
+  assert (select approved_at from providers where id = ok) is null, 'approval time cleared';
+  begin perform review_provider(ok, true); raise exception 're-approved while failing';
+  exception when others then if sqlerrm not like '%identity verification must pass%' then raise; end if; end;
+  perform record_verification(ok, 'cac', 'verified', '{}');
+  perform review_provider(ok, true);
+  assert (select status from providers where id = ok) = 'approved', 'visible again once verified and approved';
+end $$;

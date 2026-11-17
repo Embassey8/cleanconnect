@@ -2,7 +2,7 @@
 
 import { Suspense, useActionState } from "react";
 import { useSearchParams } from "next/navigation";
-import { fundWallet, withdraw, type MoneyState } from "@/app/wallet/actions";
+import { fundWallet, verifyIdentity, withdraw, type MoneyState } from "@/app/wallet/actions";
 
 const input = "min-h-11 w-full rounded-input border border-border bg-surface px-3 text-base";
 const btn = "min-h-11 rounded-input bg-primary px-5 font-bold text-white hover:bg-primary-hover disabled:opacity-60";
@@ -69,6 +69,31 @@ export function WithdrawForm({ banks = [] }: { banks?: BankOption[] }) {
       <p className="text-xs text-muted">We only keep the last 4 digits of your account number.{live ? " We confirm the account name with your bank." : ""}</p>
       <Feedback s={state} />
       <button disabled={pending} className={btn}>{pending ? "Requesting…" : "Withdraw"}</button>
+    </form>
+  );
+}
+
+export function VerifyIdentityForm({ previous }: { previous?: "mismatch" | "failed" | "pending" | null }) {
+  const [state, action, pending] = useActionState<MoneyState, FormData>(verifyIdentity, {});
+  return (
+    <form action={action} className="space-y-3">
+      {previous === "mismatch" && !state.error && (
+        <p role="alert" className="rounded-input bg-danger-bg px-3 py-2 text-sm text-danger">
+          Your last attempt didn&apos;t match the name on your account. You can try again.
+        </p>
+      )}
+      <label className="block text-sm font-semibold" htmlFor="id-kind">ID type</label>
+      <select id="id-kind" name="kind" defaultValue="nin" className={input}>
+        <option value="nin">NIN (National Identification Number)</option>
+        <option value="bvn">BVN (Bank Verification Number)</option>
+      </select>
+      <label className="block text-sm font-semibold" htmlFor="id-number">ID number</label>
+      <input id="id-number" name="idNumber" inputMode="numeric" maxLength={14} autoComplete="off" placeholder="11 digits" className={input} required />
+      <p className="text-xs text-muted">
+        We check it against the name on your account and keep only the last 4 digits. The number is never shown to anyone.
+      </p>
+      <Feedback s={state} />
+      <button disabled={pending} className={btn}>{pending ? "Checking…" : "Verify my identity"}</button>
     </form>
   );
 }

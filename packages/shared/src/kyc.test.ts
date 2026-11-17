@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mapBusinessResult, mapIdentityResult, namesMatch, splitName } from "./kyc";
+import { cleanIdNumber, mapBusinessResult, mapIdentityResult, namesMatch, splitName } from "./kyc";
 
 describe("kyc", () => {
   it("maps identity checks", () => {
@@ -21,5 +21,14 @@ describe("kyc", () => {
   it("splits names", () => {
     expect(splitName("Ada Obi Eze")).toEqual({ first: "Ada", last: "Eze" });
     expect(splitName("Ada")).toEqual({ first: "Ada", last: "Ada" });
+  });
+
+  it("cleans NIN/BVN numbers to 11 digits", () => {
+    expect(cleanIdNumber("123 4567 8901")).toBe("12345678901");
+    expect(cleanIdNumber("123-4567-8901")).toBe("12345678901");
+    expect(cleanIdNumber("1234567890")).toBeNull();
+    expect(cleanIdNumber("123456789012")).toBeNull();
+    expect(cleanIdNumber("1234567890a")).toBeNull();
+    expect(cleanIdNumber("")).toBeNull();
   });
 });
