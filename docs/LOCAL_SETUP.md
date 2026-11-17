@@ -14,6 +14,7 @@ pnpm test-env reset    # wipe and re-seed      |  pnpm test-env stop
 | Test user (customer, wallet ₦100,000) | `testuser@cleanconnect.test` | `Demo-Pass-1234` |
 | Test service (approved cleaning provider) | `testservice@cleanconnect.test` | `Demo-Pass-1234` |
 | Test admin | `testadmin@cleanconnect.test` | `Demo-Pass-1234` |
+| New test user (customer, **not** ID-verified: use it to try the verification page) | `testnewuser@cleanconnect.test` | `Demo-Pass-1234` |
 
 The longer manual steps below do the same thing.
 

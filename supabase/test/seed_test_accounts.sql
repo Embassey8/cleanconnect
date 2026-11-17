@@ -1,11 +1,12 @@
 -- TEST ACCOUNTS for a hosted Supabase project. Idempotent. Remove with cleanup_test_accounts.sql.
--- Password for all three: Demo-Pass-1234  (change it, or delete these accounts, before going live)
+-- Password for all of them: Demo-Pass-1234  (change it, or delete these accounts, before going live)
 do $$
 declare
   r record; uid uuid; pid uuid; wid uuid;
 begin
   for r in select * from (values
     ('testuser@cleanconnect.test','Test User','customer'),
+    ('testnewuser@cleanconnect.test','New Test User','customer'),  -- left unverified on purpose, to try the ID check
     ('testservice@cleanconnect.test','Test Service','provider'),
     ('testadmin@cleanconnect.test','Test Admin','admin')) v(email,name,role)
   loop
