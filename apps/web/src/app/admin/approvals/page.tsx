@@ -9,7 +9,7 @@ async function Inner({ searchParams }: { searchParams: PageProps<"/admin/approva
 export default function ApprovalsPage(props: PageProps<"/admin/approvals">) {
   return (
     <>
-      <p className="-mt-2 text-sm text-text-2">Providers are hidden from customers until you approve them.</p>
+      <p className="-mt-2 text-sm text-text-2">Providers are hidden from customers until their identity checks pass and you approve them. Shops are checked by hand against the CAC register for now.</p>
       <Suspense fallback={<p className="text-muted">Loading…</p>}><Inner searchParams={props.searchParams} /></Suspense>
     </>
   );
