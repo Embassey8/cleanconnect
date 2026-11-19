@@ -9,6 +9,8 @@ import { daysUntil, formatWhen, recentMonths, timeAgo } from "@/lib/time";
 import { AssignControl } from "@/components/ops/Buttons";
 import { ReplyForm } from "@/components/ops/Forms";
 import { ReviewButtons } from "./ReviewButtons";
+import { CacCheck } from "./CacCheck";
+import { signedDocumentUrl } from "@/lib/kyc-documents";
 
 const card = "flex min-w-0 flex-col gap-3 rounded-2xl border border-border bg-surface p-[22px]";
 const h2 = "text-lg font-bold";
@@ -190,11 +192,16 @@ const V_STYLE: Record<string, { text: string; cls: string }> = {
 export async function ApprovalsSection({ type = "all", limit, basePath }: { type?: string; limit?: number; basePath?: string }) {
   const supabase = await createClient();
   let q = supabase.from("providers")
-    .select("id, display_name, type, service, plan, created_at, verifications(kind, status)").eq("status", "pending").order("created_at");
+    .select("id, display_name, type, service, plan, created_at, verifications(kind, status, provider_ref, document_path, registered_name)").eq("status", "pending").order("created_at");
   if (type === "business" || type === "individual") q = q.eq("type", type);
   const { data, error } = await q;
   const all = data ?? [];
   const rows = limit ? all.slice(0, limit) : all;
+  // Short-lived links to the CAC certificates of shops still waiting on that check (service-role, admin pages only).
+  const docs = new Map<string, string | null>();
+  await Promise.all(rows.flatMap((p) => ((p.verifications ?? []) as { kind: string; status: string; document_path: string | null }[])
+    .filter((v) => v.kind === "cac" && v.status !== "verified" && v.document_path)
+    .map(async (v) => { docs.set(p.id, await signedDocumentUrl(v.document_path!)); })));
   const tab = (t: string, label: string) => (
     <Link key={t} href={`${basePath ?? "/admin/approvals"}${t === "all" ? "" : `?type=${t}`}`}
       className={`flex min-h-[38px] items-center rounded-lg border px-3 text-[13px] ${type === t ? "border-primary bg-primary-tint font-semibold text-primary" : "border-border bg-surface"}`}>{label}</Link>
@@ -218,12 +225,21 @@ export async function ApprovalsSection({ type = "all", limit, basePath }: { type
                   <td className="px-2 py-3 font-semibold">{p.display_name}</td>
                   <td className="px-2 py-3">{p.type === "business" ? "Shop" : "Individual"}</td>
                   <td className="px-2 py-3 capitalize">{p.service === "cleaning" ? "House cleaning" : p.service}</td>
-                  <td className="px-2 py-3"><span className="flex flex-wrap gap-1">
-                    {((p.verifications ?? []) as { kind: string; status: string }[]).map((v) => {
-                      const s = V_STYLE[v.status] ?? V_STYLE.pending;
-                      return <span key={v.kind} className={`${chip} ${s.cls}`}>{V_KIND[v.kind] ?? v.kind} {s.text}</span>;
-                    })}
-                  </span></td>
+                  <td className="px-2 py-3">
+                    <span className="flex flex-wrap gap-1">
+                      {((p.verifications ?? []) as { kind: string; status: string }[]).map((v) => {
+                        const s = V_STYLE[v.status] ?? V_STYLE.pending;
+                        return <span key={v.kind} className={`${chip} ${s.cls}`}>{V_KIND[v.kind] ?? v.kind} {s.text}</span>;
+                      })}
+                    </span>
+                    {(() => {
+                      const cac = ((p.verifications ?? []) as { kind: string; status: string; provider_ref: string | null; document_path: string | null; registered_name: string | null }[]).find((v) => v.kind === "cac");
+                      return cac ? (
+                        <CacCheck providerId={p.id} name={p.display_name} registeredName={cac.registered_name} last4={cac.provider_ref}
+                          status={cac.status} documentUrl={docs.get(p.id) ?? null} hasDocument={!!cac.document_path} />
+                      ) : null;
+                    })()}
+                  </td>
                   <td className="px-2 py-3">{p.plan === "vip" ? <span className={`${chip} bg-vip-bg font-extrabold text-vip`}>VIP</span> : "Standard"}</td>
                   <td className="px-2 py-3 text-muted">{timeAgo(p.created_at)}</td>
                   <td className="px-2 py-3"><div className="flex justify-end"><ReviewButtons providerId={p.id} /></div></td>

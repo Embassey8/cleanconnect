@@ -71,13 +71,22 @@ export function JoinForm({ commissionPct, vipPrice }: { commissionPct: number; v
             <fieldset className={`${fs} gap-4`}>
               <legend className={legend}>3. Verify your identity</legend>
               <div className="grid gap-3.5 sm:grid-cols-2">
-                <label className="flex flex-col gap-1.5 text-sm font-semibold">{type === "business" ? "Business name" : "Full name (as on ID)"}
+                <label className="flex flex-col gap-1.5 text-sm font-semibold">{type === "business" ? "Business name (shown to customers)" : "Full name (as on ID)"}
                   <input name="displayName" required autoComplete="name" className={field} />{err("displayName")}</label>
                 <label className="flex flex-col gap-1.5 text-sm font-semibold">Phone number
                   <input name="phone" type="tel" autoComplete="tel" placeholder="+234" className={field} />{err("phone")}</label>
                 {need.includes("cac") && (
-                  <label className="flex flex-col gap-1.5 text-sm font-semibold">CAC registration number (RC/BN)
-                    <input name="cac" placeholder="RC1234567" className={field} />{err("cac")}</label>
+                  <>
+                    <label className="flex flex-col gap-1.5 text-sm font-semibold">Business name as registered with CAC
+                      <input name="cacName" required autoComplete="organization" placeholder="Exactly as on your certificate" className={field} />{err("cacName")}</label>
+                    <label className="flex flex-col gap-1.5 text-sm font-semibold">CAC registration number (RC/BN)
+                      <input name="cac" required placeholder="RC1234567" className={field} />{err("cac")}</label>
+                    <label className="flex flex-col gap-1.5 text-sm font-semibold sm:col-span-2">CAC certificate (photo or scan)
+                      <span className="text-xs font-normal text-muted">JPG, PNG or WebP, up to 5 MB. Make sure the name and number are readable.</span>
+                      <input name="cacCertificate" type="file" required accept="image/jpeg,image/png,image/webp"
+                        className="min-h-11 w-full rounded-input border border-border bg-surface px-3 py-2 text-sm font-normal file:mr-3 file:rounded-lg file:border-0 file:bg-primary-tint file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-primary" />
+                      {err("cacCertificate")}</label>
+                  </>
                 )}
                 {need.includes("nin") && (
                   <label className="flex flex-col gap-1.5 text-sm font-semibold">NIN (11 digits)
@@ -97,7 +106,7 @@ export function JoinForm({ commissionPct, vipPrice }: { commissionPct: number; v
                   <span className="rounded-input border border-border px-3.5 py-2.5 text-sm font-semibold text-muted">Available after you submit</span>
                 </div>
               )}
-              <p className="text-xs text-muted">We keep only the last 4 digits of your ID numbers and never show them publicly.</p>
+              <p className="text-xs text-muted">We keep only the last 4 digits of your ID numbers and never show them publicly. Your CAC certificate is stored privately and only our review team can see it.</p>
               <div className="flex flex-col gap-2.5 rounded-xl bg-bg p-4">
                 <span className="text-sm font-bold">What you&apos;ll need</span>
                 <div className="overflow-x-auto">

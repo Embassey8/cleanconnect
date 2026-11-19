@@ -5,8 +5,9 @@ const nextConfig: NextConfig = {
   transpilePackages: ["@cleanconnect/shared"],
   cacheComponents: true,
   partialPrefetching: true,
-  // In-app photos are posted to a server action (resized to <= 1600px on the device first).
-  experimental: { serverActions: { bodySizeLimit: "5mb" } },
+  // In-app photos (resized to <= 1600px on the device first) and CAC certificates (up to 5 MB) are posted to
+  // server actions; the limit leaves room for the rest of the form.
+  experimental: { serverActions: { bodySizeLimit: "6mb" } },
   turbopack: {
     rules: {
       "*.css": {

@@ -32,7 +32,7 @@ insert into auth.users (id, email, raw_user_meta_data) values
 update users set role = 'admin' where id = '00000000-0000-0000-0000-0000000000ad';
 
 select set_config('request.jwt.sub', '00000000-0000-0000-0000-0000000000a1', false);
-select register_provider('business', 'cleaning', 'Shine Cleaners', array['Lekki'], 'standard', 'RC1234567');
+select register_provider('business', 'cleaning', 'Shine Cleaners', array['Lekki'], 'standard', 'RC1234567', p_cac_name => 'Shine Cleaners Ltd', p_cac_document => 'cac/00000000-0000-0000-0000-0000000000a1/cert.jpg');
 select set_config('request.jwt.sub', '00000000-0000-0000-0000-0000000000a2', false);
 select register_provider('individual', 'laundry', 'Shine Cleaners', array['Yaba'], 'vip', null, '12345678901', '10987654321');
 
@@ -77,7 +77,7 @@ begin
   -- duplicate registration blocked
   perform set_config('request.jwt.sub', '00000000-0000-0000-0000-0000000000a1', false);
   begin
-    perform register_provider('business', 'cleaning', 'Again', '{}', 'standard', 'RC1234567');
+    perform register_provider('business', 'cleaning', 'Again', '{}', 'standard', 'RC1234567', p_cac_name => 'Again Ltd', p_cac_document => 'cac/00000000-0000-0000-0000-0000000000a1/cert2.jpg');
     raise exception 'duplicate registration allowed';
   exception when others then
     if sqlerrm not like '%already%' then raise; end if;
@@ -1217,9 +1217,9 @@ update money_settings set payments_mode = 'mock', kyc_mode = 'mock';
 
 -- Providers: approval needs passing checks; a failing check hides an approved provider.
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000f1'::uuid);
-select register_provider('business', 'cleaning', 'Verified Biz', array['Lekki'], 'standard', 'RC7654321');
+select register_provider('business', 'cleaning', 'Verified Biz', array['Lekki'], 'standard', 'RC7654321', p_cac_name => 'Verified Biz Ltd', p_cac_document => 'cac/00000000-0000-0000-0000-0000000000f1/cert.png');
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000f2'::uuid);
-select register_provider('business', 'cleaning', 'Mismatch Biz', array['Lekki'], 'standard', 'RC7654320');
+select register_provider('business', 'cleaning', 'Mismatch Biz', array['Lekki'], 'standard', 'RC7654320', p_cac_name => 'Mismatch Biz Ltd', p_cac_document => 'cac/00000000-0000-0000-0000-0000000000f2/cert.webp');
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000ad'::uuid);
 do $$ declare ok uuid := (select id from providers where slug = 'verified-biz'); bad uuid := (select id from providers where slug = 'mismatch-biz');
 begin
@@ -1239,3 +1239,84 @@ begin
   perform review_provider(ok, true);
   assert (select status from providers where id = ok) = 'approved', 'visible again once verified and approved';
 end $$;
+
+-- ===== Manual CAC check by an admin (live KYC: CAC stays pending until an admin decides) =====
+insert into auth.users (id, email, raw_user_meta_data) values
+  ('00000000-0000-0000-0000-0000000000f3', 'pv3@x.ng', '{"name":"Manual Biz"}');
+update money_settings set kyc_mode = 'live';
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000f3'::uuid);
+select register_provider('business', 'cleaning', 'Manual Biz', array['Lekki'], 'standard', 'RC1111111', p_cac_name => 'Manual Biz Ltd', p_cac_document => 'cac/00000000-0000-0000-0000-0000000000f3/cert.jpg');
+update money_settings set kyc_mode = 'mock';
+do $$ declare pid uuid := (select id from providers where slug = 'manual-biz');
+begin
+  assert (select status from verifications where provider_id = pid and kind = 'cac') = 'pending', 'live mode leaves CAC pending';
+  -- a non-admin cannot decide it
+  perform set_config('request.jwt.sub', '00000000-0000-0000-0000-0000000000f3', false);
+  begin perform admin_set_cac_check(pid, 'verified'); raise exception 'owner verified their own CAC';
+  exception when others then if sqlerrm <> 'admin only' then raise; end if; end;
+  -- the admin cannot approve before the check, nor mark it with a made-up status
+  perform set_config('request.jwt.sub', '00000000-0000-0000-0000-0000000000ad', false);
+  begin perform review_provider(pid, true); raise exception 'approved with CAC pending';
+  exception when others then if sqlerrm not like '%identity verification must pass%' then raise; end if; end;
+  begin perform admin_set_cac_check(pid, 'pending'); raise exception 'pending accepted as a decision';
+  exception when others then if sqlerrm not like '%choose verified%' then raise; end if; end;
+  -- verify by hand, record who and why, then approve
+  perform admin_set_cac_check(pid, 'verified', 'Found on CAC register');
+  assert (select result ->> 'source' from verifications where provider_id = pid and kind = 'cac') = 'admin', 'source recorded';
+  assert (select result ->> 'note' from verifications where provider_id = pid and kind = 'cac') = 'Found on CAC register', 'note recorded';
+  assert (select result ->> 'by' from verifications where provider_id = pid and kind = 'cac') = '00000000-0000-0000-0000-0000000000ad', 'admin recorded';
+  perform review_provider(pid, true);
+  assert (select status from providers where id = pid) = 'approved', 'approved after manual check';
+  -- a later mismatch takes it off the marketplace
+  perform admin_set_cac_check(pid, 'mismatch', 'Name differs');
+  assert (select status from providers where id = pid) = 'pending', 'hidden after a failing manual check';
+  -- an individual has no CAC check
+  begin perform admin_set_cac_check((select id from providers where slug = 'wash-co'), 'verified'); raise exception 'CAC set on an individual';
+  exception when others then if sqlerrm not like '%no CAC check%' then raise; end if; end;
+end $$;
+
+-- ===== CAC sign-up requires the business name as registered and the certificate image =====
+insert into auth.users (id, email, raw_user_meta_data) values
+  ('00000000-0000-0000-0000-0000000000f4', 'pv4@x.ng', '{"name":"Doc Biz"}'),
+  ('00000000-0000-0000-0000-0000000000f5', 'pv5@x.ng', '{"name":"Other Biz"}');
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000f4'::uuid);
+do $$ declare me text := '00000000-0000-0000-0000-0000000000f4'; other text := '00000000-0000-0000-0000-0000000000f5';
+begin
+  begin perform register_provider('business', 'cleaning', 'Doc Biz', array['Lekki'], 'standard', 'RC2222222');
+    raise exception 'business registered without a name or certificate';
+  exception when others then if sqlerrm not like '%business name as registered%' then raise; end if; end;
+  begin perform register_provider('business', 'cleaning', 'Doc Biz', array['Lekki'], 'standard', 'RC2222222', p_cac_name => 'Doc Biz Ltd');
+    raise exception 'business registered without a certificate';
+  exception when others then if sqlerrm not like '%certificate image required%' then raise; end if; end;
+  begin perform register_provider('business', 'cleaning', 'Doc Biz', array['Lekki'], 'standard', 'RC2222222', p_cac_name => ' ', p_cac_document => 'cac/' || me || '/c.jpg');
+    raise exception 'blank registered name accepted';
+  exception when others then if sqlerrm not like '%business name as registered%' then raise; end if; end;
+  begin perform register_provider('business', 'cleaning', 'Doc Biz', array['Lekki'], 'standard', '', p_cac_name => 'Doc Biz Ltd', p_cac_document => 'cac/' || me || '/c.jpg');
+    raise exception 'empty CAC number accepted';
+  exception when others then if sqlerrm not like '%CAC registration number required%' then raise; end if; end;
+  -- a certificate uploaded under someone else's folder, or a path trick, is refused
+  begin perform register_provider('business', 'cleaning', 'Doc Biz', array['Lekki'], 'standard', 'RC2222222', p_cac_name => 'Doc Biz Ltd', p_cac_document => 'cac/' || other || '/c.jpg');
+    raise exception 'certificate from another folder accepted';
+  exception when others then if sqlerrm not like '%certificate image required%' then raise; end if; end;
+  begin perform register_provider('business', 'cleaning', 'Doc Biz', array['Lekki'], 'standard', 'RC2222222', p_cac_name => 'Doc Biz Ltd', p_cac_document => 'cac/' || me || '/../x.jpg');
+    raise exception 'path traversal accepted';
+  exception when others then if sqlerrm not like '%certificate image required%' then raise; end if; end;
+  assert not exists (select 1 from providers where owner_id = me::uuid), 'nothing created by the rejected attempts';
+  -- individuals do not need a certificate
+  -- the complete submission works and keeps the name and path (and still only the last 4 digits of the number)
+  perform register_provider('business', 'cleaning', 'Doc Biz', array['Lekki'], 'standard', 'RC2222222', p_cac_name => 'Doc Biz Limited', p_cac_document => 'cac/' || me || '/c.jpg');
+  assert (select registered_name from verifications where kind = 'cac' and provider_id = (select id from providers where owner_id = me::uuid)) = 'Doc Biz Limited', 'registered name kept';
+  assert (select document_path from verifications where kind = 'cac' and provider_id = (select id from providers where owner_id = me::uuid)) = 'cac/' || me || '/c.jpg', 'document path kept';
+  assert (select provider_ref from verifications where kind = 'cac' and provider_id = (select id from providers where owner_id = me::uuid)) = '2222', 'only last 4 stored';
+end $$;
+-- Manual verification needs a certificate on file (older providers without one cannot be hand-verified)
+update money_settings set kyc_mode = 'live';
+do $$ declare pid uuid := (select id from providers where slug = 'doc-biz'); begin
+  perform set_config('request.jwt.sub', '00000000-0000-0000-0000-0000000000ad', false);
+  update verifications set status = 'pending' where provider_id = pid and kind = 'cac';
+  update verifications set document_path = null where provider_id = pid and kind = 'cac';
+  begin perform admin_set_cac_check(pid, 'verified'); raise exception 'verified without a certificate';
+  exception when others then if sqlerrm not like '%no CAC certificate on file%' then raise; end if; end;
+  perform admin_set_cac_check(pid, 'mismatch', 'No certificate');
+end $$;
+update money_settings set kyc_mode = 'mock';

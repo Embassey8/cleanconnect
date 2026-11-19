@@ -7,3 +7,10 @@ project_id = "cleanconnect"
 public = false
 file_size_limit = "4MiB"
 allowed_mime_types = ["image/jpeg"]
+
+# Private bucket for CAC certificates uploaded at provider sign-up. Server-only, like job-media: the app uploads
+# with the service role and admins view the image through a short-lived signed link.
+[storage.buckets.kyc-documents]
+public = false
+file_size_limit = "5MiB"
+allowed_mime_types = ["image/jpeg", "image/png", "image/webp"]
