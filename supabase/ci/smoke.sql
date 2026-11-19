@@ -484,11 +484,11 @@ update users set role = 'admin', admin_role = 'support' where id = '00000000-000
 
 -- Partner applications: operations approve, support cannot, approval promotes the applicant
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000e1'::uuid);
-select submit_application('partner', 'Sparkle Wash', '08012345678', 'Yaba', null, null) as app_id \gset
+select submit_application('partner', 'Sparkle Wash Limited', '08012345678', 'Yaba', null, null, 'RC1234567', 'cac/00000000-0000-0000-0000-0000000000e1/cert.jpg') as app_id \gset
 select set_config('t.app_id', :'app_id', false);
 do $$ begin
   begin
-    perform submit_application('partner', 'Sparkle Wash', '08012345678', 'Yaba', null, null);
+    perform submit_application('partner', 'Sparkle Wash Limited', '08012345678', 'Yaba', null, null, 'RC1234567', 'cac/00000000-0000-0000-0000-0000000000e1/cert2.jpg');
     raise exception 'duplicate open application';
   exception when others then if sqlerrm not like '%open application%' then raise; end if; end;
 end $$;
@@ -1320,3 +1320,48 @@ do $$ declare pid uuid := (select id from providers where slug = 'doc-biz'); beg
   perform admin_set_cac_check(pid, 'mismatch', 'No certificate');
 end $$;
 update money_settings set kyc_mode = 'mock';
+
+-- ===== Car wash partner applications require the CAC name, number and certificate =====
+insert into auth.users (id, email, raw_user_meta_data) values
+  ('00000000-0000-0000-0000-0000000000e2', 'e2@x.ng', '{"name":"Wash Two"}'),
+  ('00000000-0000-0000-0000-0000000000e3', 'e3@x.ng', '{"name":"Wash Three"}');
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000e2'::uuid);
+do $$ declare me text := '00000000-0000-0000-0000-0000000000e2'; other text := '00000000-0000-0000-0000-0000000000e1';
+begin
+  begin perform submit_application('partner', 'Wash Two Ltd', '0801', 'Yaba', null, null);
+    raise exception 'partner applied without CAC details';
+  exception when others then if sqlerrm not like '%CAC registration number required%' then raise; end if; end;
+  begin perform submit_application('partner', 'Wash Two Ltd', '0801', 'Yaba', null, null, 'RC1234567');
+    raise exception 'partner applied without a certificate';
+  exception when others then if sqlerrm not like '%certificate image required%' then raise; end if; end;
+  begin perform submit_application('partner', 'Wash Two Ltd', '0801', 'Yaba', null, null, 'nope', 'cac/' || me || '/c.jpg');
+    raise exception 'bad CAC number accepted';
+  exception when others then if sqlerrm not like '%CAC registration number required%' then raise; end if; end;
+  begin perform submit_application('partner', ' ', '0801', 'Yaba', null, null, 'RC1234567', 'cac/' || me || '/c.jpg');
+    raise exception 'blank registered name accepted';
+  exception when others then if sqlerrm not like '%business name as registered%' then raise; end if; end;
+  begin perform submit_application('partner', 'Wash Two Ltd', '0801', 'Yaba', null, null, 'RC1234567', 'cac/' || other || '/c.jpg');
+    raise exception 'certificate from another folder accepted';
+  exception when others then if sqlerrm not like '%certificate image required%' then raise; end if; end;
+  begin perform submit_application('partner', 'Wash Two Ltd', '0801', 'Yaba', null, null, 'RC1234567', 'cac/' || me || '/../x.jpg');
+    raise exception 'path traversal accepted';
+  exception when others then if sqlerrm not like '%certificate image required%' then raise; end if; end;
+  assert not exists (select 1 from job_applications where applicant_id = me::uuid), 'nothing stored by the rejected attempts';
+  -- a complete application (number with a space is fine) keeps the path and only the last 4 digits
+  perform submit_application('partner', 'Wash Two Limited', '0801', 'Yaba', null, null, 'rc 7654321', 'cac/' || me || '/c.png');
+  assert (select cac_last4 from job_applications where applicant_id = me::uuid) = '4321', 'only last 4 stored';
+  assert (select cac_document from job_applications where applicant_id = me::uuid) = 'cac/' || me || '/c.png', 'document path kept';
+  assert (select business_name from job_applications where applicant_id = me::uuid) = 'Wash Two Limited', 'registered name kept';
+end $$;
+-- staff applications need no CAC details
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000e3'::uuid);
+select submit_application('staff', null, '0802', 'Lekki', 'Driver', null);
+-- approval needs a certificate on file (an older application without one cannot be approved)
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000ad'::uuid);
+do $$ declare legacy uuid; begin
+  insert into job_applications (applicant_id, kind, business_name, phone) values ('00000000-0000-0000-0000-0000000000e3', 'partner', 'Old Wash', '0803') returning id into legacy;
+  begin perform advance_application(legacy, 'approved'); raise exception 'approved without a certificate';
+  exception when others then if sqlerrm not like '%no CAC certificate on file%' then raise; end if; end;
+  perform advance_application(legacy, 'rejected', 'Please re-apply with your CAC certificate');
+  assert (select stage from job_applications where id = legacy) = 'rejected', 'legacy application can be rejected';
+end $$;
