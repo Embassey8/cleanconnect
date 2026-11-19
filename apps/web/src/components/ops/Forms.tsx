@@ -18,8 +18,14 @@ export function ApplyForm({ kind }: { kind: "partner" | "staff" }) {
     <form action={action} className="space-y-3">
       <input type="hidden" name="kind" value={kind} />
       {kind === "partner"
-        ? <><label className="block text-sm font-semibold" htmlFor="ap-name">Business name</label>
-            <input id="ap-name" name="name" className={input} required /></>
+        ? <><label className="block text-sm font-semibold" htmlFor="ap-name">Business name as registered with CAC</label>
+            <input id="ap-name" name="name" autoComplete="organization" placeholder="Exactly as on your certificate" className={input} required />
+            <label className="block text-sm font-semibold" htmlFor="ap-cac">CAC registration number (RC/BN)</label>
+            <input id="ap-cac" name="cac" placeholder="RC1234567" className={input} required />
+            <label className="block text-sm font-semibold" htmlFor="ap-cert">CAC certificate (photo or scan)</label>
+            <p className="-mt-1 text-xs text-muted">JPG, PNG or WebP, up to 5 MB. Make sure the name and number are readable.</p>
+            <input id="ap-cert" name="cacCertificate" type="file" required accept="image/jpeg,image/png,image/webp"
+              className="min-h-11 w-full rounded-input border border-border bg-surface px-3 py-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-primary-tint file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-primary" /></>
         : <><label className="block text-sm font-semibold" htmlFor="ap-pos">Position</label>
             <input id="ap-pos" name="position" className={input} required /></>}
       <label className="block text-sm font-semibold" htmlFor="ap-phone">Phone</label>
@@ -28,7 +34,7 @@ export function ApplyForm({ kind }: { kind: "partner" | "staff" }) {
       <input id="ap-area" name="area" className={input} />
       <label className="block text-sm font-semibold" htmlFor="ap-note">Anything else we should know?</label>
       <textarea id="ap-note" name="note" rows={3} className={`${input} py-2`} />
-      {kind === "partner" && <p className="text-xs text-muted">We&apos;ll arrange a site inspection and CAC check before approving you.</p>}
+      {kind === "partner" && <p className="text-xs text-muted">We&apos;ll check your CAC certificate and arrange a site inspection before approving you. Your certificate is stored privately and only our team can see it.</p>}
       <Feedback s={state} />
       <button disabled={pending} className={btn}>{pending ? "Sending…" : "Apply"}</button>
     </form>
